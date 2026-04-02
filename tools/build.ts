@@ -38,6 +38,14 @@ async function copyFolder(src: string, dest: string) {
 const isRelease = process.argv.includes("--release");
 const isDev = !isRelease;
 
+// === Entry aus CLI-Args lesen ===
+const entryArgIndex = process.argv.indexOf("--entry");
+const entryPoint: string = entryArgIndex !== -1 && process.argv[entryArgIndex + 1]
+    ? ("./game/" + process.argv[entryArgIndex + 1])
+    : "./game/main.ts"; // default fallback
+
+flog(`🚀 Entry-Point: ${entryPoint}`);
+
 let server: ReturnType<typeof Bun.serve> | null = null;
 let isBuilding = false;
 
@@ -49,8 +57,9 @@ async function build() {
     flog("🔄 Baue neu...");
 
     await Bun.build({
-        entrypoints: ["./game/main.ts"],
+        entrypoints: [entryPoint], // <-- hier dynamisch
         outdir: "./dist",
+        // outfile: "dist/main.js",
         target: "browser",
         minify: isRelease,
         sourcemap: isRelease ? false : "linked",

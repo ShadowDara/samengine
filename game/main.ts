@@ -7,7 +7,7 @@ import { renderText } from "../engine/renderer";
 import { Vector2 } from "../engine/types/vector2d";
 import { dlog } from "../engine/logger";
 import { Key } from "../engine/keys";
-import { drawTexture, getTexture, loadTextureCached, Texture, loadTextureAsync } from "../engine/texture";
+import { drawTexture, getTexture, Texture, loadTextureAsync } from "../engine/texture";
 
 const { canvas, ctx } = createCanvas(400, 400);
 setupInput(canvas);

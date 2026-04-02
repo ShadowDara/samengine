@@ -6,6 +6,7 @@ import { startEngine } from "../engine/core";
 import { renderText } from "../engine/renderer";
 import { Vector2 } from "../engine/types/vector2d";
 import { dlog } from "../engine/logger";
+import { Key } from "../engine/keys";
 
 const { canvas, ctx } = createCanvas(400, 400);
 setupInput(canvas);
@@ -18,15 +19,15 @@ let lastMove = 0;
 let speed = 0.2; // seconds per cell
 
 function gameStart() {
-  console.log("Snake gestartet");
+  dlog("Snake gestartet");
 }
 
 function gameLoop(dt: number) {
   // Input
-  if (isKeyJustPressed("ArrowUp") && dir.y === 0) dir = { x: 0, y: -1 };
-  if (isKeyJustPressed("ArrowDown") && dir.y === 0) dir = { x: 0, y: 1 };
-  if (isKeyJustPressed("ArrowLeft") && dir.x === 0) dir = { x: -1, y: 0 };
-  if (isKeyJustPressed("ArrowRight") && dir.x === 0) dir = { x: 1, y: 0 };
+  if (isKeyJustPressed(Key.ArrowUp) && dir.y === 0) dir = { x: 0, y: -1 };
+  if (isKeyJustPressed(Key.ArrowDown) && dir.y === 0) dir = { x: 0, y: 1 };
+  if (isKeyJustPressed(Key.ArrowLeft) && dir.x === 0) dir = { x: -1, y: 0 };
+  if (isKeyJustPressed(Key.ArrowRight) && dir.x === 0) dir = { x: 1, y: 0 };
 
   lastMove += dt;
   if (lastMove >= speed) {
@@ -45,7 +46,7 @@ function gameLoop(dt: number) {
     if (snake.some(s => s.x === head.x && s.y === head.y)) {
       snake = [{ x: 10, y: 10 }];
       dir = { x: 1, y: 0 };
-      dlog("Game Over");
+      dlog(`Game Over! Highscore: ${snake.length - 1}`);
       return;
     }
 
@@ -71,7 +72,7 @@ function gameLoop(dt: number) {
   ctx.fillStyle = "red";
   ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
 
-  renderText(ctx, "Score: ", 10, 10, "yellow", "24px Arial");
+  renderText(ctx, "Score: " + (snake.length - 1), 10, 10, "yellow", "24px Arial");
 
   resetInput();
 }

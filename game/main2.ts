@@ -4,16 +4,16 @@ import { createCanvas } from "../engine/html";
 import { setupInput, isKeyJustPressed, resetInput } from "../engine/input";
 import { startEngine } from "../engine/core";
 import { renderText } from "../engine/renderer";
-import { Vector2 } from "../engine/types/vector2d";
+import { Vector2d } from "../engine/types/vector2d";
 import { dlog } from "../engine/logger";
 import { Key } from "../engine/keys";
 
-const { canvas, ctx } = createCanvas(400, 400);
+const { canvas, ctx } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
 setupInput(canvas);
 
-let snake: Vector2[] = [{ x: 10, y: 10 }];
-let dir: Vector2 = { x: 1, y: 0 };
-let food: Vector2 = { x: 15, y: 10 };
+let snake: Vector2d[] = [{ x: 10, y: 10 }];
+let dir: Vector2d = { x: 1, y: 0 };
+let food: Vector2d = { x: 15, y: 10 };
 let gridSize = 20;
 let lastMove = 0;
 let speed = 0.2; // seconds per cell

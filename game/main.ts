@@ -8,7 +8,7 @@ import { Vector2d } from "../engine/types/vector2d";
 import { dlog } from "../engine/logger";
 import { Key } from "../engine/keys";
 import { drawTexture, getTexture, Texture, loadTextureAsync } from "../engine/texture";
-import { new_buildconfig } from "../engine/build/buildconfig";
+import { buildconfig, new_buildconfig } from "../engine/build/buildconfig";
 
 // const { canvas, ctx } = createCanvas(800, 800);
 const { canvas, ctx, applyScaling } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
@@ -18,7 +18,7 @@ enableFullscreen(canvas);
 setupFullscreenButton(canvas);
 
 let texture: Texture;
-let snake: Vector2d[] = [{ x: 10, y: 10 }];
+let snake: Vector2d[] = [ { x: 10, y: 10 } ];
 let dir: Vector2d = { x: 1, y: 0 };
 let food: Vector2d = { x: 15, y: 10 };
 let gridSize = 20;
@@ -26,7 +26,7 @@ let lastMove = 0;
 let speed = 0.2; // seconds per cell
 let start = false;
 
-export function buildconfig() {
+export function buildconfig(): buildconfig {
     let config = new_buildconfig();
     return config;
 }

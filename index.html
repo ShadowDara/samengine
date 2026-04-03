@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>My Game</title>
+    <!-- Für Mobile Viewports -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <style>
       * {
         margin: 0;
@@ -12,9 +14,33 @@
       body {
         overflow: hidden; /* 🔥 verhindert Scrollbars */
       }
+
+#fullscreenBtn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+
+    padding: 10px 15px;
+    font-size: 16px;
+
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 6px;
+
+    cursor: pointer;
+    z-index: 1000;
+}
+
+#fullscreenBtn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+</style>
     </style>
   </head>
   <body>
+    <!-- Button to make it fullscreen -->
+    <button id="fullscreenBtn">⛶ Fullscreen</button>
     <script type="module" src="dist/main.js"></script>
   </body>
 </html>

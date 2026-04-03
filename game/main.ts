@@ -1,6 +1,6 @@
 // A mini Snake Clone with my Webframework
 
-import { createCanvas, enableFullscreen } from "../engine/html";
+import { createCanvas, enableFullscreen, setupFullscreenButton } from "../engine/html";
 import { setupInput, isKeyJustPressed, resetInput } from "../engine/input";
 import { startEngine } from "../engine/core";
 import { renderText } from "../engine/renderer";
@@ -15,6 +15,7 @@ const { canvas, ctx, applyScaling } = createCanvas({fullscreen: true, scaling: "
 setupInput(canvas);
 
 enableFullscreen(canvas);
+setupFullscreenButton(canvas);
 
 let texture: Texture;
 let snake: Vector2d[] = [{ x: 10, y: 10 }];

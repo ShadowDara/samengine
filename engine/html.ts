@@ -68,3 +68,17 @@ export function enableFullscreen(canvas: HTMLCanvasElement) {
         }
     });
 }
+
+export function setupFullscreenButton(canvas: HTMLCanvasElement) {
+    const btn = document.getElementById("fullscreenBtn");
+
+    if (!btn) return;
+
+    btn.addEventListener("click", () => {
+        if (!document.fullscreenElement) {
+            canvas.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    });
+}

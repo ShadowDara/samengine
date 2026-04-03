@@ -8,7 +8,7 @@ import { Vector2d } from "../engine/types/vector2d";
 import { dlog } from "../engine/logger";
 import { Key } from "../engine/keys";
 import { drawTexture, getTexture, Texture, loadTextureAsync } from "../engine/texture";
-import { new_buildconfig } from "../engine/types/buildconfig";
+import { new_buildconfig } from "../engine/build/buildconfig";
 
 // const { canvas, ctx } = createCanvas(800, 800);
 const { canvas, ctx, applyScaling } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});

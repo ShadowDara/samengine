@@ -1,6 +1,7 @@
 // Function to create the Export HTML for the Build
 
-import { buildconfig } from "./buildconfig";
+// Function to create the Export HTML for the Build
+import type { buildconfig } from "./buildconfig";
 
 export function GetDefaultHTML(config: buildconfig): string {
     let  fullscreenbutton = "";
@@ -30,7 +31,8 @@ export function GetDefaultHTML(config: buildconfig): string {
 <button id="fullscreenBtn">⛶ Fullscreen</button>`;
     }
 
-    const defaulthtml: string = `
+    const defaulthtml: string = `<!-- HTML Web Game made with webgameengine by Shadowdara -->
+<!-- DO NOT REMOVE THIS NOTE ! -->    
 <!DOCTYPE html>
 <html>
   <head>

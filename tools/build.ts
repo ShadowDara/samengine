@@ -1,6 +1,6 @@
 // Check for Args
 
-import { copyFolder, flog, getContentType } from "./buildhelper";
+import { copyFolder, flog, getContentType } from "../engine/build/buildhelper";
 import Bun from "bun";
 import { watch, writeFile } from "fs";
 import { buildconfig } from "../engine/build/buildconfig";

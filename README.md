@@ -65,6 +65,8 @@ startEngine(init, gameLoop);
 bun tools/build.ts                    # Build main game
 bun tools/build.ts --entry main2      # Build specific entry
 bun tools/build.ts --release          # Production build
+
+
 ```
 
 ### Configuration
@@ -80,6 +82,19 @@ export function defineConfig() {
     outdir: 'dist',
     // ... other config
   };
+}
+```
+
+or
+
+```typescript
+// Project File for the Game
+
+import { type buildconfig, new_buildconfig } from "./engine/build/buildconfig";
+
+export function defineConfig(): buildconfig {
+    let config: buildconfig = new_buildconfig();
+    return config;
 }
 ```
 

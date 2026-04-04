@@ -8,6 +8,8 @@ resources/
 *.test.ts
 tsconfig.json
 *.map
+*.ts.map
+*.js.map
 .vscode/
 .git/
 .gitignore

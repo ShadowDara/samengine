@@ -1,49 +1,33 @@
 {
-  "name": "@yourusername/webgameengine",
-  "version": "0.1.0",
-  "description": "A lightweight web game engine framework with TypeScript support",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
+  "name": "webgameengine",
+  "version": "1.0.0",
+  "description": "A TypeScript game library",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
-    "dist",
-    "package.json",
-    "README.md"
+    "dist"
   ],
   "scripts": {
-    "dev": "bun run tools/build.ts",
-    "build": "ts-node engine/index.ts"
+    "build": "tsc"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/webgameengine.git"
+  "bin": {
+    "webgameengine": "dist/build/devserver/cli.js"
   },
   "keywords": [
     "game",
-    "engine",
-    "gamedev",
-    "2d",
-    "web",
     "typescript"
   ],
-  "author": "Your Name",
+  "author": "Shadowdara",
   "license": "MIT",
   "devDependencies": {
-    "@types/bun": "latest",
-    "esbuild": "^0.18.18",
-    "ws": "^8.17.0",
-    "typescript": "^5.2.2",
-    "@types/node": "^20.5.1",
-    "@types/ws": "^8.5.6",
-    "ts-node": "^10.9.1"
+    "@types/node": "^25.5.2",
+    "@types/ws": "^8.18.1",
+    "typescript": "^6.0.2"
   },
-  "peerDependencies": {
-    "typescript": "^5"
+  "dependencies": {
+    "esbuild": "^0.28.0",
+    "esbuild-register": "^3.6.0",
+    "mime": "^4.1.0",
+    "ws": "^8.20.0"
   }
 }

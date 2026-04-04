@@ -1,7 +1,7 @@
 // Function to create the Export HTML for the Build
 
 // Function to create the Export HTML for the Build
-import type { buildconfig } from "./buildconfig";
+import type { buildconfig } from "./buildconfig.js";
 
 export function GetDefaultHTML(config: buildconfig): string {
     let  fullscreenbutton = "";

@@ -1,33 +1,33 @@
 // Core Engine Exports
-export { startEngine } from "./core.ts";
+export { startEngine } from "./core";
 
 // Rendering
-export { renderText, renderBitmapText } from "./renderer.ts";
+export { renderText, renderBitmapText } from "./renderer";
 
 // Input System
-export { setupInput } from "./input.ts";
-export type { Mouse } from "./input.ts";
+export { setupInput } from "./input";
+export type { Mouse } from "./input";
 
 // Logging
-export { dlog } from "./logger.ts";
+export { dlog } from "./logger";
 
 // Save System
-export * from "./save.ts";
+export * from "./save";
 
 // Texture Management
-export * from "./texture.ts";
+export * from "./texture";
 
 // HTML Generation
-export * from "./html.ts";
+export * from "./html";
 
 // Keys Reference
-export * from "./keys.ts";
+export * from "./keys";
 
 // Types
-export type { Vector2d } from "./types/vector2d.ts";
-export type { Vector3d } from "./types/vector3d.ts";
-export type { Color } from "./types/color.ts";
-export type { Rect } from "./types/rectangle.ts";
+export type { Vector2d } from "./types/vector2d";
+export type { Vector3d } from "./types/vector3d";
+export type { Color } from "./types/color";
+export type { Rect } from "./types/rectangle";
 
 // Math Utilities
-export * from "./types/math-utils.ts";
+export * from "./types/math-utils";

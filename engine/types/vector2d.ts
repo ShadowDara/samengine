@@ -1,6 +1,6 @@
 // 2 Dimensional Vector Type
 
-import { clamp } from "./math-utils";
+import { clamp, lerp } from "./math-utils";
 
 // 2d Vector
 export type Vector2d = {
@@ -36,7 +36,7 @@ export function clamp2d(vector: Vector2d, min: Vector2d, max: Vector2d): Vector2
 // Lerp for a 2d Vector
 export function lerp2d(start: Vector2d, end: Vector2d, t: Vector2d): Vector2d {
     return {
-        x: clamp(start.x, end.x, t.x),
-        y: clamp(start.y, end.y, t.y),
+        x: lerp(start.x, end.x, t.x),
+        y: lerp(start.y, end.y, t.y),
     };
 }

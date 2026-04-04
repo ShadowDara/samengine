@@ -1,6 +1,6 @@
 // 3d Vector
 
-import { clamp } from "./math-utils";
+import { clamp, lerp } from "./math-utils";
 
 // Vector 3d
 export type Vector3d = {
@@ -39,8 +39,8 @@ export function clamp3d(vector: Vector3d, min: Vector3d, max: Vector3d): Vector3
 // Lerp for a 2d Vector
 export function lerp3d(start: Vector3d, end: Vector3d, t: Vector3d): Vector3d {
     return {
-        x: clamp(start.x, end.x, t.x),
-        y: clamp(start.y, end.y, t.y),
-        z: clamp(start.y, end.y, t.y),
+        x: lerp(start.x, end.x, t.x),
+        y: lerp(start.y, end.y, t.y),
+        z: lerp(start.y, end.y, t.y),
     };
 }

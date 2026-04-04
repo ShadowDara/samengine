@@ -18,7 +18,7 @@ import { loadUserConfig } from "./config.js";
 
 
 const config = await loadUserConfig();
-console.log("CONFIG:", config);
+// console.log("CONFIG:", config);
 
 let isBuilding = false;
 const isRelease = process.argv.includes("--release");
@@ -126,7 +126,7 @@ await build(config);
 if (isDev) {
     startServer();
 
-    ["tools", "resources", "game"].forEach((dir) => {
+    ["resources", "game"].forEach((dir) => {
         watch(dir, { recursive: true }, async () => {
             flog(`📁 Änderung erkannt in ${dir}`);
             await restart();

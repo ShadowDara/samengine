@@ -1,3 +1,23 @@
+import path from "path";
+import { writeFile, mkdir } from "fs/promises";
+
+import { flog } from "../../buildhelper.js";
+
+// ================= NEW PROJECT =================
+export async function createProject(name: string) {
+    const base = path.resolve(name);
+
+    flog(`📦 Erstelle neues Projekt: ${name}`);
+
+    await mkdir(base, { recursive: true });
+    await mkdir(path.join(base, "game"), { recursive: true });
+    await mkdir(path.join(base, "resources"), { recursive: true });
+    await mkdir(path.join(base, "dist"), { recursive: true });
+
+    // Basic game entry
+    await writeFile(
+        path.join(base, "game", "main.ts"),
+`
 // A mini Snake Clone with my Webframework
 
 import { createCanvas } from "@shadowdara/webgameengine";
@@ -62,7 +82,7 @@ function gameLoop(dt: number) {
             if (snake.some(s => s.x === head.x && s.y === head.y)) {
                 snake = [{ x: 10, y: 10 }];
                 dir = { x: 1, y: 0 };
-                dlog(`Game Over! Highscore: ${snake.length - 1}`);
+                dlog(\`Game Over! Highscore: \${snake.length - 1}\`);
                 return;
             }
 
@@ -97,3 +117,55 @@ function gameLoop(dt: number) {
 }
 
 startEngine(gameStart, gameLoop);
+`
+    );
+
+    // Config
+    await writeFile(
+        path.join(base, "webgameengine.config.js"),
+`
+// Project File for the Game
+
+import type { buildconfig } from "@shadowdara/webgameengine/build";
+import { new_buildconfig } from "@shadowdara/webgameengine/build";
+
+export default function defineConfig(): buildconfig {
+    let config: buildconfig = new_buildconfig();
+    return config;
+}
+`
+    );
+
+    // package.json
+    // await writeFile(
+    //     path.join(base, "package.json"),
+    //     JSON.stringify(
+    //         {
+    //             name,
+    //             version: "1.0.0",
+    //             type: "module",
+    //             scripts: {
+    //                 dev: "mycli",
+    //                 build: "mycli --release",
+    //             },
+    //         },
+    //         null,
+    //         2
+    //     )
+    // );
+
+    flog("✅ Projekt created!");
+    // flog(`👉 cd ${name}`);
+    // flog(`👉 npm install`);
+    // flog(`👉 npm run dev`);
+    console.log(`Add to your package.json file:
+  "scripts": {
+    "dev": "npx webgameengine",
+    "build": "npx webgameengine --release"
+  },
+
+Run "npm run dev" to start the Dev Server and play a little Snake Clone
+`);
+
+    process.exit(0);
+}

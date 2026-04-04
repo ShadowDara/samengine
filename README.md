@@ -51,8 +51,9 @@ startEngine(init, gameLoop);
 ### Using Bun (local development)
 
 ```bash
-npx webgameengine                   # Build main game
+npx webgameengine                   # Start Dev Server
 npx webgameengine --release         # Production build
+npx webgameengine --new             # Create a new project with a simple Snake Clone as Template
 ```
 
 ### Configuration

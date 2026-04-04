@@ -1,14 +1,14 @@
 // A mini Snake Clone with my Webframework
 
-import { createCanvas, enableFullscreen, setupFullscreenButton } from "webgameengine";
-import { setupInput, isKeyJustPressed, resetInput, getMouse } from "webgameengine";
-import { startEngine } from "webgameengine";
-import { renderText } from "webgameengine";
-import { Vector2d } from "webgameengine/types";
-import { dlog } from "webgameengine";
-import { Key } from "webgameengine";
-import { drawTexture, getTexture, Texture, loadTextureAsync } from "webgameengine";
-import { isRectClicked, Rect } from "webgameengine/types";
+import { createCanvas, enableFullscreen, setupFullscreenButton } from "@shadowdara/webgameengine";
+import { setupInput, isKeyJustPressed, resetInput, getMouse } from "@shadowdara/webgameengine";
+import { startEngine } from "@shadowdara/webgameengine";
+import { renderText } from "@shadowdara/webgameengine";
+import { Vector2d } from "@shadowdara/webgameengine/types";
+import { dlog } from "@shadowdara/webgameengine";
+import { Key } from "@shadowdara/webgameengine";
+import { drawTexture, getTexture, Texture, loadTextureAsync } from "@shadowdara/webgameengine";
+import { isRectClicked, Rect } from "@shadowdara/webgameengine/types";
 
 // const { canvas, ctx } = createCanvas(800, 800);
 const { canvas, ctx, applyScaling } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});

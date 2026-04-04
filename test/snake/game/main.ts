@@ -1,12 +1,12 @@
 // A mini Snake Clone with my Webframework
 
-import { createCanvas } from "webgameengine";
-import { setupInput, isKeyJustPressed, resetInput } from "webgameengine";
-import { startEngine } from "webgameengine";
-import { renderText } from "webgameengine";
-import { Vector2d } from "webgameengine/types";
-import { dlog } from "webgameengine";
-import { Key } from "webgameengine";
+import { createCanvas } from "@shadowdara/webgameengine";
+import { setupInput, isKeyJustPressed, resetInput } from "@shadowdara/webgameengine";
+import { startEngine } from "@shadowdara/webgameengine";
+import { renderText } from "@shadowdara/webgameengine";
+import { Vector2d } from "@shadowdara/webgameengine/types";
+import { dlog } from "@shadowdara/webgameengine";
+import { Key } from "@shadowdara/webgameengine";
 
 const { canvas, ctx } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
 setupInput(canvas);

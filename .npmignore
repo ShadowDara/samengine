@@ -3,13 +3,16 @@ engine/
 tools/
 game/
 resources/
+dist/**/*.map
 
 # Dev files
 *.test.ts
 tsconfig.json
+
 *.map
 *.ts.map
 *.js.map
+
 .vscode/
 .git/
 .gitignore

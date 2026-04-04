@@ -3,8 +3,8 @@
     "rootDir": "engine",
     "outDir": "dist",
     "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "declarationMap": false,
+    "sourceMap": false,
 
     "module": "ESNext",
     "target": "ES2020",

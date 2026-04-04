@@ -1,9 +1,5 @@
 # WebGameEngine 🎮
 
-**(Currently trying to make this into a lib)**
-
-**Use `bun tools/build.ts`**
-
 A lightweight, TypeScript-first web game engine framework for building 2D games.
 
 ## Features
@@ -19,14 +15,7 @@ A lightweight, TypeScript-first web game engine framework for building 2D games.
 ## Installation
 
 ```bash
-npm install @yourusername/webgameengine
-```
-
-Or use directly from source:
-
-```bash
-bun install
-bun run dev
+npm install @shadowdara/webgameengine
 ```
 
 ## Quick Start
@@ -34,7 +23,7 @@ bun run dev
 ### Basic Game Loop
 
 ```typescript
-import { startEngine, setupInput, dlog, renderText } from '@yourusername/webgameengine';
+import { startEngine, setupInput, dlog, renderText } from '@shadowdara/webgameengine';
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -62,19 +51,16 @@ startEngine(init, gameLoop);
 ### Using Bun (local development)
 
 ```bash
-bun tools/build.ts                    # Build main game
-bun tools/build.ts --entry main2      # Build specific entry
-bun tools/build.ts --release          # Production build
-
-
+npx webgameengine                   # Build main game
+npx webgameengine --release         # Production build
 ```
 
 ### Configuration
 
-Edit `project.ts` to configure your game:
+Edit `webgameengine.config.ts` to configure your game:
 
 ```typescript
-import { defineConfig } from './project';
+import { defineConfig } from '@shadowdara/webgameengine/build';
 
 export function defineConfig() {
   return {
@@ -90,7 +76,7 @@ or
 ```typescript
 // Project File for the Game
 
-import { type buildconfig, new_buildconfig } from "./engine/build/buildconfig";
+import { type buildconfig, new_buildconfig } from "@shadowdara/webgameengine/build";
 
 export function defineConfig(): buildconfig {
     let config: buildconfig = new_buildconfig();

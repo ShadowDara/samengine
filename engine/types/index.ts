@@ -1,12 +1,24 @@
 // Types Export
 
-// Types
-export type { Vector2d } from "./vector2d.js";
-export type { Vector3d } from "./vector3d.js";
-export type { Color } from "./color.js";
-export type { Rect } from "./rectangle.js";
+// Vector 2D
+export { type Vector2d, normalize2d, clamp2d, lerp2d, map2d } from "./vector2d.js";
 
-export { isRectClicked } from "./rectangle.js";
+// Vector 3D
+export { type Vector3d, normalize3d, clamp3d, lerp3d, map3d } from "./vector3d.js";
+
+// Color Type
+export { type Color, invertcolor, invertHexColor } from "./color.js";
+
+// Retangle Type
+export {
+    type Rect,
+    centerRectX,
+    centerRectY,
+    centerRect,
+    isPointInRect,
+    isMouseInRect,
+    isRectClicked
+} from "./rectangle.js";
 
 // Math Utilities
-// export * from "./math-utils.js";
+export { clamp, lerp, map } from "./math-utils.js";

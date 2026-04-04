@@ -1,6 +1,6 @@
 // 2 Dimensional Vector Type
 
-import { clamp, lerp } from "./math-utils";
+import { clamp, lerp, map } from "./math-utils.js";
 
 // 2d Vector
 export type Vector2d = {
@@ -39,4 +39,18 @@ export function lerp2d(start: Vector2d, end: Vector2d, t: Vector2d): Vector2d {
         x: lerp(start.x, end.x, t.x),
         y: lerp(start.y, end.y, t.y),
     };
+}
+
+// Map Function for a 2d Vector
+export function map2d(
+    value: Vector2d,
+    inMin: Vector2d,
+    inMax: Vector2d,
+    outMin: Vector2d,
+    outMax: Vector2d,
+): Vector2d {
+    return {
+        x: map(value.x, inMin.x, inMax.x, outMin.x, outMax.x),
+        y: map(value.y, inMin.y, inMax.y, outMin.y, outMax.y),
+    }
 }

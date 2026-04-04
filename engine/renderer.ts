@@ -1,4 +1,4 @@
-import { type Rect } from "./types/rectangle";
+import { type Rect } from "./types/rectangle.js";
 
 // Function to render Text
 export function renderText(

@@ -1,4 +1,4 @@
-import { dlog } from "./logger";
+import { dlog } from "./logger.js";
 
 const textures: Record<string, HTMLImageElement> = {};
 

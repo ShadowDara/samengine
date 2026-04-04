@@ -1,6 +1,6 @@
 // 3d Vector
 
-import { clamp, lerp } from "./math-utils";
+import { clamp, lerp, map } from "./math-utils.js";
 
 // Vector 3d
 export type Vector3d = {
@@ -27,7 +27,7 @@ export function normalize3d(vector: Vector3d): Vector3d {
     return vector;
 }
 
-// Function to clamp a Vector 2d
+// Function to clamp a Vector 3d
 export function clamp3d(vector: Vector3d, min: Vector3d, max: Vector3d): Vector3d {
     return {
         x: clamp(vector.x, min.x, max.x),
@@ -36,11 +36,26 @@ export function clamp3d(vector: Vector3d, min: Vector3d, max: Vector3d): Vector3
     };
 }
 
-// Lerp for a 2d Vector
+// Lerp for a 3d Vector
 export function lerp3d(start: Vector3d, end: Vector3d, t: Vector3d): Vector3d {
     return {
         x: lerp(start.x, end.x, t.x),
         y: lerp(start.y, end.y, t.y),
         z: lerp(start.y, end.y, t.y),
     };
+}
+
+// Map Function for a 3d Vector
+export function map3d(
+    value: Vector3d,
+    inMin: Vector3d,
+    inMax: Vector3d,
+    outMin: Vector3d,
+    outMax: Vector3d,
+): Vector3d {
+    return {
+        x: map(value.x, inMin.x, inMax.x, outMin.x, outMax.x),
+        y: map(value.y, inMin.y, inMax.y, outMin.y, outMax.y),
+        z: map(value.z, inMin.z, inMax.z, outMin.z, outMax.z),
+    }
 }

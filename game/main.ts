@@ -27,11 +27,6 @@ let lastMove = 0;
 let speed = 0.2; // seconds per cell
 let start = false;
 
-export function buildconfig(): buildconfig {
-    let config = new_buildconfig();
-    return config;
-}
-
 async function gameStart() {
     dlog("Snake gestartet");
 

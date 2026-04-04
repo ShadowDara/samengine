@@ -4,7 +4,8 @@ export interface buildconfig {
     htmlhead: string;
     title: string;
     show_fullscreen_button: boolean;
-    entryname: string
+    entryname: string;
+    outdir: string;
 }
 
 export function new_buildconfig(): buildconfig {
@@ -12,6 +13,7 @@ export function new_buildconfig(): buildconfig {
         htmlhead: "",
         title: "My new Game",
         show_fullscreen_button: true,
-        entryname: "main",
+        entryname: "./game/main.ts",
+        outdir: "dist",
     }
 }

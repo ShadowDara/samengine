@@ -1,5 +1,9 @@
 # WebGameEngine 🎮
 
+**(Currently trying to make this into a lib)**
+
+**Use `bun tools/build.ts`**
+
 A lightweight, TypeScript-first web game engine framework for building 2D games.
 
 ## Features

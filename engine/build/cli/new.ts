@@ -1,10 +1,10 @@
 import path from "path";
 import { writeFile, mkdir } from "fs/promises";
 
-import { flog } from "../../buildhelper.js";
+import { flog } from "../buildhelper.js";
 
 // ================= NEW PROJECT =================
-export async function createProject(name: string) {
+export async function createProject(name: string, empty: boolean) {
     const base = path.resolve(name);
 
     flog(`📦 Erstelle neues Projekt: ${name}`);
@@ -14,10 +14,41 @@ export async function createProject(name: string) {
     await mkdir(path.join(base, "resources"), { recursive: true });
     await mkdir(path.join(base, "dist"), { recursive: true });
 
-    // Basic game entry
-    await writeFile(
-        path.join(base, "game", "main.ts"),
-`
+    let content = `
+// A empty Project with the Web Framework
+
+import { createCanvas, enableFullscreen, setupFullscreenButton } from "@shadowdara/webgameengine";
+import { setupInput, resetInput, getMouse } from "@shadowdara/webgameengine";
+import { startEngine } from "@shadowdara/webgameengine";
+
+const { canvas, ctx, applyScaling } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
+setupInput(canvas);
+
+enableFullscreen(canvas);
+setupFullscreenButton(canvas);
+
+async function gameStart() {
+    // Code which runs at the Game Start
+}
+
+function gameLoop(dt: number) {
+    // Code which runs every Frame
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const mouse = getMouse();
+
+    applyScaling();
+
+    resetInput();
+}
+
+// Because start Game is Async
+startEngine(() => { gameStart().then(() => {/* ready */}) }, gameLoop);
+`;
+
+    if (empty) {
+        content =`
 // A mini Snake Clone with my Webframework
 
 import { createCanvas } from "@shadowdara/webgameengine";
@@ -39,7 +70,7 @@ let lastMove = 0;
 let speed = 0.2; // seconds per cell
 let start = false;
 
-function gameStart() {
+async function gameStart() {
     dlog("Snake gestartet");
 }
 
@@ -116,9 +147,14 @@ function gameLoop(dt: number) {
     resetInput();
 }
 
-startEngine(gameStart, gameLoop);
+// Because start Game is Async
+startEngine(() => { gameStart().then(() => {/* ready */}) }, gameLoop);
 `
-    );
+    }
+
+    // Basic game entry
+    await writeFile(
+        path.join(base, "game", "main.ts"), content);
 
     // Config
     await writeFile(

@@ -1,7 +1,7 @@
 import "esbuild-register";
 import path from "path";
 import { pathToFileURL } from "url";
-import { buildconfig } from "../../buildconfig.js";
+import { buildconfig } from "../buildconfig.js";
 
 export async function loadUserConfig(): Promise<buildconfig> {
     const configPath = path.resolve(process.cwd(), "webgameengine.config.ts");
@@ -19,7 +19,7 @@ export async function loadUserConfig(): Promise<buildconfig> {
     } catch (e) {
         console.error(e);
         throw new Error(
-            "❌ Konnte webgameengine.config.ts nicht laden\nPATH: " + configPath
+            "❌ Could not find 'webgameengine.config.ts - PATH: " + configPath
         );
     }
 }

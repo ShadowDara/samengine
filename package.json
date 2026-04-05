@@ -1,6 +1,6 @@
 {
   "name": "@shadowdara/webgameengine",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A TypeScript game library to make HTML Games",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,10 +10,10 @@
   ],
   "scripts": {
     "build": "tsc",
-    "pack": "npm run build && npm pack"
+    "pack": "node clean.js && npm run build && npm pack"
   },
   "bin": {
-    "webgameengine": "dist/build/tools/devserver/cli.js"
+    "webgameengine": "dist/build/cli/cli.js"
   },
   "exports": {
     ".": "./dist/index.js",

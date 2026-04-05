@@ -54,6 +54,7 @@ startEngine(init, gameLoop);
 npx webgameengine                   # Start Dev Server
 npx webgameengine --release         # Production build
 npx webgameengine --new             # Create a new project with a simple Snake Clone as Template
+npx webgameengine --new-empty       # Create a new empty project
 ```
 
 ### Configuration

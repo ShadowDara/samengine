@@ -8,6 +8,30 @@ export type Vector2d = {
     y: number
 };
 
+// Function to add 2 Vectors together
+export function add2d(vector1: Vector2d, vector2: Vector2d): Vector2d {
+    return {
+        x: vector1.x + vector2.x,
+        y: vector1.y + vector2.y,
+    }
+}
+
+// Function to subtract 2 Vectors from each other
+export function subtract2d(vector1: Vector2d, vector2: Vector2d): Vector2d {
+    return {
+        x: vector1.x - vector2.x,
+        y: vector1.y - vector2.y,
+    }
+}
+
+// Function to get the length from an Vector
+export function length2d(vector: Vector2d): number {
+    let produkt = vector.x * vector.x + vector.y * vector.y;
+    let root = Math.sqrt(produkt);
+
+    return root;
+}
+
 // Function to normalize a Vector 2d
 export function normalize2d(vector: Vector2d): Vector2d {
     // Check if the Vector is zero because then you dont need to
@@ -16,13 +40,25 @@ export function normalize2d(vector: Vector2d): Vector2d {
         return vector;
     }
 
-    let produkt = vector.x * vector.x + vector.y * vector.y;
-    let root = Math.sqrt(produkt);
+    let root = length2d(vector)
     
     vector.x = vector.x / root;
     vector.y = vector.y / root;
 
     return vector;
+}
+
+// Function to make scalar produkt from an Vector
+export function dot2d(v1: Vector2d, v2: Vector2d): number {
+    return (v1.x * v2.x + v1.y * v2.y);
+}
+
+// crossprodukt (only for 3 Dimensinal Vectors)
+
+// Calculate the Distance between 2 Vectors
+export function distance2d(v1: Vector2d, v2: Vector2d): number {
+    let tmp: Vector2d = subtract2d(v1, v2);
+    return length2d(tmp);
 }
 
 // Function to clamp a Vector 2d

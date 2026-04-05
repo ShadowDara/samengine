@@ -8,8 +8,8 @@ import path from "path";
 import { WebSocketServer } from "ws";
 
 import { createProject } from "./new.js";
-import { copyFolder, flog, getContentType } from "../../buildhelper.js";
-import { GetDefaultHTML } from "../../exporthtml.js";
+import { copyFolder, flog, getContentType } from "../buildhelper.js";
+import { GetDefaultHTML } from "../exporthtml.js";
 import { loadUserConfig } from "./config.js";
 
 // ================= ARG PARSING =================
@@ -20,6 +20,8 @@ function parseArgs() {
         release: false,
         port: 3000,
         newProject: null as string | null,
+        // Empty Project
+        empty: false,
     };
 
     for (let i = 0; i < args.length; i++) {
@@ -42,6 +44,11 @@ function parseArgs() {
                 options.newProject = args[i + 1];
                 i++;
                 break;
+            
+            case "--new-empty":
+                options.empty = true;
+                i++;
+                break;
 
             default:
                 console.warn(`⚠️ Unbekanntes Argument: ${arg}`);
@@ -55,7 +62,7 @@ const args = parseArgs();
 
 // Falls --new → sofort ausführen und beenden
 if (args.newProject) {
-    await createProject(args.newProject);
+    await createProject(args.newProject, args.empty);
     // and make exit afterwards
 }
 

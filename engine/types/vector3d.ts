@@ -27,6 +27,9 @@ export function normalize3d(vector: Vector3d): Vector3d {
     return vector;
 }
 
+// TODO
+// ADD CROSS PRODUKT
+
 // Function to clamp a Vector 3d
 export function clamp3d(vector: Vector3d, min: Vector3d, max: Vector3d): Vector3d {
     return {

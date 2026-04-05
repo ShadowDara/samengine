@@ -43,5 +43,26 @@ export {
     isRectClicked
 } from "./rectangle.js";
 
+// Circle Type
+export {
+    type Circle,
+    centerCircle,
+    isPointInCircle,
+    isMouseInCircle,
+    isCircleClicked,
+    isCircleColliding,
+    getCircleDistance
+} from "./circle.js";
+
+// Triangle Type
+export {
+    type Triangle,
+    centerTriangle,
+    isPointInTriangle,
+    isMouseInTriangle,
+    isTriangleClicked,
+    getTrianglePerimeter,
+} from "./triangle.js";
+
 // Math Utilities
 export { clamp, lerp, map } from "./math-utils.js";

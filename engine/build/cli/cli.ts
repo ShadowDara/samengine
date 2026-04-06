@@ -16,6 +16,10 @@ import { type CLIArgs, parseArgs } from "./argparser.js";
 
 // ================= BUILD =================
 function createBuilder(config: any, isRelease: boolean, isSingleFile: boolean = false) {
+    // Ensure that the Directories are created
+    mkdir("resources", { recursive: true });
+    mkdir("game", { recursive: true });
+
     async function build() {
         flog("🔄 Building project...");
         if (isRelease) await rm("./dist", { recursive: true, force: true });

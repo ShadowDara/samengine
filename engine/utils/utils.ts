@@ -1,5 +1,5 @@
 // Function to compress HTML
-function compressHTML(html: string): string {
+export function compressHTML(html: string): string {
     return html
         .replace(/<!--[\s\S]*?-->/g, "")
         .replace(/>\s+</g, "><")

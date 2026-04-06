@@ -4,4 +4,7 @@
 export { clamp, lerp, map } from "./math.js";
 
 // Markdown Parser
-export { parse, parseToDocument } from "./markdown.js";
+export {
+    parse as parseMarkdown,
+    parseToDocument as parseMarkdownToDocument
+} from "./markdown.js";

@@ -1,6 +1,6 @@
 // Rectangle Type for Hitboxes
 
-import { Mouse } from "../input.js";
+import { type Mouse } from "../input.js";
 import { type Vector2d } from "./vector2d.js";
 
 export type Rect = {

@@ -1,6 +1,6 @@
 # WebGameEngine 🎮
 
-A lightweight, TypeScript-first web game engine framework for building 2D games.
+A lightweight, TypeScript-first web game engine framework for building 2D games *and maybe 3D Games in the Future*.
 
 ## Features
 
@@ -12,13 +12,14 @@ A lightweight, TypeScript-first web game engine framework for building 2D games.
 - 📝 Logging utilities
 - 💾 Save/Load system
 
-## Installation
+## Quick Start
 
 ```bash
+npm init
 npm install @shadowdara/webgameengine
+npx webgameengine --new
+npx webgameengine
 ```
-
-## Quick Start
 
 ### Basic Game Loop
 

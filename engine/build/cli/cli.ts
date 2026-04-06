@@ -2,7 +2,7 @@
 
 import { build as esbuild } from "esbuild";
 import { createServer } from "http";
-import { readFile, writeFile, mkdir } from "fs/promises";
+import { readFile, writeFile, mkdir, rm } from "fs/promises";
 import { watch } from "fs";
 import path from "path";
 import { WebSocketServer } from "ws";
@@ -80,6 +80,11 @@ function createCLIApp(args: ReturnType<typeof parseArgs>, config: any) {
         isBuilding = true;
 
         flog("🔄 Building new ...");
+
+        // To Remove the Source Maps from the Export
+        if (isRelease) {
+            await rm("./dist", { recursive: true, force: true });
+        }
 
         await esbuild({
             entryPoints: [`./game/${config.entryname}`],

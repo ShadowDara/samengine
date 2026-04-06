@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@shadowdara/webgameengine": "^1.0.0"
+    "@shadowdara/webgameengine": "^1.3.0"
   }
 }

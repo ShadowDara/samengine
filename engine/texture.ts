@@ -53,18 +53,19 @@ export function drawTexture(
     height?: number,
     rotation: number = 0,
     flipX: boolean = false,
-    flipY: boolean = false
+    flipY: boolean = false,
+    scale: number = 1 // 🔹 NEU
 ): void {
     if (!texture) {
         dlog("Texture not found");
 
         ctx.fillStyle = "magenta";
-        ctx.fillRect(x, y, width ?? 32, height ?? 32);
+        ctx.fillRect(x, y, (width ?? 32) * scale, (height ?? 32) * scale);
         return;
     }
 
-    const w = width ?? texture.width;
-    const h = height ?? texture.height;
+    const w = (width ?? texture.width) * scale;   // 🔹 scale anwenden
+    const h = (height ?? texture.height) * scale; // 🔹 scale anwenden
 
     ctx.save();
 
@@ -74,7 +75,6 @@ export function drawTexture(
     ctx.translate(cx, cy);
     ctx.rotate(rotation);
 
-    // 🔹 Flip anwenden
     ctx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
 
     ctx.drawImage(texture, -w / 2, -h / 2, w, h);
@@ -124,7 +124,8 @@ export function drawAtlasFrame(
     height?: number,
     rotation: number = 0,
     flipX: boolean = false,
-    flipY: boolean = false
+    flipY: boolean = false,
+    scale: number = 1 // 🔹 NEU
 ) {
     const frame = atlas.frames[frameName];
 
@@ -133,8 +134,8 @@ export function drawAtlasFrame(
         return;
     }
 
-    const w = width ?? frame.width;
-    const h = height ?? frame.height;
+    const w = (width ?? frame.width) * scale;
+    const h = (height ?? frame.height) * scale;
 
     ctx.save();
 
@@ -144,7 +145,6 @@ export function drawAtlasFrame(
     ctx.translate(cx, cy);
     ctx.rotate(rotation);
 
-    // 🔹 Flip
     ctx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
 
     ctx.drawImage(
@@ -250,7 +250,8 @@ export function drawAnimation(
     height?: number,
     rotation: number = 0,
     flipX: boolean = false,
-    flipY: boolean = false
+    flipY: boolean = false,
+    scale: number = 1 // 🔹 NEU
 ) {
     const frame = player.getCurrentFrame();
 
@@ -264,7 +265,8 @@ export function drawAnimation(
         height,
         rotation,
         flipX,
-        flipY
+        flipY,
+        scale
     );
 }
 

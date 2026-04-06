@@ -6,6 +6,16 @@ export type Color = {
     a?: number
 };
 
+// Function to create an Object of Type Color
+export function makeColor(r: number, g: number, b: number, a?: number): Color {
+    return {
+        r: r,
+        g: g,
+        b: b,
+        a: a
+    }
+}
+
 export function invertcolor(color: Color): Color {
     return {
         r: 255 - color.r,

@@ -10,6 +10,16 @@ export type Rect = {
     height: number
 };
 
+// Function to create an Object of Type rect
+export function makeRect(x: number, y: number, width: number, height: number): Rect {
+    return {
+        x: x,
+        y: y,
+        height: height,
+        width: width
+    }
+}
+
 // Function to get the Center of the Width of the Object
 export function centerRectX(rect: Rect): number {
     return (rect.x + (rect.width / 2));

@@ -9,6 +9,15 @@ export type Vector3d = {
     z: number;
 };
 
+// Function to create an Object of Type Vector3D
+export function makeVector3d(x: number, y: number, z: number): Vector3d {
+    return {
+        x: x,
+        y: y,
+        z: z
+    }
+}
+
 // Function to add 2 Vectors together
 export function add3d(vector1: Vector3d, vector2: Vector3d): Vector3d {
     return {

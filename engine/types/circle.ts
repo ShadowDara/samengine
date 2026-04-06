@@ -9,6 +9,15 @@ export type Circle = {
     radius: number
 };
 
+// Function to create an Object of Type Circle
+export function makeCircle(x: number, y: number, radius: number): Circle {
+    return {
+        x: x,
+        y: y,
+        radius: radius,
+    }
+}
+
 // Function to get the Center of the Circle as Vector2d
 export function centerCircle(circle: Circle): Vector2d {
     return { x: circle.x, y: circle.y };

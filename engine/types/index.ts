@@ -3,6 +3,7 @@
 // Vector 2D
 export {
     type Vector2d,
+    makeVector2d,
     add2d,
     subtract2d,
     length2d,
@@ -17,6 +18,7 @@ export {
 // Vector 3D
 export {
     type Vector3d,
+    makeVector3d,
     add3d,
     subtract3d,
     length3d,
@@ -32,6 +34,7 @@ export {
 // Color Type
 export {
     type Color,
+    makeColor,
     invertcolor,
     invertHexColor
 } from "./color.js";
@@ -39,6 +42,7 @@ export {
 // Retangle Type
 export {
     type Rect,
+    makeRect,
     centerRectX,
     centerRectY,
     centerRect,
@@ -50,6 +54,7 @@ export {
 // Circle Type
 export {
     type Circle,
+    makeCircle,
     centerCircle,
     isPointInCircle,
     isMouseInCircle,
@@ -61,6 +66,7 @@ export {
 // Triangle Type
 export {
     type Triangle,
+    makeTriangle,
     centerTriangle,
     isPointInTriangle,
     isMouseInTriangle,

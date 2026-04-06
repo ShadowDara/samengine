@@ -8,6 +8,14 @@ export type Vector2d = {
     y: number
 };
 
+// Function to create an Object of Type Vector2D
+export function makeVector2d(x: number, y: number): Vector2d {
+    return {
+        x: x,
+        y: y
+    }
+}
+
 // Function to add 2 Vectors together
 export function add2d(vector1: Vector2d, vector2: Vector2d): Vector2d {
     return {

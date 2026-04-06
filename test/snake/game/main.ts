@@ -1,6 +1,6 @@
 // A mini Snake Clone with my Webframework
 
-import { createCanvas } from "@shadowdara/webgameengine";
+import { createCanvas, enableFullscreen, setupFullscreenButton } from "@shadowdara/webgameengine";
 import { setupInput, isKeyJustPressed, resetInput } from "@shadowdara/webgameengine";
 import { startEngine } from "@shadowdara/webgameengine";
 import { renderText } from "@shadowdara/webgameengine";
@@ -10,6 +10,9 @@ import { Key } from "@shadowdara/webgameengine";
 
 const { canvas, ctx } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
 setupInput(canvas);
+
+enableFullscreen(canvas);
+setupFullscreenButton(canvas);
 
 let snake: Vector2d[] = [{ x: 10, y: 10 }];
 let dir: Vector2d = { x: 1, y: 0 };

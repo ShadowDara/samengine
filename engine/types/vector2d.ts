@@ -1,6 +1,6 @@
 // 2 Dimensional Vector Type
 
-import { clamp, lerp, map } from "./math-utils.js";
+import { clamp, lerp, map } from "../utils/math.js";
 
 // 2d Vector
 export type Vector2d = {

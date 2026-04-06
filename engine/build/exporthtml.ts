@@ -106,8 +106,12 @@ ${fullscreenbutton}
         btn.addEventListener("click", async () => {
             // 🔊 Audio freischalten
             const AudioContext = window.AudioContext || window.webkitAudioContext;
+            
             const ctx = new AudioContext();
             await ctx.resume();
+
+            // 👉 HIER rein!
+            window.__audioCtx = ctx;
 
             // Startscreen entfernen
             document.getElementById("startscreen").remove();

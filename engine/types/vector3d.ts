@@ -1,6 +1,6 @@
 // 3d Vector
 
-import { clamp, lerp, map } from "./math-utils.js";
+import { clamp, lerp, map } from "../utils/math.js";
 
 // Vector 3d
 export type Vector3d = {

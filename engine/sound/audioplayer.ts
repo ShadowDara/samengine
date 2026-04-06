@@ -6,7 +6,8 @@ export class SoundSystem {
     private masterGain: GainNode;
 
     constructor() {
-        this.ctx = new AudioContext();
+        // 👉 zuerst globalen nehmen, sonst neuen erstellen
+        this.ctx = (window as any).__audioCtx ?? new AudioContext();
 
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.value = 1;

@@ -30,7 +30,11 @@ export {
 } from "./vector3d.js";
 
 // Color Type
-export { type Color, invertcolor, invertHexColor } from "./color.js";
+export {
+    type Color,
+    invertcolor,
+    invertHexColor
+} from "./color.js";
 
 // Retangle Type
 export {
@@ -63,6 +67,3 @@ export {
     isTriangleClicked,
     getTrianglePerimeter,
 } from "./triangle.js";
-
-// Math Utilities
-export { clamp, lerp, map } from "./math-utils.js";

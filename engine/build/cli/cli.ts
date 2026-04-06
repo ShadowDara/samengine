@@ -11,6 +11,7 @@ import { createProject } from "./new.js";
 import { copyFolder, flog, getContentType } from "../buildhelper.js";
 import { GetDefaultHTML } from "../exporthtml.js";
 import { loadUserConfig } from "./config.js";
+import { compressHTML } from "../../utils/utils.js";
 
 
 // ================= ARG PARSING =================
@@ -99,6 +100,12 @@ function createCLIApp(args: ReturnType<typeof parseArgs>, config: any) {
         });
 
         const html = GetDefaultHTML(config);
+
+        // Compress the HTML in Release Mode
+        const finalHTML = isRelease
+            ? compressHTML(html)
+            : html;
+
         await writeFile("./dist/index.html", html);
 
         await copyFolder("./resources", "./dist/resources");

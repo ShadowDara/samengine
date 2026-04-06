@@ -1,14 +1,16 @@
 {
-  "name": "snake",
+  "name": "nvovel",
   "version": "1.0.0",
-  "description": "",
+  "main": "index.js",
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx webgameengine",
     "build": "npx webgameengine --release"
   },
   "author": "",
   "license": "ISC",
+  "description": "",
   "dependencies": {
-    "@shadowdara/webgameengine": "^1.4.3"
+    "@shadowdara/webgameengine": "^1.4.6"
   }
 }

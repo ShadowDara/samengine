@@ -29,7 +29,6 @@ let start = false;
 async function gameStart() {
     dlog("Snake gestartet");
 
-    // Direkt versuchen, Texture zu holen (kann noch undefined sein)
     texture = await loadTextureAsync("init.png");
 
     dlog("Game Starting finished");

@@ -11,7 +11,7 @@ import { createProject } from "./new.js";
 import { copyFolder, flog, getContentType, scanResourcesAsDataURIs } from "../buildhelper.js";
 import { GetDefaultHTML, GetSingleFileHTML } from "../exporthtml.js";
 import { loadUserConfig } from "./config.js";
-import { compressHTML } from "../../utils/utils.js";
+import { compressHTML } from "../utils/utils.js";
 import { type CLIArgs, parseArgs } from "./argparser.js";
 
 // ================= BUILD =================

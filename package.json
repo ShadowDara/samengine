@@ -21,7 +21,7 @@
     "./sound": "./dist/sound/index.js",
     "./utils": "./dist/utils/index.js",
     "./build": "./dist/build/index.js",
-    "./build/utils": "./dist/build/utils/index.js",
+    "./build/utils": "./dist/build/utils/index.js"
   },
   "keywords": [
     "game",

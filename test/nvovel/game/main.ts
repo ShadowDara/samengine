@@ -19,7 +19,7 @@ async function gameStart() {
     charactertexture = await loadTextureAsync("char.png");
 
     characterpositin.x = (canvas.width / 2) - 640;
-    characterpositin.y = (canvas.width/ 5);
+    characterpositin.y = (canvas.width / 5);
 }
 
 function gameLoop(dt: number) {
@@ -41,7 +41,7 @@ function gameLoop(dt: number) {
     drawTexture(ctx, charactertexture, characterpositin.x, characterpositin.y, undefined, undefined, 0, false, false, 1);
 
     // Draw Dialogue Box
-    let dialoguebox = {x: 400, y: 550, width: 700, height: 150 };
+    let dialoguebox = { x: 400, y: 550, width: 700, height: 150 };
     drawRect(ctx, dialoguebox, "black");
 
     // Render Some Text

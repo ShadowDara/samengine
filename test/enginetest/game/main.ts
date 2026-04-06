@@ -11,14 +11,14 @@ import { drawTexture, getTexture, Texture, loadTextureAsync } from "@shadowdara/
 import { isRectClicked, Rect } from "@shadowdara/webgameengine/types";
 
 // const { canvas, ctx } = createCanvas(800, 800);
-const { canvas, ctx, applyScaling, virtualWidth, virtualHeight } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
+const { canvas, ctx, applyScaling, virtualWidth, virtualHeight } = createCanvas({ fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight });
 setupInput(canvas, virtualWidth, virtualHeight);
 
 enableFullscreen(canvas);
 setupFullscreenButton(canvas);
 
 let texture: Texture;
-let snake: Vector2d[] = [ { x: 10, y: 10 } ];
+let snake: Vector2d[] = [{ x: 10, y: 10 }];
 let dir: Vector2d = { x: 1, y: 0 };
 let food: Vector2d = { x: 15, y: 10 };
 let gridSize = 20;
@@ -48,7 +48,7 @@ function gameLoop(dt: number) {
         // ctx.fillStyle = "black";
         // ctx.fillRect(0, 0, 100, 100);
 
-        let rect: Rect = {x: 0, y: 0, width: 100, height: 100};
+        let rect: Rect = { x: 0, y: 0, width: 100, height: 100 };
         if (isRectClicked(mouse, rect)) {
             dlog("Click Works");
             // alert("Clicked");
@@ -78,4 +78,4 @@ function gameLoop(dt: number) {
 }
 
 // Because start Game is Async
-startEngine(() => { gameStart().then(() => {/* ready */}) }, gameLoop);
+startEngine(() => { gameStart().then(() => {/* ready */ }) }, gameLoop);

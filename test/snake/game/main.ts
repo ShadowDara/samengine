@@ -8,7 +8,7 @@ import { Vector2d } from "@shadowdara/webgameengine/types";
 import { dlog } from "@shadowdara/webgameengine";
 import { Key } from "@shadowdara/webgameengine";
 
-const { canvas, ctx, applyScaling, virtualWidth, virtualHeight } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
+const { canvas, ctx, applyScaling, virtualWidth, virtualHeight } = createCanvas({ fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight });
 setupInput(canvas, virtualWidth, virtualHeight);
 
 enableFullscreen(canvas);

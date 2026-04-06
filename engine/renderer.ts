@@ -52,7 +52,15 @@ export function drawRect(
     color = "white"
 ): void {
     ctx.fillStyle = color;
-    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    const radius = rect.borderRadius ?? 0;
+    
+    if (radius > 0 && (ctx as any).roundRect) {
+        ctx.beginPath();
+        (ctx as any).roundRect(rect.x, rect.y, rect.width, rect.height, radius);
+        ctx.fill();
+    } else {
+        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    }
 }
 
 // Function to draw a Rectangle outline
@@ -64,7 +72,15 @@ export function drawRectOutline(
 ): void {
     ctx.strokeStyle = color;
     ctx.lineWidth = lineWidth;
-    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+    const radius = rect.borderRadius ?? 0;
+    
+    if (radius > 0 && (ctx as any).roundRect) {
+        ctx.beginPath();
+        (ctx as any).roundRect(rect.x, rect.y, rect.width, rect.height, radius);
+        ctx.stroke();
+    } else {
+        ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+    }
 }
 
 // Function to draw a filled Circle

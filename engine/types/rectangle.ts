@@ -7,16 +7,18 @@ export type Rect = {
     x: number;
     y: number;
     width: number;
-    height: number
+    height: number;
+    borderRadius?: number;
 };
 
 // Function to create an Object of Type rect
-export function makeRect(x: number, y: number, width: number, height: number): Rect {
+export function makeRect(x: number, y: number, width: number, height: number, borderRadius: number = 0): Rect {
     return {
         x: x,
         y: y,
         height: height,
-        width: width
+        width: width,
+        borderRadius: borderRadius
     }
 }
 

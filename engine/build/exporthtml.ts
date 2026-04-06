@@ -1,9 +1,11 @@
 // Function to create the Export HTML for the Build
 
 // Function to create the Export HTML for the Build
+import { version } from "./../types/version.js";
 import type { buildconfig } from "./buildconfig.js";
 
 export function GetSingleFileHTML(config: buildconfig, bundledJsContent: string, resourcesMap: Record<string, string> = {}): string {
+    let frameworkVersion = version();
     let  fullscreenbutton = "";
     let fullscreenBtn = "";
     if (config.show_fullscreen_button) {
@@ -43,6 +45,9 @@ window.__loadResource = function(path) {
         return null;
     }
     return resource;
+};
+window.__webgameengine__ = {
+    version: "${frameworkVersion}"
 };`;
 
     // Wrap bundled JS in a function to prevent auto-execution
@@ -154,6 +159,7 @@ ${fullscreenbutton}
 }
 
 export function GetDefaultHTML(config: buildconfig): string {
+    let frameworkVersion = version()
     let  fullscreenbutton = "";
     let fullscreenBtn = "";
     if (config.show_fullscreen_button) {
@@ -269,6 +275,10 @@ ${fullscreenbutton}
             // Game laden
             import("./${config.entryname}.js");
         });
+
+        window.__webgameengine__ = {
+            version: "${frameworkVersion}"
+        };
     </script>
     ${fullscreenBtn}
   </body>

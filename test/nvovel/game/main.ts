@@ -1,7 +1,7 @@
 // A empty Project with the Web Framework
 
 import { createCanvas, enableFullscreen, setupFullscreenButton, Texture, setupInput, resetInput, getMouse, startEngine, loadTextureAsync, drawTexture, drawRect, renderText } from "@shadowdara/webgameengine";
-import { makeRect, Vector2d } from "@shadowdara/webgameengine/types"
+import { makeRect, makeVector2d, Vector2d } from "@shadowdara/webgameengine/types"
 
 const { canvas, ctx, applyScaling, virtualWidth, virtualHeight } = createCanvas({ fullscreen: true, scaling: "fit", virtualWidth: 1920, virtualHeight: 1080 });
 setupInput(canvas, virtualWidth, virtualHeight);
@@ -10,7 +10,7 @@ enableFullscreen(canvas);
 setupFullscreenButton(canvas);
 
 let charactertexture: Texture;
-let characterpositin: Vector2d = { x: 0, y: 0 }
+let characterpositin: Vector2d = makeVector2d(0, 0);
 
 async function gameStart() {
     // Code which runs at the Game Start

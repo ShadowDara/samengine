@@ -35,15 +35,15 @@ async function gameStart() {
 }
 
 function gameLoop(dt: number) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    applyScaling(); // 🔥 wichtig!
+
+    ctx.clearRect(0, 0, virtualWidth, virtualHeight);
 
     const mouse = getMouse();
 
-    applyScaling(); // 🔥 wichtig!
-
     if (!start) {
         ctx.fillStyle = "yellow";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, virtualWidth, virtualHeight);
 
         // ctx.fillStyle = "black";
         // ctx.fillRect(0, 0, 100, 100);

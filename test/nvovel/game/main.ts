@@ -1,7 +1,7 @@
 // A empty Project with the Web Framework
 
 import { createCanvas, enableFullscreen, setupFullscreenButton, Texture, setupInput, resetInput, getMouse, startEngine, loadTextureAsync, drawTexture, drawRect, renderText } from "@shadowdara/webgameengine";
-import { Vector2d } from "@shadowdara/webgameengine/types"
+import { makeRect, Vector2d } from "@shadowdara/webgameengine/types"
 
 const { canvas, ctx, applyScaling, virtualWidth, virtualHeight } = createCanvas({ fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight });
 setupInput(canvas, virtualWidth, virtualHeight);
@@ -25,17 +25,17 @@ async function gameStart() {
 function gameLoop(dt: number) {
     // Code which runs every Frame
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const mouse = getMouse();
+    // Clear the physical canvas FIRST before applying scaling
+    ctx.clearRect(0, 0, virtualWidth, virtualHeight);
 
     applyScaling();
+
+    const mouse = getMouse();
 
     // Code comes here
 
     // Make a white background
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawRect(ctx, makeRect(0, 0, virtualWidth, virtualHeight), "white");
 
     // drawTexture zeigt magenta, wenn texture fehlt, und loggt Fehler
     drawTexture(ctx, charactertexture, characterpositin.x, characterpositin.y, undefined, undefined, 0, false, false, 1);

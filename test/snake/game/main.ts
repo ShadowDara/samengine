@@ -35,7 +35,7 @@ function gameLoop(dt: number) {
 
     if (!start) {
         ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, virtualWidth, virtualHeight);
 
         renderText(ctx, "Snake", 10, 10, "black", "24px Arial");
         renderText(ctx, "Press ESC to start or Pause the Game!", 10, 50, "black", "24px Arial");
@@ -56,7 +56,7 @@ function gameLoop(dt: number) {
             const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
 
             // Kollision mit Walls
-            if (head.x < 0 || head.y < 0 || head.x >= canvas.width / gridSize || head.y >= canvas.height / gridSize) {
+            if (head.x < 0 || head.y < 0 || head.x >= virtualWidth / gridSize || head.y >= virtualHeight / gridSize) {
                 snake = [{ x: 10, y: 10 }];
                 dir = { x: 1, y: 0 };
                 dlog("Game Over");
@@ -75,17 +75,17 @@ function gameLoop(dt: number) {
 
             // Food Check
             if (head.x === food.x && head.y === food.y) {
-                food = { x: Math.floor(Math.random() * (canvas.width / gridSize)), y: Math.floor(Math.random() * (canvas.height / gridSize)) };
+                food = { x: Math.floor(Math.random() * (virtualWidth / gridSize)), y: Math.floor(Math.random() * (virtualHeight / gridSize)) };
             } else {
                 snake.pop();
             }
         }
 
         // Zeichnen
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, virtualWidth, virtualHeight);
 
         ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, virtualWidth, virtualHeight);
 
         ctx.fillStyle = "green";
         snake.forEach(s => ctx.fillRect(s.x * gridSize, s.y * gridSize, gridSize, gridSize));

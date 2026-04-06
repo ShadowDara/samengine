@@ -11,6 +11,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@shadowdara/webgameengine": "^1.4.7"
+    "@shadowdara/webgameengine": "^1.4.9"
   }
 }

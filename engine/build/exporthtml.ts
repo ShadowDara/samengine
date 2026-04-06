@@ -93,7 +93,7 @@ ${fullscreenbutton}
   </head>
   <body>
   <div id="startscreen">
-        <h2>WebGameEngine</h2>
+        <h2>made with WebGameEngine</h2>
         <h1>${config.title}</h1>
         <p>${config.version}</p>
 
@@ -113,7 +113,7 @@ ${fullscreenbutton}
             document.getElementById("startscreen").remove();
 
             // Game laden
-            import("./${config.entryname}");
+            import("./${config.entryname}.js");
         });
     </script>
     ${fullscreenBtn}

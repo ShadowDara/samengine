@@ -20,10 +20,18 @@ export function loadTextureAsync(src: string): Promise<HTMLImageElement> {
 
         // 🔹 Hier Pfad modifizieren, z.B. Prefix hinzufügen
         let finalSrc = getresourcepath(src);
+        const cacheKey = finalSrc;
+
+        // Check if resources are embedded (single file build)
+        const embeddedResources = (window as any).__resources;
+        if (embeddedResources && embeddedResources[src]) {
+            // Use embedded resource (data URI)
+            finalSrc = embeddedResources[src];
+        }
 
         img.onload = () => {
-            // Cache speichern
-            textures[finalSrc] = img; // optional: Original-Pfad oder finalSrc?
+            // Cache speichern - always use the same cache key for consistency
+            textures[cacheKey] = img;
             resolve(img);
         };
 
@@ -194,7 +202,7 @@ export class AnimationPlayer {
     private finished = false;
 
     // Konstruktor Function
-    constructor(public animation: Animation) {}
+    constructor(public animation: Animation) { }
 
     update(deltaTime: number) {
         if (this.finished) return;

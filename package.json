@@ -1,6 +1,6 @@
 {
   "name": "@shadowdara/webgameengine",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "A TypeScript game library to make HTML Games",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

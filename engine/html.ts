@@ -49,6 +49,8 @@ export function createCanvas(config: CanvasConfig = {}) {
         canvas,
         ctx,
         applyScaling,
+        virtualWidth,
+        virtualHeight,
     };
 }
 

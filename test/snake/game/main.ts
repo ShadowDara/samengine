@@ -8,8 +8,8 @@ import { Vector2d } from "@shadowdara/webgameengine/types";
 import { dlog } from "@shadowdara/webgameengine";
 import { Key } from "@shadowdara/webgameengine";
 
-const { canvas, ctx } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
-setupInput(canvas);
+const { canvas, ctx, applyScaling, virtualWidth, virtualHeight } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
+setupInput(canvas, virtualWidth, virtualHeight);
 
 enableFullscreen(canvas);
 setupFullscreenButton(canvas);
@@ -30,6 +30,8 @@ function gameLoop(dt: number) {
     if (isKeyJustPressed(Key.Escape)) {
         start = !start
     }
+
+    applyScaling(); // 🔥 wichtig!
 
     if (!start) {
         ctx.fillStyle = "white";

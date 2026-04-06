@@ -11,8 +11,8 @@ import { drawTexture, getTexture, Texture, loadTextureAsync } from "@shadowdara/
 import { isRectClicked, Rect } from "@shadowdara/webgameengine/types";
 
 // const { canvas, ctx } = createCanvas(800, 800);
-const { canvas, ctx, applyScaling } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
-setupInput(canvas);
+const { canvas, ctx, applyScaling, virtualWidth, virtualHeight } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
+setupInput(canvas, virtualWidth, virtualHeight);
 
 enableFullscreen(canvas);
 setupFullscreenButton(canvas);

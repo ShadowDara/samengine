@@ -45,6 +45,11 @@ window.__loadResource = function(path) {
     return resource;
 };`;
 
+    // Wrap bundled JS in a function to prevent auto-execution
+    const wrappedGameCode = `function __initializeGame() {
+${bundledJsContent.split('\n').map(line => '  ' + line).join('\n')}
+}`;
+
     const defaulthtml: string = `<!-- HTML Web Game made with webgameengine by Shadowdara -->
 <!-- DO NOT REMOVE THIS NOTE ! -->    
 <!DOCTYPE html>
@@ -118,9 +123,9 @@ ${fullscreenbutton}
         ${resourceLoaderScript}
     </script>
     <script>
-        ${bundledJsContent}
+        ${wrappedGameCode}
     </script>
-    <script>
+    <script type="module">
         const btn = document.getElementById("startBtn");
 
         btn.addEventListener("click", async () => {
@@ -135,6 +140,9 @@ ${fullscreenbutton}
 
             // Startscreen entfernen
             document.getElementById("startscreen").remove();
+
+            // Initialize the game
+            window.__initializeGame();
         });
     </script>
     ${fullscreenBtn}

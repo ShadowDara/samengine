@@ -21,8 +21,27 @@ export class SoundSystem {
             return this.bufferCache.get(url)!;
         }
 
-        const res = await fetch(url);
-        const arrayBuffer = await res.arrayBuffer();
+        let arrayBuffer: ArrayBuffer;
+        
+        // Check if resource is embedded in single-file export
+        const loadResource = (window as any).__loadResource;
+        if (loadResource) {
+            const dataUri = loadResource(url);
+            if (dataUri) {
+                // Convert data URI to ArrayBuffer
+                const response = await fetch(dataUri);
+                arrayBuffer = await response.arrayBuffer();
+            } else {
+                // Fallback to fetch if resource not found
+                const res = await fetch(url);
+                arrayBuffer = await res.arrayBuffer();
+            }
+        } else {
+            // Normal fetch for multi-file export
+            const res = await fetch(url);
+            arrayBuffer = await res.arrayBuffer();
+        }
+
         const buffer = await this.ctx.decodeAudioData(arrayBuffer);
 
         this.bufferCache.set(url, buffer);

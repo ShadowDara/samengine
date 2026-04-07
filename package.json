@@ -32,10 +32,10 @@
   "dependencies": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/shadowdara/webgameengine"
+    "url": "https://github.com/shadowdara/samengine"
   },
   "bugs": {
-    "url": "https://github.com/shadowdara/webgameengine/issues"
+    "url": "https://github.com/shadowdara/samengine/issues"
   },
   "type": "module"
 }

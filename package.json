@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "pack": "node clean.js && npm run build && npm pack"
+    "pack": "node clean.js && npm run build && npm pack && git push --follow-tags"
   },
   "bin": {
     "webgameengine": "dist/build/cli/cli.js"

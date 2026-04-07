@@ -1,16 +1,14 @@
 {
   "name": "samengine",
-  "version": "1.5.4",
+  "version": "1.6.0",
   "description": "A TypeScript game library to make HTML Games",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "sideEffects": false,
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsc",
-    "pack": "node clean.js && npm run build && npm pack && git push --follow-tags && node checkversion.js",
+    "pack": "node scripts/clean.js && npm run build && npm pack && git push --follow-tags && node scripts/checkversion.js",
     "test": "bun test"
   },
   "exports": {
@@ -18,8 +16,7 @@
     "./types": "./dist/types/index.js",
     "./sound": "./dist/sound/index.js",
     "./utils": "./dist/utils/index.js",
-    "./build": "./dist/build/index.js",
-    "./build/utils": "./dist/build/utils/index.js"
+    "./build": "./dist/build/index.js"
   },
   "bin": {
     "webgameengine": "dist/build/cli/cli.js",
@@ -33,18 +30,11 @@
   "author": "Shadowdara",
   "license": "MIT",
   "devDependencies": {
-    "@types/html-minifier-terser": "^7.0.2",
+    "chalk": "^5.6.2",
     "@types/node": "^25.5.2",
-    "@types/ws": "^8.18.1",
     "typescript": "^6.0.2"
   },
-  "dependencies": {
-    "chalk": "^5.6.2",
-    "esbuild": "^0.28.0",
-    "html-minifier-terser": "^7.2.0",
-    "mime": "^4.1.0",
-    "ws": "^8.20.0"
-  },
+  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/shadowdara/webgameengine"

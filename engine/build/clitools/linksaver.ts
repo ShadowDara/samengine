@@ -18,6 +18,7 @@ class ConfigError extends Error { }
 export type Link = {
     link: string;
     description: string;
+    license?: string;
 };
 
 // Config
@@ -28,8 +29,10 @@ export type AppConfig = {
 };
 
 // Function to generate a new Link
-function newLink(link = "", description = ""): Link {
-    return { link, description };
+function newLink(link = "", description = "", license?: string): Link {
+    return license
+        ? { link, description, license }
+        : { link, description };
 }
 
 function newAppConfig(projectname = ""): AppConfig {
@@ -90,7 +93,16 @@ function loadConfig(path: string): AppConfig {
                 throw new Error(`links[${i}].description must be a string`);
             }
 
-            return { link: item.link, description: item.description };
+            const linkObj: Link = {
+                link: item.link,
+                description: item.description,
+            };
+
+            if (typeof item.license === "string") {
+                linkObj.license = item.license;
+            }
+
+            return linkObj;
         });
 
         return {
@@ -146,8 +158,9 @@ async function init() {
 async function addLink(config: AppConfig) {
     const newLinkVal = await prompt("New Link: ");
     const newDesc = await prompt("New Description: ");
+    const newLic = await prompt("License: ");
 
-    config.links.push(newLink(newLinkVal, newDesc));
+    config.links.push(newLink(newLinkVal, newDesc, newLic));
     console.log("Added new Link!");
 
     saveConfig(config);
@@ -155,7 +168,7 @@ async function addLink(config: AppConfig) {
 
 function viewLinks(config: AppConfig) {
     for (const link of config.links) {
-        console.log(`[${chalk.green(link.link)}] - ${link.description}`);
+        console.log(`[${chalk.green(link.link)}] - ${link.description} - [${chalk.red(link.license)}]`);
     }
 }
 

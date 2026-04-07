@@ -142,7 +142,7 @@ export function drawAtlasFrame(
     x: number,
     y: number,
     options: DrawOptions = {}
-) {
+): void {
     const {
         width,
         height,
@@ -221,7 +221,7 @@ export class AnimationPlayer {
     // Konstruktor Function
     constructor(public animation: Animation) { }
 
-    update(deltaTime: number) {
+    update(deltaTime: number): void {
         if (this.finished) return;
 
         this.time += deltaTime;
@@ -247,7 +247,7 @@ export class AnimationPlayer {
         return this.animation.frames[this.currentFrameIndex];
     }
 
-    reset() {
+    reset(): void {
         this.time = 0;
         this.currentFrameIndex = 0;
         this.finished = false;
@@ -272,7 +272,7 @@ export function drawAnimation(
     x: number,
     y: number,
     options: DrawOptions = {}
-) {
+): void {
     const frame = player.getCurrentFrame();
 
     drawAtlasFrame(

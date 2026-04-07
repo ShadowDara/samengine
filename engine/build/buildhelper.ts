@@ -12,7 +12,7 @@ export const flog = (...args: any[]) => {
     console.log(time, ...args);
 }
 
-export async function copyFolder(src: string, dest: string) {
+export async function copyFolder(src: string, dest: string): Promise<void> {
     // Zielordner erstellen
     mkdirSync(dest, { recursive: true });
 
@@ -63,7 +63,7 @@ export async function scanResourcesAsDataURIs(resourceDir: string): Promise<Reco
 }
 
 // === Helper ===
-export function getContentType(path: string) {
+export function getContentType(path: string): string {
     if (path.endsWith(".js")) return "application/javascript";
     if (path.endsWith(".ts")) return "application/typescript";
     if (path.endsWith(".html")) return "text/html";

@@ -7,7 +7,13 @@ export type CanvasConfig = {
     virtualHeight?: number;
 };
 
-export function createCanvas(config: CanvasConfig = {}) {
+export function createCanvas(config: CanvasConfig = {}): {
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    applyScaling: () => void;
+    virtualWidth: number;
+    virtualHeight: number;
+} {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d")!;
 
@@ -29,7 +35,7 @@ export function createCanvas(config: CanvasConfig = {}) {
     window.addEventListener("resize", resize);
     resize();
 
-    function applyScaling() {
+    function applyScaling(): void {
         if (config.scaling === "fit") {
             const scale = Math.min(
                 canvas.width / virtualWidth,
@@ -54,12 +60,12 @@ export function createCanvas(config: CanvasConfig = {}) {
     };
 }
 
-export function resizeCanvas(canvas: HTMLCanvasElement) {
+export function resizeCanvas(canvas: HTMLCanvasElement): void {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
 
-export function enableFullscreen(canvas: HTMLCanvasElement) {
+export function enableFullscreen(canvas: HTMLCanvasElement): void {
     window.addEventListener("keydown", (e) => {
         if (e.key === "f") {
             if (!document.fullscreenElement) {
@@ -71,7 +77,7 @@ export function enableFullscreen(canvas: HTMLCanvasElement) {
     });
 }
 
-export function setupFullscreenButton(canvas: HTMLCanvasElement) {
+export function setupFullscreenButton(canvas: HTMLCanvasElement): void {
     const btn = document.getElementById("fullscreenBtn");
 
     if (!btn) return;

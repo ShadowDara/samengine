@@ -56,7 +56,7 @@ export class SoundSystem {
             loop?: boolean;
             playbackRate?: number;
         } = {}
-    ) {
+    ): Promise<AudioBufferSourceNode> {
         const buffer = await this.load(url);
 
         const source = this.ctx.createBufferSource();
@@ -82,7 +82,7 @@ export class SoundSystem {
     }
 
     // ================= STOP =================
-    stopAll() {
+    stopAll(): void {
         for (const s of this.activeSources) {
             try {
                 s.stop();
@@ -92,18 +92,18 @@ export class SoundSystem {
     }
 
     // ================= GLOBAL VOLUME =================
-    setVolume(v: number) {
+    setVolume(v: number): void {
         this.masterGain.gain.value = v;
     }
 
     // ================= CONTEXT CONTROL =================
-    async resume() {
+    async resume(): Promise<void> {
         if (this.ctx.state === "suspended") {
             await this.ctx.resume();
         }
     }
 
-    async pause() {
+    async pause(): Promise<void> {
         if (this.ctx.state === "running") {
             await this.ctx.suspend();
         }

@@ -10,7 +10,7 @@ export function renderText(
     y: number,
     color = "white",
     font = "20px Arial"
-) {
+): void {
     ctx.fillStyle = color;
     ctx.font = font;
     ctx.textBaseline = "top";

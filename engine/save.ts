@@ -2,7 +2,7 @@ type SaveData = Record<string, any>;
 
 const SAVE_KEY = "my_game_save";
 
-export function saveGame(data: SaveData) {
+export function saveGame(data: SaveData): void {
     try {
         const json = JSON.stringify(data);
         localStorage.setItem(SAVE_KEY, json);
@@ -23,7 +23,7 @@ export function loadGame(): SaveData | null {
     }
 }
 
-export function clearSave() {
+export function clearSave(): void {
     localStorage.removeItem(SAVE_KEY);
     console.log("Save cleared!");
 }

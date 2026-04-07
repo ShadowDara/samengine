@@ -45,7 +45,7 @@ let canvasRef: HTMLCanvasElement;
 let virtualWidth = 800;
 let virtualHeight = 800;
 
-export function setupInput(canvas: HTMLCanvasElement, vWidth = 800, vHeight = 800) {
+export function setupInput(canvas: HTMLCanvasElement, vWidth = 800, vHeight = 800): void {
     canvasRef = canvas;
     virtualWidth = vWidth;
     virtualHeight = vHeight;
@@ -128,15 +128,15 @@ export function setupInput(canvas: HTMLCanvasElement, vWidth = 800, vHeight = 80
 }
 
 // ===== KEY HELPERS =====
-export function isKeyPressed(code: string) {
+export function isKeyPressed(code: string): boolean {
     return keys[code]?.pressed || false;
 }
 
-export function isKeyJustPressed(code: string) {
+export function isKeyJustPressed(code: string): boolean {
     return keys[code]?.justPressed || false;
 }
 
-export function isKeyJustReleased(code: string) {
+export function isKeyJustReleased(code: string): boolean {
     return keys[code]?.justReleased || false;
 }
 
@@ -146,7 +146,7 @@ export function getMouse(): Readonly<Mouse> {
 }
 
 // ===== RESET =====
-export function resetInput() {
+export function resetInput(): void {
     for (const k in keys) {
         keys[k].justPressed = false;
         keys[k].justReleased = false;

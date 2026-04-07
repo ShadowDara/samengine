@@ -8,7 +8,7 @@ import path from "path";
 import { WebSocket, WebSocketServer } from "ws";
 
 import { createProject } from "./new.js";
-import { copyFolder, flog, getContentType, scanResourcesAsDataURIs } from "../buildhelper.js";
+import { copyFolder, flog, getContentType, scanResourcesAsDataURIs, filterResourcesByUsage } from "../buildhelper.js";
 import { GetDefaultHTML, GetSingleFileHTML } from "../exporthtml.js";
 import { loadUserConfig } from "./config.js";
 import { compressHTML } from "../utils/utils.js";
@@ -41,7 +41,10 @@ function createBuilder(config: any, isRelease: boolean, isSingleFile: boolean = 
                 const bundledJsContent = await readFile(bundledJsPath, "utf-8");
                 
                 // Scan resources and convert to data URIs
-                const resourcesMap = await scanResourcesAsDataURIs("./resources");
+                let resourcesMap = await scanResourcesAsDataURIs("./resources");
+                
+                // Filter resources by usage in the bundled code
+                resourcesMap = filterResourcesByUsage(bundledJsContent, resourcesMap);
                 
                 let html = GetSingleFileHTML(config, bundledJsContent, resourcesMap);
                 if (isRelease) html = await compressHTML(html);

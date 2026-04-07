@@ -35,7 +35,7 @@ export async function copyFolder(src: string, dest: string) {
 // Scan resources folder and convert to data URIs (base64)
 export async function scanResourcesAsDataURIs(resourceDir: string): Promise<Record<string, string>> {
     const resourceMap: Record<string, string> = {};
-    
+
     if (!existsSync(resourceDir)) {
         return resourceMap;
     }
@@ -90,4 +90,31 @@ export function getMimeType(filename: string): string {
         "css": "text/css",
     };
     return mimeTypes[ext] || "application/octet-stream";
+}
+
+// Filter resources by checking if they are actually used in the bundled code
+export function filterResourcesByUsage(bundledJsContent: string, resourcesMap: Record<string, string>): Record<string, string> {
+    const filteredResources: Record<string, string> = {};
+    const unusedResources: string[] = [];
+
+    for (const resourcePath in resourcesMap) {
+        // Extract just the filename (last part after /)
+        const filename = resourcePath.split("/").pop() || resourcePath;
+
+        // Check if the resource is referenced in the bundled code
+        // Look for string literals containing the resource path or filename
+        if (bundledJsContent.includes(filename) || bundledJsContent.includes(resourcePath)) {
+            filteredResources[resourcePath] = resourcesMap[resourcePath];
+        } else {
+            unusedResources.push(resourcePath);
+        }
+    }
+
+    // Log unused resources
+    if (unusedResources.length > 0) {
+        flog(`⚠️  ${unusedResources.length} unused resource(s) excluded from single-file build:`);
+        unusedResources.forEach(res => flog(`   - ${res}`));
+    }
+
+    return filteredResources;
 }

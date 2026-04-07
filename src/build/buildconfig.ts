@@ -22,5 +22,5 @@ export function new_buildconfig(): buildconfig {
 
 // Function to get the Version
 export function version(): string {
-    return "1.5.2";
+    return "1.5.3";
 }

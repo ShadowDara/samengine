@@ -1,8 +1,3 @@
-// Buildconfig Export
+// Buildconfig Export and Version
 export type { buildconfig } from "./buildconfig.js";
-export { new_buildconfig } from "./buildconfig.js";
-
-// version
-export {
-    version
-} from "../build/version.js";
+export { new_buildconfig, version } from "./buildconfig.js";

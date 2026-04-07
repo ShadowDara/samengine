@@ -134,7 +134,7 @@ function main() {
             return;
         }
 
-        if (args[0] === "help") {
+        if (args[0] === "help" || args[0] === "-h" || args[0] === "--help") {
             help();
             return;
         }

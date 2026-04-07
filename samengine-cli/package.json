@@ -1,8 +1,14 @@
 {
   "name": "samengine-cli",
-  "version": "1.6.0",
-  "description": "",
+  "version": "1.6.2",
+  "description": "CLI which help with samengine",
   "scripts": {
+    "build": "tsc",
+    "pack": "node ../scripts/clean.js && npm run build && npm pack && git push --follow-tags && node ../scripts/checkversion.js"
+  },
+  "bin": {
+    "samengine-cli-linksaver": "dist/linksaver.js",
+    "samengine-cli-buildinfos": "dist/buildinfos.js"
   },
   "author": "Shadowdara",
   "type": "module",
@@ -12,5 +18,13 @@
   },
   "dependencies": {
     "chalk": "^5.6.2"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shadowdara/samengine"
+  },
+  "bugs": {
+    "url": "https://github.com/shadowdara/samengine/issues"
   }
 }

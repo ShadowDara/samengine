@@ -73,3 +73,11 @@ export {
     isTriangleClicked,
     getTrianglePerimeter,
 } from "./triangle.js";
+
+// Button Type
+export {
+    type Button,
+    makeButton,
+    clickedButton,
+    drawButton
+} from "./button.js";

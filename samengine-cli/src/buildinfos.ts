@@ -9,7 +9,7 @@ import os from "os";
 import chalk from 'chalk';
 import { mkdir } from "fs/promises";
 
-const CONFIG_FILE = ".webgameengine/buildinfos.json";
+const CONFIG_FILE = ".samengine/buildinfos.json";
 
 // Sample config
 const sampleConfig = {

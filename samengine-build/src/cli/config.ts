@@ -35,7 +35,7 @@ export async function loadUserConfig() {
     } catch (e) {
         console.error(e);
         throw new Error(
-            "❌ Could not load webgameengine.config.ts: " + configPath
+            "❌ Could not load samengine.config.ts: " + configPath
         );
     }
 }

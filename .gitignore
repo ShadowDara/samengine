@@ -5,3 +5,4 @@ bun.lock
 *.tgz
 
 **/.webgameengine/config.mjs
+**/.samengine/config.mjs

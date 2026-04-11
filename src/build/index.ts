@@ -1,2 +1,4 @@
-// Export the Version
-export { version } from "./version.js";
+// Function to get the Version
+export function version(): string {
+    return "1.7.0";
+}

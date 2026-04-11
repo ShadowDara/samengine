@@ -25,10 +25,15 @@ export {
 export { dlog } from "./logger.js";
 
 // Save System
+export type {
+    SaveData
+} from "./save.js";
 export {
+    SAVE_KEY,
     saveGame,
     loadGame,
-    clearSave
+    clearSave,
+    exportSave
 } from "./save.js";
 
 // Texture Management

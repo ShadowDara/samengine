@@ -15,6 +15,7 @@ import { GetDefaultHTML, GetSingleFileHTML } from "../exporthtml.js";
 import { loadUserConfig } from "./config.js";
 import { compressHTML } from "../utils/utils.js";
 import { type CLIArgs, parseArgs } from "./argparser.js";
+import { version } from "samengine/build";
 
 // ================= BUILD =================
 function createBuilder(config: any, isRelease: boolean, isSingleFile: boolean = false) {
@@ -67,13 +68,13 @@ function createBuilder(config: any, isRelease: boolean, isSingleFile: boolean = 
                 if (isRelease) html = await compressHTML(html);
                 
                 // Add HTML comment at the beginning after minification
-                const htmlComment = `<!-- Game made with samengine v${config.version} - https://www.npmjs.com/samengine -->\n`;
+                const htmlComment = `<!-- Game made with samengine v${version()} - https://www.npmjs.com/samengine -->\n`;
                 html = htmlComment + html;
                 
                 await writeFile("./dist/index.html", html);
                 
                 // Add JS comment at the beginning of JS files
-                const jsComment = `// Game made with samengine v${config.version} - https://www.npmjs.com/samengine\n`;
+                const jsComment = `// Game made with samengine v${version()} - https://www.npmjs.com/samengine\n`;
                 const jsPath = path.join(".", config.outdir, `${config.entryname.replace(/\.[^.]*$/, "")}.js`);
                 let jsContent = await readFile(jsPath, "utf-8");
                 jsContent = jsComment + jsContent;

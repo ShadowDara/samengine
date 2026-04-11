@@ -18,3 +18,8 @@ export function map(
 ): number {
     return (outMax - outMin) * ((value - inMin) / (inMax - inMin)) + outMin;
 }
+
+// Scale
+export function scale(n1: number, n2: number): number {
+    return n1 * n2;
+}

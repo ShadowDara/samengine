@@ -1,7 +1,7 @@
 // Utils Package
 
 // Math Utilities
-export { clamp, lerp, map } from "./math.js";
+export { clamp, lerp, map, scale } from "./math.js";
 
 // Markdown Parser
 export {

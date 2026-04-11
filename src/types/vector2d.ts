@@ -1,6 +1,6 @@
 // 2 Dimensional Vector Type
 
-import { clamp, lerp, map } from "../utils/math.js";
+import { clamp, lerp, map, scale } from "../utils/math.js";
 
 // 2d Vector
 export type Vector2d = {
@@ -96,5 +96,13 @@ export function map2d(
     return {
         x: map(value.x, inMin.x, inMax.x, outMin.x, outMax.x),
         y: map(value.y, inMin.y, inMax.y, outMin.y, outMax.y),
+    }
+}
+
+// Function to scale a Vector
+export function scale2d(value: Vector2d, vscale: number): Vector2d {
+    return {
+        x: scale(value.x, vscale),
+        y: scale(value.y, vscale),
     }
 }

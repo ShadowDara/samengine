@@ -5,13 +5,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx samengine-build",
-    "build": "npx samengine-build --release"
+    "build": "npx samengine-build --release",
+    "pub": "npx samengine-build --release --single-file"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "samengine": "^1.6.4",
-    "samengine-build": "^1.6.4"
+    "samengine": "^1.6.5",
+    "samengine-build": "^1.6.5"
   }
 }

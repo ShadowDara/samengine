@@ -12,7 +12,8 @@ export {
     distance2d,
     clamp2d,
     lerp2d,
-    map2d
+    map2d,
+    scale2d
 } from "./vector2d.js";
 
 // Vector 3D

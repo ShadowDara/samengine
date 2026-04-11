@@ -1,7 +1,7 @@
 // A empty Project with the Web Framework
 
 import { createCanvas, enableFullscreen, setupFullscreenButton, Texture, setupInput, resetInput, getMouse, startEngine, loadTextureAsync, drawTexture, drawRect, renderText } from "samengine";
-import { makeRect, makeVector2d, Vector2d } from "samengine/types"
+import { makeButton, makeRect, makeVector2d, Rect, Vector2d } from "samengine/types"
 
 const { canvas, ctx, applyScaling, virtualWidth, virtualHeight } = createCanvas({ fullscreen: true, scaling: "fit", virtualWidth: 1920, virtualHeight: 1080 });
 setupInput(canvas, virtualWidth, virtualHeight);
@@ -11,6 +11,7 @@ setupFullscreenButton(canvas);
 
 let charactertexture: Texture;
 let characterpositin: Vector2d = makeVector2d(0, 0);
+// let button: Button
 
 async function gameStart() {
     // Code which runs at the Game Start
@@ -41,10 +42,10 @@ function gameLoop(dt: number) {
     renderText(ctx, `Width: ${virtualWidth} - Height: ${virtualHeight}`, 0, 0, "black", "20px Arial");
 
     // drawTexture zeigt magenta, wenn texture fehlt, und loggt Fehler
-    drawTexture(ctx, charactertexture, characterpositin.x, characterpositin.y, undefined, undefined, 0, false, false, 1.5);
+    drawTexture(ctx, charactertexture, characterpositin.x, characterpositin.y, { scale: 1.5 });
 
     // Draw Dialogue Box
-    let dialoguebox = { x: 500, y: 850, width: 920, height: 150 };
+    let dialoguebox: Rect = { x: 500, y: 850, width: 920, height: 150 };
     drawRect(ctx, dialoguebox, "black");
 
     // Render Some Text

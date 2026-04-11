@@ -1,6 +1,6 @@
 {
   "name": "samengine-build",
-  "version": "1.6.5",
+  "version": "1.7.0",
   "description": "The build and export Tool for samengine.",
   "sideEffects": false,
   "files": [
@@ -30,7 +30,7 @@
     "esbuild": "^0.28.0",
     "html-minifier-terser": "^7.2.0",
     "mime": "^4.1.0",
-    "samengine": "^1.6.5",
+    "samengine": "^1.7.0",
     "ws": "^8.20.0"
   },
   "license": "MIT",

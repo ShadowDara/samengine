@@ -64,14 +64,12 @@ ${bundledJsContent.split('\n').map(line => '  ' + line).join('\n')}
     <title>${config.title}</title>
     <!-- Für Mobile Viewports -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    ${config.htmlhead}
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-      }
-      body {
-        overflow: hidden; /* 🔥 verhindert Scrollbars */
       }
 body {
     margin: 0;
@@ -82,6 +80,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    overflow: hidden; /* 🔥 verhindert Scrollbars */
 }
 
 #startscreen {
@@ -113,7 +112,6 @@ h2 {
 }
 ${fullscreenbutton}
 </style>
-    </style>
   </head>
   <body>
   <div id="startscreen">
@@ -196,14 +194,12 @@ export function GetDefaultHTML(config: buildconfig): string {
     <title>${config.title}</title>
     <!-- Für Mobile Viewports -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    ${config.htmlhead}
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-      }
-      body {
-        overflow: hidden; /* 🔥 verhindert Scrollbars */
       }
 body {
     margin: 0;
@@ -214,6 +210,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    overflow: hidden; /* 🔥 verhindert Scrollbars */
 }
 
 #startscreen {
@@ -245,7 +242,6 @@ h2 {
 }
 ${fullscreenbutton}
 </style>
-    </style>
   </head>
   <body>
   <div id="startscreen">

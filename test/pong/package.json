@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "samengine": "^1.7.0",
+    "samengine": "^1.7.1",
     "samengine-build": "^1.7.0"
   }
 }

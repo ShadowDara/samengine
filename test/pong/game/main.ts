@@ -1,17 +1,33 @@
 // A empty Project with the Web Framework
 
-import { createCanvas, enableFullscreen, setupFullscreenButton } from "samengine";
-import { setupInput, resetInput, getMouse, isKeyJustPressed, Key } from "samengine";
-import { startEngine } from "samengine";
+import {
+    createCanvas,
+    enableFullscreen,
+    setupFullscreenButton,
+    Texture,
+    setupInput,
+    resetInput,
+    getMouse,
+    startEngine,
+    loadTextureAsync,
+    drawTexture,
+    drawRect,
+    renderText,
+    isKeyPressed,
+    Key,
+    drawCircle
+} from "samengine";
 
-const { canvas, ctx, applyScaling } = createCanvas({
+import { makeCircle, makeRect } from "samengine/types";
+
+const { canvas, ctx, applyScaling, virtualWidth, virtualHeight } = createCanvas({
     fullscreen: true,
     scaling: "fit",
-    virtualWidth: window.innerWidth,
-    virtualHeight: window.innerHeight
+    virtualWidth: 1920,
+    virtualHeight: 1080
 });
 
-setupInput(canvas);
+setupInput(canvas, virtualWidth, virtualHeight);
 
 enableFullscreen(canvas);
 setupFullscreenButton(canvas);
@@ -23,25 +39,25 @@ setupFullscreenButton(canvas);
 let ball = {
     x: 0,
     y: 0,
-    vx: 400,
-    vy: 200,
-    r: 10
+    vx: 600,
+    vy: 300,
+    r: 12
 };
 
 let paddleLeft = {
-    x: 30,
+    x: 40,
     y: 0,
     w: 20,
-    h: 100,
-    speed: 500
+    h: 140,
+    speed: 800
 };
 
 let paddleRight = {
     x: 0,
     y: 0,
     w: 20,
-    h: 100,
-    speed: 500
+    h: 140,
+    speed: 800
 };
 
 let scoreLeft = 0;
@@ -54,9 +70,10 @@ let scoreRight = 0;
 async function gameStart() {
     resetBall();
 
-    paddleLeft.y = canvas.height / 2;
-    paddleRight.x = canvas.width - 50;
-    paddleRight.y = canvas.height / 2;
+    paddleLeft.y = virtualHeight / 2 - paddleLeft.h / 2;
+
+    paddleRight.x = virtualWidth - 60;
+    paddleRight.y = virtualHeight / 2 - paddleRight.h / 2;
 }
 
 // ======================
@@ -64,13 +81,13 @@ async function gameStart() {
 // ======================
 
 function resetBall() {
-    ball.x = canvas.width / 2;
-    ball.y = canvas.height / 2;
+    ball.x = virtualWidth / 2;
+    ball.y = virtualHeight / 2;
 
     const dir = Math.random() > 0.5 ? 1 : -1;
 
-    ball.vx = 400 * dir;
-    ball.vy = (Math.random() * 2 - 1) * 300;
+    ball.vx = 600 * dir;
+    ball.vy = (Math.random() * 2 - 1) * 400;
 }
 
 // ======================
@@ -78,53 +95,48 @@ function resetBall() {
 // ======================
 
 function gameLoop(dt: number) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, virtualWidth, virtualHeight);
     applyScaling();
+
+    // Background
+    drawRect(ctx, makeRect(0, 0, virtualWidth, virtualHeight), "black");
 
     // ======================
     // 🎮 INPUT
     // ======================
 
-    // Player Left (W/S)
-    if (isKeyPressed(Key.KeyW)) {
-        paddleLeft.y -= paddleLeft.speed * dt;
-    }
-    if (isKeyPressed(Key.KeyS)) {
-        paddleLeft.y += paddleLeft.speed * dt;
-    }
+    // Left paddle (W/S)
+    if (isKeyPressed(Key.KeyW)) paddleLeft.y -= paddleLeft.speed * dt;
+    if (isKeyPressed(Key.KeyS)) paddleLeft.y += paddleLeft.speed * dt;
 
-    // Player Right (Arrow Keys)
-    if (isKeyPressed(Key.ArrowUp)) {
-        paddleRight.y -= paddleRight.speed * dt;
-    }
-    if (isKeyPressed(Key.ArrowDown)) {
-        paddleRight.y += paddleRight.speed * dt;
-    }
+    // Right paddle (Arrow Keys)
+    if (isKeyPressed(Key.ArrowUp)) paddleRight.y -= paddleRight.speed * dt;
+    if (isKeyPressed(Key.ArrowDown)) paddleRight.y += paddleRight.speed * dt;
 
     // Clamp paddles
-    paddleLeft.y = Math.max(0, Math.min(canvas.height - paddleLeft.h, paddleLeft.y));
-    paddleRight.y = Math.max(0, Math.min(canvas.height - paddleRight.h, paddleRight.y));
+    paddleLeft.y = Math.max(0, Math.min(virtualHeight - paddleLeft.h, paddleLeft.y));
+    paddleRight.y = Math.max(0, Math.min(virtualHeight - paddleRight.h, paddleRight.y));
 
     // ======================
-    // ⚡ BALL MOVE
+    // ⚡ BALL
     // ======================
 
     ball.x += ball.vx * dt;
     ball.y += ball.vy * dt;
 
-    // Top / Bottom bounce
+    // Top / Bottom
     if (ball.y - ball.r < 0) {
         ball.y = ball.r;
         ball.vy *= -1;
     }
 
-    if (ball.y + ball.r > canvas.height) {
-        ball.y = canvas.height - ball.r;
+    if (ball.y + ball.r > virtualHeight) {
+        ball.y = virtualHeight - ball.r;
         ball.vy *= -1;
     }
 
     // ======================
-    // 💥 PADDLE COLLISION
+    // 💥 COLLISION
     // ======================
 
     // Left paddle
@@ -136,9 +148,8 @@ function gameLoop(dt: number) {
         ball.x = paddleLeft.x + paddleLeft.w + ball.r;
         ball.vx *= -1;
 
-        // Winkel basierend auf Trefferpunkt
         const hit = (ball.y - paddleLeft.y) / paddleLeft.h;
-        ball.vy = (hit - 0.5) * 600;
+        ball.vy = (hit - 0.5) * 800;
     }
 
     // Right paddle
@@ -151,7 +162,7 @@ function gameLoop(dt: number) {
         ball.vx *= -1;
 
         const hit = (ball.y - paddleRight.y) / paddleRight.h;
-        ball.vy = (hit - 0.5) * 600;
+        ball.vy = (hit - 0.5) * 800;
     }
 
     // ======================
@@ -163,7 +174,7 @@ function gameLoop(dt: number) {
         resetBall();
     }
 
-    if (ball.x > canvas.width) {
+    if (ball.x > virtualWidth) {
         scoreLeft++;
         resetBall();
     }
@@ -172,21 +183,25 @@ function gameLoop(dt: number) {
     // 🎨 DRAW
     // ======================
 
-    ctx.fillStyle = "white";
-
     // Ball
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-    ctx.fill();
+    drawCircle(
+        ctx,
+        makeCircle(ball.x - ball.r, ball.y - ball.r, ball.r),
+        "white"
+    );
 
     // Paddles
-    ctx.fillRect(paddleLeft.x, paddleLeft.y, paddleLeft.w, paddleLeft.h);
-    ctx.fillRect(paddleRight.x, paddleRight.y, paddleRight.w, paddleRight.h);
+    drawRect(ctx, makeRect(paddleLeft.x, paddleLeft.y, paddleLeft.w, paddleLeft.h), "white");
+    drawRect(ctx, makeRect(paddleRight.x, paddleRight.y, paddleRight.w, paddleRight.h), "white");
+
+    // Middle line
+    for (let y = 0; y < virtualHeight; y += 40) {
+        drawRect(ctx, makeRect(virtualWidth / 2 - 5, y, 10, 20), "white");
+    }
 
     // Score
-    ctx.font = "40px Arial";
-    ctx.fillText(scoreLeft.toString(), canvas.width / 4, 50);
-    ctx.fillText(scoreRight.toString(), canvas.width * 0.75, 50);
+    renderText(ctx, scoreLeft.toString(), virtualWidth * 0.25, 80, "white", "60px Arial");
+    renderText(ctx, scoreRight.toString(), virtualWidth * 0.75, 80, "white", "60px Arial");
 
     resetInput();
 }

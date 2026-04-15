@@ -3,6 +3,7 @@
 A lightweight, TypeScript-first web game engine framework for building
 2D games *and maybe 3D Games in the Future*.
 
+
 ## Features
 
 - 🎯 Simple game loop management
@@ -12,6 +13,7 @@ A lightweight, TypeScript-first web game engine framework for building
 - 🛠️ Build tools included
 - 📝 Logging utilities
 - 💾 Save/Load system
+
 
 ## Quick Start
 
@@ -24,6 +26,7 @@ npm install samengine-build
 npx samengine-build --new
 npx samengine-build
 ```
+
 
 ### Basic Game Loop
 
@@ -53,7 +56,9 @@ function gameLoop(dt: number) {
 startEngine(init, gameLoop);
 ```
 
+
 ## Development & Building
+
 
 ### Using Bun (local development)
 
@@ -64,6 +69,7 @@ npx samengine-build --new (newproject)    # Create a new project with a
                                           # simple Snake Clone as Template
 npx samengine-build --new-empty (new)     # Create a new empty project
 ```
+
 
 ### Configuration
 
@@ -95,19 +101,24 @@ export function defineConfig(): buildconfig {
 }
 ```
 
+
 ## API Reference
+
 
 ### Core Engine
 - `startEngine(init, gameLoop)` - Initialize game loop
+
 
 ### Rendering
 - `renderText(ctx, text, x, y, color?, font?)` - Render text
 - `renderBitmapText()` - Render bitmap font text
 
+
 ### Input System
 - `setupInput(canvas, width?, height?)` - Initialize input
 - `getKeyState(key)` - Check key state
 - Mouse state available via input module
+
 
 ### Types
 - `Vector2D` / `Vector3D` - Vector mathematics
@@ -115,13 +126,16 @@ export function defineConfig(): buildconfig {
 - `Rect` - Rectangle collision
 - Math utilities for game logic
 
+
 ### Utilities
 <!-- - `dlog()` - Development logging -->
 - `startEngine()` - Manage game loop
 
+
 ## License
 
 MIT
+
 
 ## More Addons in the Game Library
 
@@ -130,6 +144,7 @@ MIT
 
 *(I dont now why i added this)*
 
+
 ## More Tools for samengine and Game Making by me lol
 
 - [samengine-build](https://www.npmjs.com/package/samengine-build)
@@ -137,11 +152,16 @@ MIT
 - [old deprecated npm package](https://www.npmjs.com/package/@shadowdara/webgameengine)
 - [linksaver](https://github.com/shadowdara/linksaver)
 
+
+## Commit Tags
+
+The tags which are ending with `-build` are for the `samengine-build` Tool and the
+which end with `-cli` are for the `samengine-cli` package.
+
 <!--
 
 IDEAS
 
-- SVG Integration
 - SVG Generator
 
 -->

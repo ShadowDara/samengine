@@ -13,7 +13,7 @@
 // Typen
 // ---------------------------------------------------------------------------
 
-interface ParseOptions {
+export interface ParseOptions {
   /** Fügt target="_blank" rel="noopener noreferrer" zu externen Links hinzu */
   externalLinks?: boolean;
   /** Bricht einfache Zeilenumbrüche in <br> um */

@@ -5,6 +5,18 @@ import { version } from "samengine/build";
 import type { buildconfig } from "./buildconfig.js";
 import { parseMarkdown } from "samengine/utils";
 
+// function to get the startscreen
+function getStartScreen(config: buildconfig): string {
+    return `<div id="startscreen">
+        <h2>made with samengine</h2>
+        <h1>${config.title}</h1>
+        <p>${config.version}</p>
+        <p>by ${config.gameauthor}</p>
+
+        <button class="startbutton" id="startBtn">Start</button>
+    </div>`;
+}
+
 // function to get the standard CSS
 function getStandardCSS(config: buildconfig): string {
     return `* {
@@ -235,9 +247,7 @@ window.__samengine__ = {
 ${bundledJsContent.split('\n').map(line => '  ' + line).join('\n')}
 }`;
 
-    const defaulthtml: string = `<!-- HTML Web Game made with samengine by Shadowdara -->
-<!-- DO NOT REMOVE THIS NOTE ! -->    
-<!DOCTYPE html>
+    const defaulthtml: string = `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8" />
@@ -253,14 +263,7 @@ ${getFullscreenButton(config)}
 </style>
     </head>
     <body>
-    <div id="startscreen">
-        <h2>made with samengine</h2>
-        <h1>${config.title}</h1>
-        <p>${config.version}</p>
-        <p>${config.gameauthor}</p>
-
-        <button class="startbutton" id="startBtn">Start</button>
-    </div>
+    ${getStartScreen(config)}
 
     ${getMDNotes(config)}
 
@@ -310,9 +313,7 @@ ${getFullscreenButton(config)}
 export function GetDefaultHTML(config: buildconfig): string {
     let frameworkVersion = version()
 
-    const defaulthtml: string = `<!-- HTML Web Game made with samengine by Shadowdara -->
-<!-- DO NOT REMOVE THIS NOTE ! -->    
-<!DOCTYPE html>
+    const defaulthtml: string = `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8" />
@@ -328,14 +329,7 @@ ${getFullscreenButton(config)}
 </style>
     </head>
     <body>
-    <div id="startscreen">
-        <h2>made with samengine</h2>
-        <h1>${config.title}</h1>
-        <p>${config.version}</p>
-        <p>${config.gameauthor}</p>
-
-        <button class="startbutton" id="startBtn">Start</button>
-    </div>
+    ${getStartScreen(config)}
 
     ${getMDNotes(config)}
 

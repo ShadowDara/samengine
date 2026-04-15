@@ -5,6 +5,53 @@ import { version } from "samengine/build";
 import type { buildconfig } from "./buildconfig.js";
 import { parseMarkdown } from "samengine/utils";
 
+// function to get the standard CSS
+function getStandardCSS(config: buildconfig): string {
+    return `* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+body {
+    margin: 0;
+    background: #0f172a;
+    color: white;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    overflow: hidden; /* 🔥 verhindert Scrollbars */
+}
+
+#startscreen {
+    text-align: center;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+h2 {
+    font-weight: normal;
+    opacity: 0.7;
+}
+
+.startbutton {
+    margin-top: 2rem;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    background: #22c55e;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.startbutton:hover {
+    background: #16a34a;
+}`;
+}
 
 // Function which formats the HTML for the Notes
 function getMDNotes(config: buildconfig): string {
@@ -26,13 +73,14 @@ function getMDNotes(config: buildconfig): string {
 /* Markdown Notes Container */
 #mdnotes, #mdnotes div {
     position: absolute;
-    bottom: 10px;
+    bottom: 0px;
     left: 10px;
     max-width: 400px;
-    max-height: 60vh;
+    max-height: 40vh;
     overflow-y: auto;
     z-index: 900;
     font-size: 0.9rem;
+    width: 60%;
 }
 
 /* Einzelne Note */
@@ -158,6 +206,10 @@ function getFullscreenButtonHTML(config: buildconfig): string {
 }
 
 
+//
+///////////////////////////////////////////////////////////////////////////////////
+//
+//
 export function GetSingleFileHTML(config: buildconfig, bundledJsContent: string, resourcesMap: Record<string, string> = {}): string {
     let frameworkVersion = version();
 
@@ -194,50 +246,7 @@ ${bundledJsContent.split('\n').map(line => '  ' + line).join('\n')}
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     ${config.htmlhead}
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-body {
-    margin: 0;
-    background: #0f172a;
-    color: white;
-    font-family: sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden; /* 🔥 verhindert Scrollbars */
-}
-
-#startscreen {
-    text-align: center;
-}
-
-h1 {
-    font-size: 3rem;
-    margin-bottom: 0.5rem;
-}
-
-h2 {
-    font-weight: normal;
-    opacity: 0.7;
-}
-
-.startbutton {
-    margin-top: 2rem;
-    padding: 1rem 2rem;
-    font-size: 1.2rem;
-    background: #22c55e;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.startbutton:hover {
-    background: #16a34a;
-}
+${getStandardCSS(config)}
 
 ${getFullscreenButton(config)}
 
@@ -248,6 +257,7 @@ ${getFullscreenButton(config)}
         <h2>made with samengine</h2>
         <h1>${config.title}</h1>
         <p>${config.version}</p>
+        <p>${config.gameauthor}</p>
 
         <button class="startbutton" id="startBtn">Start</button>
     </div>
@@ -276,6 +286,9 @@ ${getFullscreenButton(config)}
             // Startscreen entfernen
             document.getElementById("startscreen").remove();
 
+            // Markdown Info entfernen
+            document.getElementById("mdnotes").remove();
+
             // Initialize the game
             window.__initializeGame();
         });
@@ -290,6 +303,10 @@ ${getFullscreenButton(config)}
     return defaulthtml;
 }
 
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+//
 export function GetDefaultHTML(config: buildconfig): string {
     let frameworkVersion = version()
 
@@ -304,50 +321,7 @@ export function GetDefaultHTML(config: buildconfig): string {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     ${config.htmlhead}
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-body {
-    margin: 0;
-    background: #0f172a;
-    color: white;
-    font-family: sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden; /* 🔥 verhindert Scrollbars */
-}
-
-#startscreen {
-    text-align: center;
-}
-
-h1 {
-    font-size: 3rem;
-    margin-bottom: 0.5rem;
-}
-
-h2 {
-    font-weight: normal;
-    opacity: 0.7;
-}
-
-.startbutton {
-    margin-top: 2rem;
-    padding: 1rem 2rem;
-    font-size: 1.2rem;
-    background: #22c55e;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.startbutton:hover {
-    background: #16a34a;
-}
+${getStandardCSS(config)}
 
 ${getFullscreenButton(config)}
 
@@ -358,6 +332,7 @@ ${getFullscreenButton(config)}
         <h2>made with samengine</h2>
         <h1>${config.title}</h1>
         <p>${config.version}</p>
+        <p>${config.gameauthor}</p>
 
         <button class="startbutton" id="startBtn">Start</button>
     </div>
@@ -379,6 +354,9 @@ ${getFullscreenButton(config)}
 
             // Startscreen entfernen
             document.getElementById("startscreen").remove();
+
+            // Markdown Info entfernen
+            document.getElementById("mdnotes").remove();
 
             // Game laden
             import("./${config.entryname}.js");

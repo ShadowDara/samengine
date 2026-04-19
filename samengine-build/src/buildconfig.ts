@@ -14,6 +14,12 @@ export interface buildconfig {
 export interface Paragraph {
     title: string;
     content: string;
+    style: Style;
+}
+
+export interface Style {
+    color: string;
+    bg_color: string;
 }
 
 export function new_buildconfig(): buildconfig {
@@ -26,5 +32,6 @@ export function new_buildconfig(): buildconfig {
         outdir: "dist",
         markdown_notes: [],
         gameauthor: "DEV",
+
     }
 }

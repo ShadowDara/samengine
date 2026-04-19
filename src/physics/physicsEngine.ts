@@ -108,3 +108,15 @@ export class PhysicsWorld {
         }
     }
 }
+
+
+export function setGravityDirection(world: PhysicsWorld, x: number, y: number, strength: number) {
+    const len = Math.sqrt(x * x + y * y);
+
+    if (len === 0) return;
+
+    world.gravity = makeVector2d(
+        (x / len) * strength,
+        (y / len) * strength
+    );
+}

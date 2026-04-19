@@ -5,5 +5,6 @@ export {
 } from "./physicsObject.js";
 
 export {
-    PhysicsWorld
+    PhysicsWorld,
+    setGravityDirection
 } from "./physicsEngine.js";

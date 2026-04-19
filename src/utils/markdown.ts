@@ -75,17 +75,17 @@ function renderInline(text: string, opts: ParseOptions): string {
     // Escaped Zeichen sichern (wichtig für Markdown-Sonderzeichen)
     // ---------------------------------------------------------------------
     const ESCAPES: Record<string, string> = {
-        "\\\\": "\x00ESC_BACKSLASH\x00",
-        "\\[": "\x00ESC_LBRACKET\x00",
-        "\\]": "\x00ESC_RBRACKET\x00",
-        "\\(": "\x00ESC_LPAREN\x00",
-        "\\)": "\x00ESC_RPAREN\x00",
-        "\\|": "\x00ESC_PIPE\x00",
-        '\\"': "\x00ESC_QUOTE\x00",
-        "\\*": "\x00ESC_STAR\x00",
-        "\\_": "\x00ESC_UNDERSCORE\x00",
-        "\\`": "\x00ESC_BACKTICK\x00",
-        "\\~": "\x00ESC_TILDE\x00"
+        "\\\\": "@@ESC-BACKSLASH@@",
+        "\\[": "@@ESC-LBRACKET@@",
+        "\\]": "@@ESC-RBRACKET@@",
+        "\\(": "@@ESC-LPAREN@@",
+        "\\)": "@@ESC-RPAREN@@",
+        "\\|": "@@ESC-PIPE@@",
+        '\\"': "@@ESC-QUOTE@@",
+        "\\*": "@@ESC-STAR@@",
+        "\\_": "@@ESC-UNDERSCORE@@",
+        "\\`": "@@ESC-BACKTICK@@",
+        "\\~": "@@ESC-TILDE@@"
     };
 
     for (const [char, placeholder] of Object.entries(ESCAPES)) {
@@ -98,7 +98,7 @@ function renderInline(text: string, opts: ParseOptions): string {
     if (!opts.sanitize) {
         text = text.replace(/<[^>]+>/g, (match) => {
             const idx = htmlPlaceholders.push(match) - 1;
-            return `\x00HTML${idx}\x00`;
+            return `@@HTML${idx}@@`;
         });
     }
 
@@ -111,10 +111,9 @@ function renderInline(text: string, opts: ParseOptions): string {
                 opts.externalLinks && isExternalUrl(url)
                     ? ' target="_blank" rel="noopener noreferrer"'
                     : "";
-            return `<a href="${url}"${t}${ext}>${renderInline(linkText, opts)}</a>`;
+            return `<a href="${url}"${t}${ext}>${linkText}</a>`;
         }
     );
-
     // Code-Spans (höchste Priorität, vor allem anderen)
     text = text.replace(/`{2}([^`]+)`{2}|`([^`\n]+)`/g, (_, a, b) => {
         return `<code>${escapeHtml(a ?? b)}</code>`;
@@ -178,13 +177,21 @@ function renderInline(text: string, opts: ParseOptions): string {
 
     // HTML-Platzhalter wiederherstellen
     if (!opts.sanitize) {
-        text = text.replace(/\x00HTML(\d+)\x00/g, (_, i) => htmlPlaceholders[+i]);
+        text = text.replace(/@@HTML(\d+)@@/g, (_, i) => htmlPlaceholders[+i]);
     }
 
-    // <<< HIER rein
-    for (const [char, placeholder] of Object.entries(ESCAPES)) {
-        text = text.replace(new RegExp(placeholder, "g"), char.replace("\\", ""));
-    }
+    text = text.replace(/@@ESC-BACKSLASH@@/g, "\\");
+    text = text.replace(/@@ESC-LPAREN@@/g, "(");
+    text = text.replace(/@@ESC-RPAREN@@/g, ")");
+    text = text.replace(/@@ESC-PIPE@@/g, "|");
+    text = text.replace(/@@ESC-QUOTE@@/g, '"');
+    text = text.replace(/@@ESC-STAR@@/g, "*");
+    text = text.replace(/@@ESC-UNDERSCORE@@/g, "_");
+    text = text.replace(/@@ESC-BACKTICK@@/g, "`");
+    text = text.replace(/@@ESC-TILDE@@/g, "~");
+
+    text = text.replace(/@@ESC-RBRACKET@@/g, "]");
+    text = text.replace(/@@ESC-LBRACKET@@/g, "[");
 
     return text;
 }
@@ -293,9 +300,9 @@ function parseTable(block: string, opts: ParseOptions): string {
         .map((c) =>
             c
                 .trim()
-                .replace(/\\\|/g, "|")
-                .replace(/\\\[/g, "[")
-                .replace(/\\\]/g, "]")
+            // .replace(/\\\|/g, "|")
+            // .replace(/\\\[/g, "[")
+            // .replace(/\\\]/g, "]")
         );
 
     const alignRow = rows[1].split(/(?<!\\)\|/).filter((c) => /[-:]/.test(c));
@@ -321,9 +328,9 @@ function parseTable(block: string, opts: ParseOptions): string {
             .map((c) =>
                 c
                     .trim()
-                    .replace(/\\\|/g, "|")
-                    .replace(/\\\[/g, "[")
-                    .replace(/\\\]/g, "]")
+                // .replace(/\\\|/g, "|")
+                // .replace(/\\\[/g, "[")
+                // .replace(/\\\]/g, "]")
             );
         return `<tr>\n${cells
             .map((c, i) => {
@@ -424,7 +431,7 @@ function parseBlocks(markdown: string, opts: ParseOptions): string {
         // -----------------------------------------------------------------------
         // Code-Block-Platzhalter (bereits in parse() extrahiert)
         {
-            const m = remaining.match(/^\x00CODEBLOCK\d+\x00/);
+            const m = remaining.match(/^@@CODEBLOCK\d+@@/);
             if (m) {
                 output.push(m[0]); // wird später in parse() ersetzt
                 remaining = remaining.slice(m[0].length);
@@ -742,7 +749,7 @@ export function parse(markdown: string, options: ParseOptions = {}): string {
         /^(`{3,}|~{3,})([^\n]*)\n([\s\S]*?)\n?\1[ \t]*(?:\n|$)/gm,
         (_, fence, lang, code) => {
             const idx = codeBlockPlaceholders.push(renderCodeBlock(lang.trim(), code)) - 1;
-            return `\x00CODEBLOCK${idx}\x00\n`;
+            return `@@CODEBLOCK${idx}@@\n`;
         }
     );
 
@@ -757,7 +764,7 @@ export function parse(markdown: string, options: ParseOptions = {}): string {
     let html = parseBlocks(text, opts);
 
     // Platzhalter durch gerenderte Code-Blöcke ersetzen
-    html = html.replace(/\x00CODEBLOCK(\d+)\x00/g, (_, i) => codeBlockPlaceholders[+i]);
+    html = html.replace(/@@CODEBLOCK(\d+)@@/g, (_, i) => codeBlockPlaceholders[+i]);
 
     // Fußnoten-Liste anhängen
     html += renderFootnoteList(notes, opts);

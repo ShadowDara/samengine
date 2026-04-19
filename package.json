@@ -1,6 +1,6 @@
 {
   "name": "samengine",
-  "version": "1.8.1",
+  "version": "1.7.8",
   "description": "A TypeScript game library to make HTML Games",
   "sideEffects": false,
   "files": [

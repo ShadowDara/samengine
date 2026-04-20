@@ -14,7 +14,7 @@ export interface buildconfig {
 export interface Paragraph {
     title: string;
     content: string;
-    style: Style;
+    style?: Style;
 }
 
 export interface Style {

@@ -6,20 +6,20 @@ export default function Home() {
       {/* Hero */}
       <section className="flex flex-col items-center justify-center text-center py-32 px-6">
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
-          SamEngine
+          samengine
         </h1>
         <p className="text-lg md:text-xl text-gray-400 max-w-2xl mb-8">
-          Die nächste Generation von Performance-Tools. Schnell. Modular. Entwickelt für Creator & Entwickler.
+          a Webgameframework written in Typescript for Webgames which export in a single HTML File. <i>(and 3D Games in the Future)</i>
         </p>
         <div className="flex gap-4">
-          <Link href="/download">
+          <a href="https://npmjs.com/samengine" target="_blank">
             <button className="bg-white text-black px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition">
-              Download
+              Download Package
             </button>
-          </Link>
+          </a>
           <Link href="/docs">
             <button className="border border-white px-6 py-3 rounded-xl hover:bg-white hover:text-black transition">
-              Dokumentation
+              Documentation (in Progress)
             </button>
           </Link>
         </div>
@@ -31,20 +31,24 @@ export default function Home() {
           Features
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-10 max-w-6xl mx-auto">
           {[
             {
               title: "Ultra Performance",
-              desc: "Optimiert für maximale Geschwindigkeit und Effizienz."
+              desc: "samengine has no Runtime, this means, every unused Feature will NOT be in the export!"
             },
+            // {
+            //   title: "Modular aufgebaut",
+            //   desc: "Erweitere samengine genau so, wie du es brauchst."
+            // },
+            // {
+            //   title: "Developer Friendly",
+            //   desc: "An easy API and clear Structure with every Tool and Function for making Games"
+            // },
             {
-              title: "Modular aufgebaut",
-              desc: "Erweitere SamEngine genau so, wie du es brauchst."
+              title: "Build",
+              desc: "samengine has its own buildtool to make the build workflow a lot easier!"
             },
-            {
-              title: "Developer Friendly",
-              desc: "Einfache API, klare Struktur, perfekt für moderne Workflows."
-            }
           ].map((f, i) => (
             <div
               key={i}
@@ -60,21 +64,21 @@ export default function Home() {
       {/* CTA */}
       <section className="py-24 px-6 text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-6">
-          Bereit loszulegen?
+          Are you Ready?
         </h2>
         <p className="text-gray-400 mb-8">
-          Starte jetzt mit SamEngine und bring deine Projekte aufs nächste Level.
+          Start new with samengine and create a new high efficient webgame!
         </p>
-        <Link href="/download">
+        <a href="https://npmjs.com/samengine" target="_blank">
           <button className="bg-white text-black px-8 py-4 rounded-xl font-semibold hover:bg-gray-200 transition">
-            Jetzt starten
+            Start now
           </button>
-        </Link>
+        </a>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-zinc-800 py-8 text-center text-gray-500 text-sm">
-        © {new Date().getFullYear()} SamEngine. All rights reserved.
+        © {new Date().getFullYear()} samengine. All rights reserved.
       </footer>
     </main>
   );

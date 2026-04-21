@@ -24,7 +24,7 @@ export default function Home() {
           </a>
           <Link href="/docs">
             <button className="border border-white px-6 py-3 rounded-xl hover:bg-white hover:text-black transition">
-              Documentation (in Progress)
+              Documentation (Work in Progress)
             </button>
           </Link>
         </div>
@@ -39,7 +39,7 @@ export default function Home() {
         <div className="grid md:grid-cols-2 gap-10 max-w-6xl mx-auto">
           {[
             {
-              title: "Ultra Performance",
+              title: "High Performance",
               desc: "samengine has no Runtime, this means, every unused Feature will NOT be in the export!"
             },
             // {

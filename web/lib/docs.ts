@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 
-const docsDirectory = path.join(process.cwd(), "content");
+const docsDirectory = path.join(process.cwd(), "../docs");
 
 export function getDocSlugs() {
   return fs.readdirSync(docsDirectory);

@@ -20,7 +20,7 @@ export default function DocsLayout({
       <aside style={{ width: "250px", padding: "20px" }} className="bg-zinc-900 min-h-screen">
         
         {/* Get back to the Homepage */}
-        <p className="mb-1">
+        <p className="mb-2">
           <Link href="/" className="hover:underline p-1">Home</Link>
         </p>
 

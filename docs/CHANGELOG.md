@@ -1,12 +1,16 @@
 # CHANGELOG
 
+## samengine-build (1.9.1) (21.04.2026)
 
-## Newest samengine (1.9.0)
+- little Bugfix in the buildconfig
+
+
+## samengine (1.9.0) (21.04.2026)
 
 - removed the `version()` function
 
 
-## Newest samengine-build (1.9.0)
+## samengine-build (1.9.0) (21.04.2026)
 
 - made the Style optional in the buildconfig for Paraggraphs
 - added a new Function to check the Version from samengine from the `node_modules`
@@ -14,7 +18,7 @@ folder
 - added Default Icon
 
 
-## Newest samengine-cli (1.9.0)
+## Newest samengine-cli
 
 
 ## Info

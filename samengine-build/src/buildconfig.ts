@@ -31,7 +31,7 @@ export function new_buildconfig(): buildconfig {
         outdir: "dist",
         markdown_notes: [],
         gameauthor: "DEV",
-        htmlhead: `<link rel="icon" href="data:image/svg+xml;base64,${btoa(svgfile)}`,
+        htmlhead: `<link rel="icon" href="data:image/svg+xml;base64,${btoa(svgfile)}">`,
     }
 }
 

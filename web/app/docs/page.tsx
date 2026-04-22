@@ -10,10 +10,13 @@ import rehypeHighlight from "rehype-highlight";
 export default function DocsHome() {
   const { slug, content } = getDocBySlug("README");
 
+  // Remove HTML Comments
+  const clean = content.replace(/<!--[\s\S]*?-->/g, "");
+
   return (
     <div className="prose dark:prose-invert">
       <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-        {content}
+        {clean}
       </ReactMarkdown>
     </div>
   );

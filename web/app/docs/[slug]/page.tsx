@@ -27,13 +27,16 @@ export default async function DocPage({
 
   const doc = getDocBySlug(slug);
 
+  // Remove HTML Comments
+  const clean = doc.content.replace(/<!--[\s\S]*?-->/g, "");
+
   return (
     <div className="prose dark:prose-invert min-w-full">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight]}
       >
-        {doc.content}
+        {clean}
       </ReactMarkdown>
     </div>
   );

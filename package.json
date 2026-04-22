@@ -7,9 +7,11 @@
     "dist"
   ],
   "scripts": {
+    "dev": "npx samengine-build",
     "build": "tsc",
     "pack": "node scripts/clean.js && npm run build && npm pack && git push --follow-tags",
-    "test": "bun test"
+    "test": "bun test",
+    "up": "npx automatic-md-index --files=docs/Api.md,docs/Build.md,docs/Config.md,docs/Get-Started.md,docs/README.md,CHANGELOG.md,README.md --no-strict"
   },
   "exports": {
     ".": "./dist/index.js",
@@ -27,8 +29,9 @@
   "license": "MIT",
   "devDependencies": {
     "chalk": "^5.6.2",
-    "@types/node": "^25.5.2",
-    "typescript": "^6.0.2"
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3",
+    "automatic-md-index": "^1.2.2"
   },
   "repository": {
     "type": "git",

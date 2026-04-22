@@ -12,6 +12,9 @@ export default function ChangelogPage() {
   const filePath = path.join(process.cwd(), "..", "CHANGELOG.md");
   const markdown = fs.readFileSync(filePath, "utf-8");
 
+  // Remove HTML Comments
+  const clean = markdown.replace(/<!--[\s\S]*?-->/g, "");
+
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 px-6 py-16">
       <div className="max-w-3xl mx-auto">
@@ -43,7 +46,7 @@ export default function ChangelogPage() {
               hr: () => <hr className="my-8 border-neutral-800" />,
             }}
           >
-            {markdown}
+            {clean}
           </ReactMarkdown>
         </article>
       </div>

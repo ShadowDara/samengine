@@ -4,6 +4,44 @@ A lightweight, TypeScript-first web game engine framework for building
 2D games *and maybe 3D Games in the Future*.
 
 
+<!--$$MD_INDEX_START$$-->
+<!-- 
+    Index by Automatic MD Index
+    a simple Tool to Index your Markdown files like this
+
+    More Infos:
+    https://github.com/ShadowDara/automatic-md-index
+
+    DO NOT REMOVE THIS CREDIT !!!
+
+    Last Update Time of the Index:
+    2026-04-22T15:30:23.314Z
+-->
+
+## Index
+- [Samengine 🎮](#samengine-)
+  - [Features](#features)
+  - [Info](#info)
+  - [Quick Start](#quick-start)
+- [Make sure both of them have the same Version](#make-sure-both-of-them-have-the-same-version)
+    - [Basic Game Loop](#basic-game-loop)
+  - [Development & Building](#development-building)
+    - [Using Bun (local development)](#using-bun-local-development)
+  - [Config](#config)
+  - [API Reference](#api-reference)
+    - [Core Engine](#core-engine)
+    - [Rendering](#rendering)
+    - [Input System](#input-system)
+    - [Types](#types)
+    - [Utilities](#utilities)
+  - [License](#license)
+  - [More Addons in the Game Library](#more-addons-in-the-game-library)
+  - [More Tools for samengine and Game Making by me lol](#more-tools-for-samengine-and-game-making-by-me-lol)
+  - [Commit Tags](#commit-tags)
+<!-- Index by Automatic MD Index -->
+<!--$$MD_INDEX_END$$-->
+
+
 ## Features
 
 - 🎯 Simple game loop management

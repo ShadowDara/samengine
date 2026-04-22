@@ -14,7 +14,7 @@ import { copyFolder, flog, getContentType, scanResourcesAsDataURIs, filterResour
 import { GetDefaultHTML, GetSingleFileHTML } from "../exporthtml.js";
 import { loadUserConfig } from "./config.js";
 import { compressHTML } from "../utils/utils.js";
-import { type CLIArgs, parseArgs } from "./argparser.js";
+import { parseArgs } from "./argparser.js";
 import { buildconfig } from "../buildconfig.js";
 import { getPackageVersion } from "../getversion.js";
 
@@ -29,7 +29,7 @@ function createBuilder(config: buildconfig, isRelease: boolean, isSingleFile: bo
     async function build() {
         try {
             flog("🔄 Building project...");
-            if (isRelease) await rm("./dist", { recursive: true, force: true });
+            if (isRelease) await rm(`./${config.outdir}`, { recursive: true, force: true });
 
             await esbuild({
                 entryPoints: [`./game/${config.entryname}`],
@@ -59,10 +59,10 @@ function createBuilder(config: buildconfig, isRelease: boolean, isSingleFile: bo
                 const htmlComment = `<!-- Game made with samengine v${version} - https://github.com/Shadowdara/samengine ${config.gameauthor} (Game Author) -->\n`;
                 html = htmlComment + html;
                 
-                await writeFile("./dist/index.html", html);
+                await writeFile(`./${config.outdir}/index.html`, html);
 
                 // Delete the JS File
-                await rm("./dist/main.js", { recursive: true, force: true });
+                await rm(`./${config.outdir}/main.js`, { recursive: true, force: true });
 
                 flog("✅ Single-file export created!");
             } else {
@@ -74,7 +74,7 @@ function createBuilder(config: buildconfig, isRelease: boolean, isSingleFile: bo
                 const htmlComment = `<!-- Game made with samengine v${version} - https://www.npmjs.com/samengine ${config.gameauthor} (Game Author) -->\n`;
                 html = htmlComment + html;
                 
-                await writeFile("./dist/index.html", html);
+                await writeFile(`./${config.outdir}/index.html`, html);
                 
                 // Add JS comment at the beginning of JS files
                 const jsComment = `// Game made with samengine v${version} - https://www.npmjs.com/samengine by ${config.gameauthor} (Game Author)\n`;
@@ -83,7 +83,7 @@ function createBuilder(config: buildconfig, isRelease: boolean, isSingleFile: bo
                 jsContent = jsComment + jsContent;
                 await writeFile(jsPath, jsContent);
                 
-                await copyFolder("./resources", "./dist/resources");
+                await copyFolder("./resources", `./${config.outdir}/resources`);
                 flog("✅ Build finished!");
             }
         } catch (error) {
@@ -95,11 +95,11 @@ function createBuilder(config: buildconfig, isRelease: boolean, isSingleFile: bo
 }
 
 // ================= SERVER & RELOAD =================
-function createDevServer(port: number) {
-    const sockets = new Set<WebSocket>(); // <-- ws WebSocket, nicht DOM
+function createDevServer(config: buildconfig) {
+    const sockets = new Set<WebSocket>();
     const server = createServer(async (req, res) => {
         const url = req.url || "/";
-        const filePath = path.join(process.cwd(), "dist", url === "/" ? "index.html" : url);
+        const filePath = path.join(process.cwd(), `${config.outdir}`, url === "/" ? "index.html" : url);
 
         try {
             const file = await readFile(filePath);
@@ -117,7 +117,24 @@ function createDevServer(port: number) {
         ws.on("close", () => sockets.delete(ws));
     });
 
-    server.listen(port, () => flog(`🚀 Dev Server running on http://localhost:${port}`));
+    function startListening(port: number) {
+        server.listen(port);
+
+        server.on("listening", () => {
+            flog(`🚀 Dev Server running on http://localhost:${port}`);
+        });
+
+        server.on("error", (err: any) => {
+            if (err.code === "EADDRINUSE") {
+                flog(`⚠️ Port ${port} belegt, versuche ${port + 1}...`);
+                startListening(port + 1);
+            } else {
+                throw err;
+            }
+        });
+    }
+
+    startListening(config.dev_server_port);
 
     function reloadClients() {
         flog("🔄 Browser reload...");
@@ -183,11 +200,13 @@ async function main() {
 
     let devServer: ReturnType<typeof createDevServer> | null = null;
 
+    // Only start the Dev Server in Release Mode
     if (!args.release) {
-        devServer = createDevServer(args.port);
+        devServer = createDevServer(config);
         await startWatcher(restart);
     }
 
+    // Dev or Release Mode
     flog(`Build finished! Mode: ${args.release ? "Release" : "Dev"}`);
 }
 

@@ -35,6 +35,9 @@ export default function defineConfig(): buildconfig {
     // The Game Author (will be mentioned on the Game startpage)
     config.author = "you";
 
+    // The Webserver Port for the Develepment Server
+    config.dev_server_port = 3000;
+
     return config;
 }
 ```

@@ -9,6 +9,7 @@ export interface buildconfig {
     outdir: string;
     markdown_notes: Paragraph[];
     gameauthor: string;
+    dev_server_port: number;
 }
 
 export interface Paragraph {
@@ -32,6 +33,7 @@ export function new_buildconfig(): buildconfig {
         markdown_notes: [],
         gameauthor: "DEV",
         htmlhead: `<link rel="icon" href="data:image/svg+xml;base64,${btoa(svgfile)}">`,
+        dev_server_port: 3000,
     }
 }
 

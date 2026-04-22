@@ -27,6 +27,11 @@ export default function Home() {
               Documentation (Work in Progress)
             </button>
           </Link>
+          <Link href="/changelog">
+            <button className="border border-white px-6 py-3 rounded-xl hover:bg-white hover:text-black transition">
+              Changelog
+            </button>
+          </Link>
         </div>
       </section>
 

@@ -8,3 +8,5 @@ bun.lock
 **/.samengine/config.mjs
 
 web/docs
+
+dist2/

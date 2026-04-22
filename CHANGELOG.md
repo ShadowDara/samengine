@@ -1,5 +1,11 @@
 # CHANGELOG
 
+
+## samengine-build (1.9.2) (22.04.2026)
+
+- fixed a Bug with the Outdir
+
+
 ## samengine-build (1.9.1) (21.04.2026)
 
 - little Bugfix in the buildconfig

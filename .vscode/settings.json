@@ -7,6 +7,8 @@
     "**/dist2/**": true,
     "**/.next/**": true,
     "web/docs": true,
-    "web/next-env.d.ts": true
+    "web/next-env.d.ts": true,
+    "**/.samengine/config.mjs": true,
+    "**/.samengine": true
   },
 }

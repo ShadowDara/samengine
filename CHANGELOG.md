@@ -1,6 +1,11 @@
 # CHANGELOG
 
 
+## Newest samengine-build (Probably 1.9.3) (22.04.2026)
+
+- Server Reloads when the Config changes
+
+
 ## samengine-build (1.9.2) (22.04.2026)
 
 - fixed a Bug with the Outdir

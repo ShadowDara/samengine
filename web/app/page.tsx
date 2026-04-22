@@ -1,5 +1,6 @@
 // app/page.tsx
 
+// Make it static!
 export const dynamic = "force-static";
 
 import Link from "next/link";
@@ -59,6 +60,14 @@ export default function Home() {
               title: "High Performance",
               desc: "samengine has no Runtime, this means, every unused Feature will NOT be in the export!"
             },
+            // {
+            //   title: "Modular aufgebaut",
+            //   desc: "Erweitere samengine genau so, wie du es brauchst."
+            // },
+            // {
+            //   title: "Developer Friendly",
+            //   desc: "An easy API and clear Structure with every Tool and Function for making Games"
+            // },
             {
               title: "Build",
               desc: "samengine has its own buildtool to make the build workflow a lot easier!"

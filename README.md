@@ -14,8 +14,7 @@ A lightweight, TypeScript-first web game engine framework for building
 
     DO NOT REMOVE THIS CREDIT !!!
 
-    Last Update Time of the Index:
-    2026-04-22T15:56:43.388Z
+    Last Update Time of the Index: 
 -->
 
 ## Index

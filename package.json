@@ -9,9 +9,9 @@
   "scripts": {
     "dev": "npx samengine-build",
     "build": "tsc",
-    "pack": "node scripts/clean.js && npm run build && npm pack && git push --follow-tags",
+    "pack": "node scripts/clean.js && npm run build && npm pack && git push --follow-tags && npm run up",
     "test": "bun test",
-    "up": "npx automatic-md-index --no-h1 --files=docs/Api.md,docs/Build.md,docs/Config.md,docs/Get-Started.md,docs/README.md,CHANGELOG.md,README.md --no-strict"
+    "up": "npx automatic-md-index --no-h1 --files=docs/Api.md,docs/Build.md,docs/Config.md,docs/Get-Started.md,docs/README.md,CHANGELOG.md,README.md --no-strict --no-timestamp"
   },
   "exports": {
     ".": "./dist/index.js",
@@ -31,7 +31,7 @@
     "chalk": "^5.6.2",
     "@types/node": "^25.6.0",
     "typescript": "^6.0.3",
-    "automatic-md-index": "^1.3.5"
+    "automatic-md-index": "^1.3.6"
   },
   "repository": {
     "type": "git",

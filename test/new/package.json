@@ -1,0 +1,8 @@
+{
+  "name": "new",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "npx samengine-build",
+    "build": "npx samengine-build --release"}
+}

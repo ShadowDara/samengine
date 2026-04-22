@@ -29,6 +29,8 @@
 ## Newest samengine-build (Probably 1.9.3) (22.04.2026)
 
 - Server Reloads when the Config changes
+- fixed a Bug where the wrong config was used
+- fixed a Bug when no Markdown Notes where added
 
 
 ## samengine-build (1.9.2) (22.04.2026)

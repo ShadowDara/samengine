@@ -199,8 +199,8 @@ async function main() {
                 // Create new Dev Server
                 devServer = createDevServer(newConfig);
 
-                // New Builder
-                builder = createBuilder(config, args.release, args.singlefile);
+                // New Builder (use the new Config)
+                builder = createBuilder(newConfig, args.release, args.singlefile);
 
                 await builder.build();
 

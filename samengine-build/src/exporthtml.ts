@@ -264,7 +264,7 @@ function getSettingsButtonCSS(config: buildconfig): string {
     /* Menü */
     #menu {
       position: fixed;
-      bottom: 90px;
+      bottom: 80px;
       right: 20px;
       background: rgba(0, 0, 0, 0.6);
       padding: 10px;
@@ -389,8 +389,11 @@ ${getFullscreenButton(config)}
             // Startscreen entfernen
             document.getElementById("startscreen").remove();
 
-            // Markdown Info entfernen
-            document.getElementById("mdnotes").remove();
+            // Only when there are Markdown Notes
+            ${config.markdown_notes.entries.length == 0 ? `
+// Markdown Info entfernen
+document.getElementById("mdnotes").remove();
+` : ""}
 
             // Initialize the game
             window.__initializeGame();
@@ -453,9 +456,12 @@ ${getSettingsButtonCSS(config)}
 
             // Startscreen entfernen
             document.getElementById("startscreen").remove();
-
-            // Markdown Info entfernen
-            document.getElementById("mdnotes").remove();
+            
+            // Only when there are Markdown Notes
+            ${config.markdown_notes.entries.length == 0 ? `
+// Markdown Info entfernen
+document.getElementById("mdnotes").remove();
+` : ""}
 
             // Game laden
             import("./${config.entryname}.js");

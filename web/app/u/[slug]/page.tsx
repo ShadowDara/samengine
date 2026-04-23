@@ -3,6 +3,14 @@
 // Make it static!
 export const dynamic = "force-static";
 
+export async function generateStaticParams() {
+  return [
+    { slug: "sam" },
+    { slug: "alex" },
+    { slug: "testuser" },
+  ];
+}
+
 export default async function UserSlug({
   params,
 }: {

@@ -34,6 +34,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "samtool"
+version = "0.1.0"
+dependencies = [
+ "fluaterm",
+ "sakeparser",
+ "win-utf8-rs",
+]
+
+[[package]]
 name = "syn"
 version = "2.0.117"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -42,15 +51,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
-]
-
-[[package]]
-name = "tool"
-version = "0.1.0"
-dependencies = [
- "fluaterm",
- "sakeparser",
- "win-utf8-rs",
 ]
 
 [[package]]

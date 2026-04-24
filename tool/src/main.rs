@@ -1,7 +1,7 @@
-use std::env;
+use std::{collections::HashMap, env};
 
 use fluaterm::{self, END, GREEN, RED, YELLOW};
-use sakeparser::{parse, run_task, validate};
+use sakeparser::{parse, run_task, validate_all, RuntimeState};
 use win_utf8_rs::enable_utf8;
 
 const PROGNAME: &str = "samtool";
@@ -22,14 +22,19 @@ fn help() {
     works a bit simmilliar to makefile and can used to make the build
     process easier.
     
-    Execute commands or scripts from it by running {} build, to run the
+    Execute commands or scripts from it by running {}{}{} build, to run the
     build script.
     
-    PS: The File is named {}samfile{}"#, RED, END, GREEN, END, PROGNAME, YELLOW, END)
+    PS: The File is named {}samfile{}"#, RED, END, GREEN, END, YELLOW, PROGNAME, END, YELLOW, END)
 }
 
 // Run sth from the samfile
 fn run_sam_file(command: &str) {
+    let mut state = RuntimeState {
+        cwd: std::env::current_dir().unwrap(),
+        env: HashMap::new(),
+    };
+
     let content = match std::fs::read_to_string("samfile") {
         Ok(c) => c,
         Err(e) => {
@@ -41,13 +46,13 @@ fn run_sam_file(command: &str) {
     let tasks = parse(&content);
 
     // Check for cycled dependencies
-    validate(&tasks, command);
+    validate_all(&tasks);
 
     // Map which one was already visited
     let mut visited = std::collections::HashSet::new();
 
     // Execute the Task
-    run_task(&tasks, command, &mut visited);
+    run_task(&tasks, command, &mut visited, &mut state);
 }
 
 // Main function
@@ -58,7 +63,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     if args.len() < 2 {
-        eprintln!("{}{}: No Argument Provided{}", RED, PROGNAME, END);
+        eprintln!("{}{}{}: {}No Argument Provided{}", YELLOW, PROGNAME, END, RED, END);
         return;
     }
 

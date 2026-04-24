@@ -1,5 +1,5 @@
-use std::{collections::HashMap, fs};
-use std::{env, process::Command as Proc};
+use std::path::PathBuf;
+use std::{collections::HashMap};
 use std::collections::HashSet;
 
 // Commands
@@ -23,8 +23,11 @@ enum VisitState {
     Visited,
 }
 
-// To Control Cycles
-type StateMap = HashMap<String, VisitState>;
+// Runtime Path for every Script
+pub struct RuntimeState {
+    pub cwd: PathBuf,
+    pub env: HashMap<String, String>,
+}
 
 fn detect_cycles(
     tasks: &Tasks,
@@ -35,13 +38,16 @@ fn detect_cycles(
     match state.get(name).unwrap_or(&VisitState::NotVisited) {
         VisitState::Visiting => {
             // CYCLE FOUND
-            let cycle_start = stack.iter()
-                .position(|n| n == name)
-                .unwrap();
+            let cycle_start = match stack.iter().position(|n| n == name) {
+                Some(i) => i,
+                None => {
+                    panic!("Internal error: cycle detection state corrupted");
+                }
+            };
 
             let cycle = &stack[cycle_start..];
 
-            panic!("❌ Cycle detected: {:?}", cycle);
+            panic!("samfile Cycle detected: {:?}", cycle);
         }
 
         VisitState::Visited => return,
@@ -56,6 +62,13 @@ fn detect_cycles(
     let task = tasks.get(name)
         .expect("task not found");
 
+    // Check Unknow dependencies
+    for dep in &task.deps {
+        if !tasks.contains_key(dep) {
+            panic!("Unknown dependency '{}' in task '{}'", dep, name);
+        }
+    }
+
     for dep in &task.deps {
         detect_cycles(tasks, dep, state, stack);
     }
@@ -66,28 +79,14 @@ fn detect_cycles(
 
 
 // To detect Cycles
-pub fn validate(tasks: &Tasks, root: &str) {
+pub fn validate_all(tasks: &Tasks) {
     let mut state = HashMap::new();
     let mut stack = vec![];
 
-    detect_cycles(tasks, root, &mut state, &mut stack);
+    for task in tasks.keys() {
+        detect_cycles(tasks, task, &mut state, &mut stack);
+    }
 }
-
-
-// Shell
-#[cfg(windows)]
-const SHELL: &str = "cmd";
-
-#[cfg(windows)]
-const SHELL_SUB: &str = "/C";
-
-// Linux / MacOS
-
-#[cfg(not(windows))]
-const SHELL: &str = "sh";
-
-#[cfg(not(windows))]
-const SHELL_SUB: &str = "-c";
 
 
 // Function to parse a Line
@@ -99,7 +98,13 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     if line.starts_with("run ") {
-        return Some(Command::Run(line[4..].to_string()));
+        let cmd = line[4..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty run command");
+        }
+
+        return Some(Command::Run(cmd.to_string()));
     }
 
     if line.starts_with("env ") {
@@ -163,12 +168,19 @@ pub fn parse(content: &str) -> Tasks {
         // command
         else if line.starts_with(' ') {
             if let Some(task_name) = &current {
-                let cmd = parse_line(line).unwrap();
+                match parse_line(line) {
+                    Some(cmd) => {
+                        tasks.get_mut(task_name)
+                            .unwrap()
+                            .commands
+                            .push(cmd);
+                    }
 
-                tasks.get_mut(task_name)
-                    .unwrap()
-                    .commands
-                    .push(cmd);
+                    None => {
+                        // ignore unknown lines (or comments, typos, etc.)
+                        eprintln!("warning: ignored invalid line: {}", line);
+                    }
+                }
             }
         }
     }
@@ -182,6 +194,7 @@ pub fn run_task(
     tasks: &Tasks,
     name: &str,
     visited: &mut HashSet<String>,
+    state: &mut RuntimeState,
 ) {
     if visited.contains(name) {
         return;
@@ -192,9 +205,14 @@ pub fn run_task(
     let task = tasks.get(name)
         .expect("task not found");
 
+    let mut local_state = RuntimeState {
+        cwd: state.cwd.clone(),
+        env: state.env.clone(),
+    };
+
     // 1. run dependencies first
     for dep in &task.deps {
-        run_task(tasks, dep, visited);
+        run_task(tasks, dep, visited, &mut local_state);
     }
 
     println!("\n==> running task: {}\n", name);
@@ -203,8 +221,20 @@ pub fn run_task(
     for cmd in &task.commands {
         match cmd {
             Command::Cd(path) => {
-                std::env::set_current_dir(path)
-                    .expect("cd failed");
+                let new_path = if PathBuf::from(path).is_absolute() {
+                    PathBuf::from(path)
+                } else {
+                    state.cwd.join(path)
+                };
+
+                println!("> cd {}", new_path.display());
+
+                state.cwd = match new_path.canonicalize() {
+                    Ok(p) => p,
+                    Err(_) => {
+                        panic!("cd failed: path does not exist: {}", new_path.display());
+                    }
+                };
             }
 
             Command::Env(k, v) => {
@@ -220,6 +250,7 @@ pub fn run_task(
 
                 let status = std::process::Command::new(program)
                     .args(args)
+                    .current_dir(&state.cwd)   // 🔥 WICHTIG
                     .status()
                     .expect("failed");
 
@@ -230,18 +261,3 @@ pub fn run_task(
         }
     }
 }
-
-// // Usage
-//
-// fn main() {
-//     let content = std::fs::read_to_string("Samfile").unwrap();
-
-//     let tasks = parse(&content);
-
-//     let mut visited = std::collections::HashSet::new();
-
-//     let args: Vec<String> = std::env::args().collect();
-//     let task = args.get(1).map(|s| s.as_str()).unwrap_or("build");
-
-//     run_task(&tasks, task, &mut visited);
-// }

@@ -5,9 +5,12 @@ use sakeparser::{parse, run_task, validate_all, RuntimeState};
 use win_utf8_rs::enable_utf8;
 
 mod linksaver;
+mod tags;
 
 const PROGNAME: &str = "samtool";
 
+
+// Help Message
 fn help() {
     println!(r#"{}
 ███████╗ █████╗ ███╗   ███╗███████╗███╗   ██╗ ██████╗ ██╗███╗   ██╗███████╗
@@ -39,8 +42,13 @@ fn help() {
     Use {}{}{} --linksaver -h to get more Information
     or {}-l{} instead of linksaver
     check {}https://samengine.vercel.app/docs/linksaver{} for more Infos
-"#, RED, END, GREEN, END, YELLOW, PROGNAME, END, YELLOW, END, BLUE, END, PURPLE, END, GREEN, END, YELLOW, PROGNAME, END, PURPLE, END, BLUE, END);
+
+{}Tags{}:
+    Run -t or --tag and then a Tag which should be added to the Git Repository
+    and pushed to Github.
+"#, RED, END, GREEN, END, YELLOW, PROGNAME, END, YELLOW, END, BLUE, END, PURPLE, END, GREEN, END, YELLOW, PROGNAME, END, PURPLE, END, BLUE, END, GREEN, END);
 }
+
 
 // Run sth from the samfile
 fn run_sam_file(command: &str) {
@@ -160,6 +168,16 @@ fn main() {
             }
 
             linksaver::execute(sndarg);
+        }
+
+        // Tags
+        "-t" | "--tag" => {
+            if args.len() >= 3 {
+                let sndarg = &args[2];
+                tags::add_tag(sndarg);
+            }
+
+            eprintln!("Missing Argument after --tag!");
         }
 
         // When not found

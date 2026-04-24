@@ -33,10 +33,11 @@
 - Markdown notes are now removed correctly on Game Start
 
 
-## Future samengine ()
+## Future samengine () (Probaly 1.9.1)
 
 - added a has function
 - added a ImGUI inspired UI System
+- added CSV Parser
 
 
 ## samengine-build (1.9.2) (22.04.2026)

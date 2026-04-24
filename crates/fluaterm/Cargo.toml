@@ -1,0 +1,11 @@
+[package]
+name = "fluaterm"
+version = "0.2.2"
+edition = "2024"
+authors = ["Shadowdara"]
+readme = "README.md"
+description = "a terminal module for flua which supports ANSI colors (now samengine, because flua is dead)"
+license = "Apache-2.0"
+include = ["LICENSE", "README.md", "Cargo.toml", "/src/"]
+keywords = ["terminal", "fluaterm", "flua", "ansi", "color"]
+repository = "https://github.com/shadowdara/samengine"

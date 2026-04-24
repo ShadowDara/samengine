@@ -1,4 +1,4 @@
-use std::{collections::HashMap, env};
+use std::{collections::HashMap, env, fs, path::Path};
 
 use fluaterm::{self, END, GREEN, RED, YELLOW};
 use sakeparser::{parse, run_task, validate_all, RuntimeState};
@@ -25,7 +25,10 @@ fn help() {
     Execute commands or scripts from it by running {}{}{} build, to run the
     build script.
     
-    PS: The File is named {}samfile{}"#, RED, END, GREEN, END, YELLOW, PROGNAME, END, YELLOW, END)
+    PS: The File is named {}samfile{}
+    PS: Full Guide about it on https://samengine.vercel.app/docs/samfile
+    
+    Run with --init to create a new samefile in your project directory"#, RED, END, GREEN, END, YELLOW, PROGNAME, END, YELLOW, END)
 }
 
 // Run sth from the samfile
@@ -35,7 +38,7 @@ fn run_sam_file(command: &str) {
         env: HashMap::new(),
     };
 
-    let content = match std::fs::read_to_string("samfile") {
+    let content = match std::fs::read_to_string(".samengine/samfile") {
         Ok(c) => c,
         Err(e) => {
             eprintln!("Error while reading samfile: {}", e);
@@ -55,6 +58,61 @@ fn run_sam_file(command: &str) {
     run_task(&tasks, command, &mut visited, &mut state);
 }
 
+fn has_gitignore(dir: &str) -> bool {
+    Path::new(dir).join(".gitignore").exists()
+}
+
+fn read_gitignore(dir: &str) -> Option<String> {
+    let path = std::path::Path::new(dir).join(".gitignore");
+
+    fs::read_to_string(path).ok()
+}
+
+fn is_samfile_ignored(gitignore_content: &str) -> bool {
+    gitignore_content
+        .lines()
+        .any(|line| line.trim() == "samfile")
+}
+
+fn init() {
+    let dir = std::path::Path::new(".samengine");
+    let file = dir.join("samfile");
+
+    // ❌ check first
+    if dir.exists() && file.exists() {
+        println!("samefile already exists — aborting init");
+        return;
+    }
+
+    println!("Creating a new samfile");
+
+    // Create .samengine Directory
+    std::fs::create_dir_all(dir)
+        .expect("failed to create directory");
+
+    std::fs::write(
+        &file,
+        "# A new samfile, write your scripts here"
+    )
+    .expect("failed to create file");
+
+    let dir2 = std::env::current_dir()
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_string();
+
+    if has_gitignore(&dir2) {
+        if let Some(content) = read_gitignore(&dir2) {
+            if is_samfile_ignored(&content) {
+                println!("samfile is ignored by git");
+            } else {
+                println!("samfile is NOT ignored");
+            }
+        }
+    }
+}
+
 // Main function
 fn main() {
     #[cfg(windows)]
@@ -63,7 +121,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     if args.len() < 2 {
-        eprintln!("{}{}{}: {}No Argument Provided{}", YELLOW, PROGNAME, END, RED, END);
+        eprintln!("{}{}{}: {}No Argument Provided{} - run with help!", YELLOW, PROGNAME, END, RED, END);
         return;
     }
 
@@ -71,8 +129,13 @@ fn main() {
 
     match first_arg.as_str() {
         // Print Help
-        "help" => {
+        "help" | "-h" | "--help" => {
             help()
+        }
+
+        // Init
+        "--init" => {
+            init();
         }
 
         // When not found

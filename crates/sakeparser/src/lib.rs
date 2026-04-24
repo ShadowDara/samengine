@@ -148,8 +148,19 @@ pub fn parse(content: &str) -> Tasks {
 
     for line in content.lines() {
         let line = line.trim_end();
+        
+        let trimmed = line.trim();
 
-        if line.trim().is_empty() || line.starts_with('#') {
+        // ignore empty lines
+        if trimmed.is_empty() {
+            continue;
+        }
+
+        // ignore comments
+        if trimmed.starts_with('#')
+            || trimmed.starts_with("//")
+            || trimmed.starts_with("--")
+        {
             continue;
         }
 
@@ -202,8 +213,24 @@ pub fn run_task(
 
     visited.insert(name.to_string());
 
-    let task = tasks.get(name)
-        .expect("task not found");
+    let task = match tasks.get(name) {
+        Some(t) => t,
+        None => {
+            let mut msg = format!("Task '{}' not found\n", name);
+
+            msg.push_str("Available tasks:\n");
+            for key in tasks.keys() {
+                msg.push_str(&format!("  - {}\n", key));
+            }
+
+            println!("\n{}", msg);
+
+            // no panic on the titanic
+            // panic!("{}", msg);
+
+            return;
+        }
+    };
 
     let mut local_state = RuntimeState {
         cwd: state.cwd.clone(),

@@ -1,11 +1,16 @@
 use std::{collections::HashMap, env, fs, path::Path};
 
-use fluaterm::{self, END, GREEN, RED, YELLOW};
+use fluaterm::{self, BLUE, END, GREEN, PURPLE, RED, YELLOW};
 use sakeparser::{parse, run_task, validate_all, RuntimeState};
 use win_utf8_rs::enable_utf8;
 
+mod linksaver;
+mod tags;
+
 const PROGNAME: &str = "samtool";
 
+
+// Help Message
 fn help() {
     println!(r#"{}
 ███████╗ █████╗ ███╗   ███╗███████╗███╗   ██╗ ██████╗ ██╗███╗   ██╗███████╗
@@ -26,10 +31,24 @@ fn help() {
     build script.
     
     PS: The File is named {}samfile{}
-    PS: Full Guide about it on https://samengine.vercel.app/docs/samfile
+    PS: Full Guide about it on {}https://samengine.vercel.app/docs/samfile{}
     
-    Run with --init to create a new samefile in your project directory"#, RED, END, GREEN, END, YELLOW, PROGNAME, END, YELLOW, END)
+    Run with {}--init{} to create a new samefile in your project directory
+
+{}linksaver{}:
+    This is a Tool to save links for your project and then merge them into
+    one single file
+    
+    Use {}{}{} --linksaver -h to get more Information
+    or {}-l{} instead of linksaver
+    check {}https://samengine.vercel.app/docs/linksaver{} for more Infos
+
+{}Tags{}:
+    Run -t or --tag and then a Tag which should be added to the Git Repository
+    and pushed to Github.
+"#, RED, END, GREEN, END, YELLOW, PROGNAME, END, YELLOW, END, BLUE, END, PURPLE, END, GREEN, END, YELLOW, PROGNAME, END, PURPLE, END, BLUE, END, GREEN, END);
 }
+
 
 // Run sth from the samfile
 fn run_sam_file(command: &str) {
@@ -78,7 +97,7 @@ fn init() {
     let dir = std::path::Path::new(".samengine");
     let file = dir.join("samfile");
 
-    // ❌ check first
+    // check first if exists
     if dir.exists() && file.exists() {
         println!("samefile already exists — aborting init");
         return;
@@ -102,6 +121,7 @@ fn init() {
         .unwrap()
         .to_string();
 
+    // Check if there is a gitignore
     if has_gitignore(&dir2) {
         if let Some(content) = read_gitignore(&dir2) {
             if is_samfile_ignored(&content) {
@@ -120,8 +140,9 @@ fn main() {
 
     let args: Vec<String> = env::args().collect();
 
+    // Check arguemnt len
     if args.len() < 2 {
-        eprintln!("{}{}{}: {}No Argument Provided{} - run with help!", YELLOW, PROGNAME, END, RED, END);
+        eprintln!("{}{}{}: {}No Argument Provided{} - run with --help!", YELLOW, PROGNAME, END, RED, END);
         return;
     }
 
@@ -129,13 +150,34 @@ fn main() {
 
     match first_arg.as_str() {
         // Print Help
-        "help" | "-h" | "--help" => {
+        "-h" | "--help" => {
             help()
         }
 
         // Init
         "--init" => {
             init();
+        }
+
+        // Linksaver
+        "--linksaver" | "-l" => {
+            let mut sndarg = "";
+            
+            if args.len() >= 3 {
+                sndarg = &args[2];
+            }
+
+            linksaver::execute(sndarg);
+        }
+
+        // Tags
+        "-t" | "--tag" => {
+            if args.len() >= 3 {
+                let sndarg = &args[2];
+                tags::add_tag(sndarg);
+            }
+
+            eprintln!("Missing Argument after --tag!");
         }
 
         // When not found

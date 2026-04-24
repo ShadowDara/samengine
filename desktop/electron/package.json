@@ -1,8 +1,8 @@
 {
-  "name": "desktop",
-  "productName": "desktop",
+  "name": "samengine",
+  "productName": "samengine",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "samengine Desktop Game",
   "main": "src/index.js",
   "private": true,
   "scripts": {

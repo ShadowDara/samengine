@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "tauri-app",
+  "productName": "samengine",
   "version": "0.1.0",
   "identifier": "com.dara.tauri-app",
   "build": {
@@ -10,7 +10,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "tauri-app",
+        "title": "samengine Desktop",
         "width": 800,
         "height": 600
       }

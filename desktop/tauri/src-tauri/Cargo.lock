@@ -967,6 +967,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fluaterm"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "498b5f10efc84a3a7ed4dc78c0d01147a6e9dc80acc29d9bf48f8114113ad7a8"
+
+[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3039,6 +3045,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "samengine"
+version = "0.1.0"
+dependencies = [
+ "fluaterm",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-opener",
+]
+
+[[package]]
 name = "schemars"
 version = "0.8.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3655,17 +3673,6 @@ dependencies = [
  "webview2-com",
  "window-vibrancy",
  "windows",
-]
-
-[[package]]
-name = "tauri-app"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-opener",
 ]
 
 [[package]]

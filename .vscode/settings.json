@@ -2,7 +2,7 @@
   "files.exclude": {
     "**/node_modules/**": true,
     "**/*tgz": true,
-    "**/bun.lock": true,
+    // "**/bun.lock": true,
     "**/dist/**": true,
     "**/dist2/**": true,
     "**/.next/**": true,

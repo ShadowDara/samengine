@@ -2,6 +2,10 @@
 
 import re
 
+def dot_to_index(expr):
+    # ersetzt .name → ["name"] mehrfach
+    return re.sub(r'\.(\w+)', r'["\1"]', expr)
+
 class ReturnSignal(Exception):
     def __init__(self, value):
         self.value = value
@@ -138,17 +142,24 @@ class Interpreter:
             self.define_var(name, self.parse_value(value))
 
     def handle_assignment(self, line):
-        # Array-Zugriff: a[1] = ...
+        # Struct-Feld: p.age = ...
+        match = re.match(r"(\w+)\.(\w+) = (.+)", line)
+        if match:
+            obj, key, value = match.groups()
+            data = self.get_var(obj)
+            data[key] = self.parse_value(value)
+            return
+
+        # Array: a[1] = ...
         match = re.match(r"(\w+)\[(.+)\] = (.+)", line)
         if match:
             name, index, value = match.groups()
             arr = self.get_var(name)
             idx = self.parse_value(index)
-            val = self.parse_value(value)
-            arr[idx] = val
+            arr[idx] = self.parse_value(value)
             return
 
-        # Normale Variable
+        # normal
         match = re.match(r"(\w+) = (.+)", line)
         if match:
             name, value = match.groups()
@@ -210,17 +221,24 @@ class Interpreter:
         if value.startswith('"') and value.endswith('"'):
             return value[1:-1]
 
-        # Zahl
         elif value.isdigit():
             return int(value)
 
-        # Array / Expression / Zugriff
+        # Struct keys fix
+        if value.startswith("{") and value.endswith("}"):
+            value = re.sub(r'(\w+)\s*:', r'"\1":', value)
+
+        # 👉 WICHTIG: hier anwenden
+        value = dot_to_index(value)
+
         try:
             return eval(value, {}, self.current_env())
         except Exception:
             return self.get_var(value)
 
     def eval_expression(self, expr):
+        expr = dot_to_index(expr)
+
         try:
             return eval(expr, {}, self.current_env())
         except Exception:
@@ -261,10 +279,28 @@ fn test() {
 
 test()
 
+fn testr() {
+    let user = { name: "Max", age: 20 }
+
+    print user.name
+    print user.age
+
+    user.age = 30
+    print user.age
+
+    let arr = [1,2,3]
+    print arr[1]
+
+    let nested = { person: user }
+    print nested.person.name
+}
+
+testr()
+
 fn primes() {
     let n = 2
 
-    while n <= 1000 {
+    while n <= 10000000 {
         let isPrime = 1
         let i = 2
 

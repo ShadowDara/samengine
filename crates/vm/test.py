@@ -1,4 +1,4 @@
-# Interpreter mit Funktionsblöcken, return, if und while
+# Interpreter mit echten Scopes (Stack-basiert)
 
 import re
 
@@ -8,8 +8,30 @@ class ReturnSignal(Exception):
 
 class Interpreter:
     def __init__(self):
-        self.variables = {}
+        self.scopes = [{}]  # Stack von Scopes
         self.functions = {}
+
+    # ===== Scope Helpers =====
+    def push_scope(self):
+        self.scopes.append({})
+
+    def pop_scope(self):
+        self.scopes.pop()
+
+    def set_var(self, name, value):
+        self.scopes[-1][name] = value
+
+    def get_var(self, name):
+        for scope in reversed(self.scopes):
+            if name in scope:
+                return scope[name]
+        raise Exception(f"Variable nicht gefunden: {name}")
+
+    def current_env(self):
+        env = {}
+        for scope in self.scopes:
+            env.update(scope)
+        return env
 
     # ===== Runner =====
     def eval(self, code):
@@ -36,10 +58,6 @@ class Interpreter:
         elif line.startswith("return "):
             value = self.parse_value(line[len("return "):])
             raise ReturnSignal(value)
-        elif line.startswith("if "):
-            raise Exception("'if' darf nur im Block verarbeitet werden")
-        elif line.startswith("while "):
-            raise Exception("'while' darf nur im Block verarbeitet werden")
         elif "(" in line and line.endswith(")"):
             self.call_function(line)
         else:
@@ -56,6 +74,7 @@ class Interpreter:
 
             if line.endswith("{"):
                 depth += 1
+
             if line == "}":
                 if depth == 0:
                     break
@@ -63,42 +82,52 @@ class Interpreter:
                 body.append(line)
             else:
                 body.append(line)
+
             i += 1
 
         return body, i
 
     def exec_block(self, body):
+        self.push_scope()
         i = 0
-        while i < len(body):
-            line = body[i].strip()
 
-            # IF
-            if line.startswith("if ") and line.endswith("{"):
-                cond = line[3:-1].strip()
-                block, end = self.collect_block(body, i + 1)
-                if self.eval_expression(cond):
-                    self.exec_block(block)
-                i = end
+        try:
+            while i < len(body):
+                line = body[i].strip()
 
-            # WHILE
-            elif line.startswith("while ") and line.endswith("{"):
-                cond = line[6:-1].strip()
-                block, end = self.collect_block(body, i + 1)
-                while self.eval_expression(cond):
-                    self.exec_block(block)
-                i = end
+                # IF
+                if line.startswith("if ") and line.endswith("{"):
+                    cond = line[3:-1].strip()
+                    block, end = self.collect_block(body, i + 1)
 
-            else:
-                self.execute(line)
+                    if self.eval_expression(cond):
+                        self.exec_block(block)
 
-            i += 1
+                    i = end
+
+                # WHILE
+                elif line.startswith("while ") and line.endswith("{"):
+                    cond = line[6:-1].strip()
+                    block, end = self.collect_block(body, i + 1)
+
+                    while self.eval_expression(cond):
+                        self.exec_block(block)
+
+                    i = end
+
+                else:
+                    self.execute(line)
+
+                i += 1
+        finally:
+            self.pop_scope()
 
     # ===== Variables =====
     def handle_variable(self, line):
         match = re.match(r"let (\w+) = (.+)", line)
         if match:
             name, value = match.groups()
-            self.variables[name] = self.parse_value(value)
+            self.set_var(name, self.parse_value(value))
 
     # ===== Print =====
     def handle_print(self, line):
@@ -134,18 +163,18 @@ class Interpreter:
 
         if name in self.functions:
             params, body = self.functions[name]
-            local_vars = dict(zip(params, args))
 
-            old_vars = self.variables.copy()
-            self.variables.update(local_vars)
+            self.push_scope()
+            for p, a in zip(params, args):
+                self.set_var(p, a)
 
             try:
                 self.exec_block(body)
             except ReturnSignal as r:
-                self.variables = old_vars
+                self.pop_scope()
                 return r.value
 
-            self.variables = old_vars
+            self.pop_scope()
         else:
             print(f"Unbekannte Funktion: {name}")
 
@@ -157,44 +186,40 @@ class Interpreter:
             return value[1:-1]
         elif value.isdigit():
             return int(value)
-        elif value in self.variables:
-            return self.variables[value]
         else:
-            return self.eval_expression(value)
+            try:
+                return self.get_var(value)
+            except:
+                return self.eval_expression(value)
 
     def eval_expression(self, expr):
         try:
-            return eval(expr, {}, self.variables)
+            return eval(expr, {}, self.current_env())
         except Exception:
             return False
 
 
 # ===== Beispiel =====
 code = """
-let x = 0
+let x = 100
 
-fn count(n) {
+fn test() {
+    let x = 5
+    print x
+}
+
+test()
+print x
+
+fn loop() {
     let i = 0
-    while i < n {
-        print i
+    while i < 3 {
         let i = i + 1
+        print i
     }
 }
 
-fn add(a, b) {
-    return a + b
-}
-
-count(5)
-print add(3, 4)
-
-fn test(v) {
-    if v > 5 {
-        print "groesser"
-    }
-}
-
-test(10)
+loop()
 """
 
 interpreter = Interpreter()

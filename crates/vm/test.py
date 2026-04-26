@@ -57,6 +57,8 @@ class Interpreter:
 
     # ===== Statements =====
     def execute(self, line):
+        line = re.split(r"//|#|--", line)[0].strip()
+
         if not line:
             return
 
@@ -220,6 +222,10 @@ fn loop() {
         print i
     }
 }
+
+// Comment
+-- Comment
+# Coment
 
 loop()
 """

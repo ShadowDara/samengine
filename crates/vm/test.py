@@ -138,6 +138,17 @@ class Interpreter:
             self.define_var(name, self.parse_value(value))
 
     def handle_assignment(self, line):
+        # Array-Zugriff: a[1] = ...
+        match = re.match(r"(\w+)\[(.+)\] = (.+)", line)
+        if match:
+            name, index, value = match.groups()
+            arr = self.get_var(name)
+            idx = self.parse_value(index)
+            val = self.parse_value(value)
+            arr[idx] = val
+            return
+
+        # Normale Variable
         match = re.match(r"(\w+) = (.+)", line)
         if match:
             name, value = match.groups()
@@ -198,13 +209,16 @@ class Interpreter:
 
         if value.startswith('"') and value.endswith('"'):
             return value[1:-1]
+
+        # Zahl
         elif value.isdigit():
             return int(value)
-        else:
-            try:
-                return self.get_var(value)
-            except:
-                return self.eval_expression(value)
+
+        # Array / Expression / Zugriff
+        try:
+            return eval(value, {}, self.current_env())
+        except Exception:
+            return self.get_var(value)
 
     def eval_expression(self, expr):
         try:
@@ -228,6 +242,48 @@ fn loop() {
 # Coment
 
 loop()
+
+fn test() {
+    let a = [1, 2, 3]
+
+    print a
+    print a[0]
+
+    a[1] = 99
+    print a
+
+    let i = 0
+    while i < 3 {
+        print a[i]
+        i = i + 1
+    }
+}
+
+test()
+
+fn primes() {
+    let n = 2
+
+    while n <= 1000 {
+        let isPrime = 1
+        let i = 2
+
+        while i < n {
+            if n % i == 0 {
+                isPrime = 0
+            }
+            i = i + 1
+        }
+
+        if isPrime == 1 {
+            print n
+        }
+
+        n = n + 1
+    }
+}
+
+primes()
 """
 
 interpreter = Interpreter()

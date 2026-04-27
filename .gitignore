@@ -10,3 +10,5 @@ bun.lock
 web/docs
 
 dist2/
+
+*.exe

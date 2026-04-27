@@ -1,0 +1,17 @@
+out/
+.vs/*
+
+SX-UI/.vs/*
+
+*.exe
+*.pdb
+SX-UI/obj
+SX-UI/bin
+SX-UI/packages
+SX-UI/.vs/SX-UI.slnx
+*.pfx
+*.csproj.user
+*.TMP
+build
+rbuild
+build-ui

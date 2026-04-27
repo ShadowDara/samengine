@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "npx samengine-build",
     "build": "tsc",
-    "pack": "node ../../scripts/clean.js && npm run build && npm pack && git push --follow-tags && npm run up && node ../../scripts/copyreadme.js",
+    "pack": "node ../../scripts/clean.js && npm run build && npm pack && git push --follow-tags && npm run up",
     "test": "bun test"
   },
   "exports": {

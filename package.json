@@ -2,6 +2,7 @@
   "name": "samengine-index",
   "version": "1.0.0",
   "scripts": {
-    "up": "npx automatic-md-index --no-h1 --files=docs/Api.md,docs/Build.md,docs/Config.md,docs/Get-Started.md,docs/README.md,CHANGELOG.md,README.md --no-strict --no-timestamp"
+    "up": "npx automatic-md-index --no-h1 --files=docs/Api.md,docs/Build.md,docs/Config.md,docs/Get-Started.md,docs/README.md,CHANGELOG.md,README.md --no-strict --no-timestamp",
+    "read": "node scripts/copyreadme.js"
   }
 }

@@ -1,7 +1,7 @@
-const fs = require('fs/promises');
+import fs from "fs/promises";
 
 async function copy() {
-    await fs.copyFile('README.md', '../../README.md');
+    await fs.copyFile('packages/samengine/README.md', 'README.md');
 }
 
 await copy();

@@ -1,5 +1,5 @@
 {
-  "name": "@shadowdara/samtoollinux-arm64",
+  "name": "@shadowdara/samtool-linux-arm64-musl",
   "version": "0.1.0",
   "os": [
     "linux"
@@ -8,6 +8,6 @@
     "arm64"
   ],
   "libc": [
-    "glibc"
+    "musl"
   ]
 }

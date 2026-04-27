@@ -1,5 +1,5 @@
 {
-  "name": "@shadowdara/samtoolwin32-x64",
+  "name": "@shadowdara/samtool-win32-x64",
   "version": "0.1.0",
   "os": [
     "win32"

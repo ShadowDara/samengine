@@ -29,7 +29,7 @@ name = "samtool"
 # Platform package name prefix. Defaults to "{name}-". It is recommended to
 # use a scoped prefix (e.g. "@myorg/my-tool-") as publishing many packages
 # at once can trigger npm spam detection.
-prefix = "@shadowdara/samtool"
+prefix = "@shadowdara/samtool-"
 
 # Binaries to include. Defaults to all [[bin]] targets in the crate.
 bins = ["samtool"]
@@ -50,7 +50,8 @@ targets = [
   "aarch64-apple-darwin",
 
   # Windows
-  "x86_64-pc-windows-msvc"
+  "x86_64-pc-windows-msvc",
+#   "x86_64-pc-windows-gnu"
 ]
 
 # Output directory. Defaults to "npm". Can only be set at the workspace

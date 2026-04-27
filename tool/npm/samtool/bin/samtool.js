@@ -17,19 +17,19 @@ function isMusl() {
 
 const PLATFORMS = {
   darwin: {
-    arm64: '@shadowdara/samtooldarwin-arm64/samtool',
-    x64: '@shadowdara/samtooldarwin-x64/samtool',
+    arm64: '@shadowdara/samtool-darwin-arm64/samtool',
+    x64: '@shadowdara/samtool-darwin-x64/samtool',
   },
   linux: {
-    arm64: '@shadowdara/samtoollinux-arm64/samtool',
-    x64: '@shadowdara/samtoollinux-x64/samtool',
+    arm64: '@shadowdara/samtool-linux-arm64/samtool',
+    x64: '@shadowdara/samtool-linux-x64/samtool',
   },
   'linux-musl': {
-    arm64: '@shadowdara/samtoollinux-arm64-musl/samtool',
-    x64: '@shadowdara/samtoollinux-x64-musl/samtool',
+    arm64: '@shadowdara/samtool-linux-arm64-musl/samtool',
+    x64: '@shadowdara/samtool-linux-x64-musl/samtool',
   },
   win32: {
-    x64: '@shadowdara/samtoolwin32-x64/samtool.exe',
+    x64: '@shadowdara/samtool-win32-x64/samtool.exe',
   },
 }
 

@@ -1,13 +1,13 @@
 {
-  "name": "@shadowdara/samtoollinux-x64-musl",
+  "name": "@shadowdara/samtool-linux-arm64",
   "version": "0.1.0",
   "os": [
     "linux"
   ],
   "cpu": [
-    "x64"
+    "arm64"
   ],
   "libc": [
-    "musl"
+    "glibc"
   ]
 }

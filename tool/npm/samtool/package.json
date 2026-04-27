@@ -8,12 +8,12 @@
     "node": ">=14"
   },
   "optionalDependencies": {
-    "@shadowdara/samtooldarwin-arm64": "0.1.0",
-    "@shadowdara/samtooldarwin-x64": "0.1.0",
-    "@shadowdara/samtoollinux-arm64": "0.1.0",
-    "@shadowdara/samtoollinux-arm64-musl": "0.1.0",
-    "@shadowdara/samtoollinux-x64": "0.1.0",
-    "@shadowdara/samtoollinux-x64-musl": "0.1.0",
-    "@shadowdara/samtoolwin32-x64": "0.1.0"
+    "@shadowdara/samtool-darwin-arm64": "0.1.0",
+    "@shadowdara/samtool-darwin-x64": "0.1.0",
+    "@shadowdara/samtool-linux-arm64": "0.1.0",
+    "@shadowdara/samtool-linux-arm64-musl": "0.1.0",
+    "@shadowdara/samtool-linux-x64": "0.1.0",
+    "@shadowdara/samtool-linux-x64-musl": "0.1.0",
+    "@shadowdara/samtool-win32-x64": "0.1.0"
   }
 }

@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "pack": "node ../scripts/clean.js && npm run build && npm pack && git push --follow-tags"
+    "pack": "node ../../scripts/clean.js && npm run build && npm pack && git push --follow-tags"
   },
   "exports": {
     ".": "./dist/index.js",

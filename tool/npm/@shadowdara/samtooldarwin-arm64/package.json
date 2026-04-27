@@ -1,0 +1,10 @@
+{
+  "name": "@shadowdara/samtooldarwin-arm64",
+  "version": "0.1.0",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ]
+}

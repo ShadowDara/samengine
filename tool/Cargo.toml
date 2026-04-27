@@ -21,3 +21,43 @@ strip = true        # entfernt Debug-Symbole (optional)
 debug = false
 incremental = false
 #inherits = "release"
+
+[package.metadata.npm]
+# Main package name. Defaults to the crate name.
+name = "samtool"
+
+# Platform package name prefix. Defaults to "{name}-". It is recommended to
+# use a scoped prefix (e.g. "@myorg/my-tool-") as publishing many packages
+# at once can trigger npm spam detection.
+prefix = "@shadowdara/samtool"
+
+# Binaries to include. Defaults to all [[bin]] targets in the crate.
+bins = ["samtool"]
+
+# Target triples to generate packages for. When unset, falls back to
+# build.target in .cargo/config.toml.
+targets = [
+  # Linux musl (universal)
+  "x86_64-unknown-linux-musl",
+  "aarch64-unknown-linux-musl",
+
+  # Linux glibc
+  "x86_64-unknown-linux-gnu",
+  "aarch64-unknown-linux-gnu",
+
+  # macOS
+  "x86_64-apple-darwin",
+  "aarch64-apple-darwin",
+
+  # Windows
+  "x86_64-pc-windows-msvc"
+]
+
+# Output directory. Defaults to "npm". Can only be set at the workspace
+# level (or in a standalone crate).
+out-dir = "npm"
+
+# Generate mode. In "create" mode (default), package directories are
+# recreated from scratch on every run. In "merge" mode, the main package
+# is edited in-place, preserving any custom files or package.json fields.
+mode = "create"

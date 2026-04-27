@@ -1,6 +1,6 @@
 use std::{collections::HashMap, env, fs, path::Path};
 
-use fluaterm::{self, BLUE, END, GREEN, PURPLE, RED, YELLOW};
+use fluaterm::{self, BLUE, END, GREEN, PURPLE, RED, YELLOW, functions::{green, purple}};
 use sakeparser::{parse, run_task, validate_all, RuntimeState};
 use win_utf8_rs::enable_utf8;
 
@@ -22,7 +22,7 @@ fn help() {
                    
 === Help Menu ===
 
-{}samfile{}:
+{}:
     This is a file which can be created in the .samengine directory, it
     works a bit simmilliar to makefile and can used to make the build
     process easier.
@@ -39,14 +39,14 @@ fn help() {
     This is a Tool to save links for your project and then merge them into
     one single file
     
-    Use {}{}{} --linksaver -h to get more Information
+    Use {}{}{} {} to get more Information
     or {}-l{} instead of linksaver
     check {}https://samengine.vercel.app/docs/linksaver{} for more Infos
 
 {}Tags{}:
-    Run -t or --tag and then a Tag which should be added to the Git Repository
+    Run {} or {} and then a Tag which should be added to the Git Repository
     and pushed to Github.
-"#, RED, END, GREEN, END, YELLOW, PROGNAME, END, YELLOW, END, BLUE, END, PURPLE, END, GREEN, END, YELLOW, PROGNAME, END, PURPLE, END, BLUE, END, GREEN, END);
+"#, RED, END, green("samefile"), YELLOW, PROGNAME, END, YELLOW, END, BLUE, END, PURPLE, END, GREEN, END, YELLOW, PROGNAME, END, purple("--linksaver -h"), PURPLE, END, BLUE, END, GREEN, END, purple("-t"), purple("--tag"));
 }
 
 
@@ -103,7 +103,7 @@ fn init() {
         return;
     }
 
-    println!("Creating a new samfile");
+    println!("Creating a new samfile!");
 
     // Create .samengine Directory
     std::fs::create_dir_all(dir)
@@ -142,7 +142,7 @@ fn main() {
 
     // Check arguemnt len
     if args.len() < 2 {
-        eprintln!("{}{}{}: {}No Argument Provided{} - run with --help!", YELLOW, PROGNAME, END, RED, END);
+        eprintln!("{}{}{}: {}No Argument Provided!{} - run with --help!", YELLOW, PROGNAME, END, RED, END);
         return;
     }
 

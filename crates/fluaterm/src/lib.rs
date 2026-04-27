@@ -64,3 +64,6 @@ pub fn clear_terminal() {
         Command::new("clear").status().unwrap();
     }
 }
+
+// Coloring Functions
+pub mod functions;

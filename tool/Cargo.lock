@@ -4,9 +4,9 @@ version = 4
 
 [[package]]
 name = "fluaterm"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "498b5f10efc84a3a7ed4dc78c0d01147a6e9dc80acc29d9bf48f8114113ad7a8"
+checksum = "d74df872c5f7d77dc4011b05ea54dd61ac4c6c3663e39d06f1a514eccb09e827"
 
 [[package]]
 name = "itoa"

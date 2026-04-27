@@ -1,0 +1,16 @@
+# Not Published
+
+[package]
+name = "samfileparser"
+version = "0.1.0"
+edition = "2024"
+authors = ["Shadowdara"]
+readme = "README.md"
+description = "a little Makefile inspired Command file"
+license = "Apache-2.0"
+include = ["LICENSE", "README.md", "Cargo.toml", "/src/"]
+keywords = ["cmd", "cmdfile", "samfile"]
+repository = "https://github.com/shadowdara/samengine"
+
+[dependencies]
+fluaterm = "0.2.2"

@@ -39,8 +39,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "sakeparser"
+name = "samfileparser"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7195ae8b3e5ae8e90d530d8a4e6260f1bb6b82335492b3731f02d21420ac0d54"
 dependencies = [
  "fluaterm",
 ]
@@ -50,7 +52,7 @@ name = "samtool"
 version = "0.1.1"
 dependencies = [
  "fluaterm",
- "sakeparser",
+ "samfileparser",
  "serde",
  "serde_json",
  "win-utf8-rs",

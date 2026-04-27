@@ -2,9 +2,9 @@
 
 import { hash } from "../utils/index.js";
 
-type UIElementType = "button" | "text" | "checkbox";
+export type UIElementType = "button" | "text" | "checkbox";
 
-type UIElement = {
+export type UIElement = {
     el: HTMLElement;
     type: UIElementType;
 };

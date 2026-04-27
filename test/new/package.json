@@ -1,8 +1,14 @@
 {
   "name": "new",
   "type": "module",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "npx samengine-build",
-    "build": "npx samengine-build --release"}
+    "build": "npx samengine-build --release"
+  },
+  "dependencies": {
+    "@shadowdara/samtool": "^0.1.1",
+    "samengine-build": "^1.9.4"
+  }
 }

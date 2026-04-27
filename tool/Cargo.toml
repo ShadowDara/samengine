@@ -1,6 +1,6 @@
 [package]
 name = "samtool"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 
 [dependencies]
@@ -24,7 +24,7 @@ incremental = false
 
 [package.metadata.npm]
 # Main package name. Defaults to the crate name.
-name = "samtool"
+name = "@shadowdara/samtool"
 
 # Platform package name prefix. Defaults to "{name}-". It is recommended to
 # use a scoped prefix (e.g. "@myorg/my-tool-") as publishing many packages
@@ -46,8 +46,8 @@ targets = [
   "aarch64-unknown-linux-gnu",
 
   # macOS
-  "x86_64-apple-darwin",
-  "aarch64-apple-darwin",
+#   "x86_64-apple-darwin",
+#   "aarch64-apple-darwin",
 
   # Windows
   "x86_64-pc-windows-msvc",
@@ -61,4 +61,4 @@ out-dir = "npm"
 # Generate mode. In "create" mode (default), package directories are
 # recreated from scratch on every run. In "merge" mode, the main package
 # is edited in-place, preserving any custom files or package.json fields.
-mode = "create"
+mode = "merge"

@@ -6,5 +6,9 @@
   ],
   "cpu": [
     "x64"
-  ]
+  ],
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  }
 }

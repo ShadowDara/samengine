@@ -1,0 +1,10 @@
+{
+  "name": "@shadowdara/samtool-win32-x64",
+  "version": "0.1.1",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ]
+}

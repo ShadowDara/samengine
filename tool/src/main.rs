@@ -2,6 +2,8 @@ use std::{collections::HashMap, env, fs, path::Path};
 
 use fluaterm::{self, BLUE, END, GREEN, PURPLE, RED, YELLOW};
 use sakeparser::{parse, run_task, validate_all, RuntimeState};
+
+#[cfg(windows)]
 use win_utf8_rs::enable_utf8;
 
 mod linksaver;

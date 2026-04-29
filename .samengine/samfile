@@ -1,4 +1,6 @@
 # This is Comment
+// Comment
+-- Comment
 
 build:
     echo Hello

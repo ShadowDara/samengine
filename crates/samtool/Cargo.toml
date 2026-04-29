@@ -2,10 +2,18 @@
 name = "samtool"
 version = "0.1.1"
 edition = "2024"
+authors = ["Shadowdara"]
+readme = "README.md"
+description = "the fast cli tool for samengine"
+license = "Apache-2.0"
+include = ["LICENSE", "README.md", "Cargo.toml", "/src/"]
+keywords = ["samengine", "cli"]
+repository = "https://github.com/shadowdara/samengine"
+
 
 [dependencies]
 fluaterm = "0.2.2"
-sakeparser = { path = "../crates/sakeparser" }
+samfileparser = "0.1.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 

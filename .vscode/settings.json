@@ -3,7 +3,7 @@
     // "**/node_modules/**": true,
     "**/*tgz": true,
     "**/bun.lock": true,
-    // "**/dist/**": true,
+    "**/dist/**": true,
     "**/dist2/**": true,
     "**/.next/**": true,
     "web/docs": true,

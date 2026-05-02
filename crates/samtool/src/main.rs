@@ -1,9 +1,7 @@
 use std::{collections::HashMap, env, fs, path::Path};
 
 use fluaterm::{self, BLUE, END, GREEN, PURPLE, RED, YELLOW};
-use samfileparser::{parse, run_task, validate_all, RuntimeState};
-
-#[cfg(windows)]
+use sakeparser::{parse, run_task, validate_all, RuntimeState};
 use win_utf8_rs::enable_utf8;
 
 mod linksaver;
@@ -71,7 +69,7 @@ fn init() {
         return;
     }
 
-    println!("Creating a new samfile");
+    println!("Creating a new samfile!");
 
     // Create .samengine Directory
     std::fs::create_dir_all(dir)
@@ -111,7 +109,7 @@ fn main() {
 
     // Check arguemnt len
     if args.len() < 2 {
-        eprintln!("{}{}{}: {}No Argument Provided{} - run with --help!", YELLOW, PROGNAME, END, RED, END);
+        eprintln!("{}{}{}: {}No Argument Provided!{} - run with --help!", YELLOW, PROGNAME, END, RED, END);
         return;
     }
 

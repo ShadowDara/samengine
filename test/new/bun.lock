@@ -1,0 +1,14 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "new",
+      "dependencies": {
+        "samengine": "^1.9.0",
+      },
+    },
+  },
+  "packages": {
+    "samengine": ["samengine@1.9.0", "", {}, "sha512-AD8iQ++ZdDZxn33BymSU97cS0dLb65xhZQe5FN2saCDx2E39GLBganVXhXs5pmrpqPhM5SX8iPA64yk0jW7yuA=="],
+  }
+}

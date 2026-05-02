@@ -1,14 +1,10 @@
 #include "ffi.hpp"
+#include <fstream>
+#include <iostream>
 
 // Global state for loaded commands
 static KVPMAP* g_loaded_commands = nullptr;
 static bool g_initialized = false;
-
-// Helper function to get the configuration file path
-static std::string get_config_path() {
-    // Typically the config is in the home directory with filename sx.conf
-    return getHomeDirectory() + "/sx.conf";
-}
 
 // Initialize the SX system
 int init_sx() {
@@ -28,7 +24,7 @@ int init_sx() {
     }
 }
 
-// Load all commands from the SX configuration file
+// Load all commands from the SX configuration file (following sx_lib.cpp pattern)
 int load_commands() {
     if (!g_initialized) {
         if (init_sx() != 0) {
@@ -37,16 +33,25 @@ int load_commands() {
     }
 
     try {
-        std::string config_path = get_config_path();
-        
-        // Load the configuration file
-        // The KVPMAP will parse the file and store key-value pairs
-        if (!g_loaded_commands->load(config_path)) {
-            std::cerr << "Error loading configuration file: " << config_path << "\n";
+        // Get Home Directory
+        auto homeDir = getHomeDirectory();
+
+        // Load KVP File
+        std::ifstream file{ homeDir + "/sx.conf" };
+        if (!file) {
+            std::cerr << RED "Could not open Config File" END << std::endl;
             return 1;
         }
 
-        std::cout << "Commands loaded successfully from: " << config_path << "\n";
+        // Read the entire file content
+        std::string content(
+            (std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>()
+        );
+
+        // Parse the KVP content
+        *g_loaded_commands = parse_kvp2(content);
+
+        std::cout << "Commands loaded successfully from: " << homeDir << "/sx.conf\n";
         return 0;
     }
     catch (const std::exception& e) {
@@ -96,7 +101,7 @@ int execute_command(const char* command_name, const char* args) {
 
         // Execute the command
         int return_code = runCommand(command, linux_shell, windows_shell);
-        
+
         return return_code;
     }
     catch (const std::exception& e) {
@@ -106,35 +111,29 @@ int execute_command(const char* command_name, const char* args) {
 }
 
 // Get all loaded commands as a string
-const char* get_loaded_commands() {
+std::string get_loaded_commands() {
     if (!g_initialized || !g_loaded_commands) {
-        static const char* error_msg = "SX system not initialized";
-        return error_msg;
+        return "SX system not initialized";
     }
 
     try {
-        // Create a static string to hold the result
-        static std::string commands_list;
-        commands_list.clear();
+        std::string result;
+        bool first = true;
 
         // Iterate through all commands and build a comma-separated list
-        // Note: This depends on the KVPMAP interface - adjust based on actual API
-        bool first = true;
-        
-        // The actual implementation depends on how KVPMAP exposes its data
-        // For now, we'll return a placeholder that would need to be adapted
-        // to the actual KVPMAP API
-        
-        if (commands_list.empty()) {
-            commands_list = "Commands loaded successfully";
+        for (const auto& [key, value] : g_loaded_commands->get_data()) {
+            if (!first) {
+                result += ", ";
+            }
+            result += key;
+            first = false;
         }
-        
-        return commands_list.c_str();
+
+        return result;
     }
     catch (const std::exception& e) {
         std::cerr << "Error getting commands list: " << e.what() << "\n";
-        static const char* error_msg = "Error retrieving commands";
-        return error_msg;
+        return "Error retrieving commands";
     }
 }
 

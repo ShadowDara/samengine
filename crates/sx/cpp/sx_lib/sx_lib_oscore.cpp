@@ -1,4 +1,4 @@
-#include <sx_lib/sx_lib_oscore.hpp>
+#include "../sx_lib/sx_lib_oscore.hpp"
 
 
 // Function to get the user's home directory in a cross-platform way

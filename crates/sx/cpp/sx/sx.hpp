@@ -9,10 +9,10 @@
 
 #include "sx_config.hpp"
 
-#include <sx_lib/sx_lib_oscore.hpp>
-#include <sx_lib/ansicolors.hpp>
+#include "../sx_lib/sx_lib_oscore.hpp"
+#include "../sx_lib/ansicolors.hpp"
 
-#include <kvp/kvp2.hpp>
+#include "../kvp/kvp2.hpp"
 
 
 // for the unordered Map

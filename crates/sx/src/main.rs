@@ -1,4 +1,4 @@
-pub mod bridge;
+mod bridge;
 
 fn main() {
     println!("Hello");

@@ -95,6 +95,7 @@ fn is_samfile_ignored(gitignore_content: &str) -> bool {
         .any(|line| line.trim() == "samfile")
 }
 
+// Create new samfile
 fn init() {
     let dir = std::path::Path::new(".samengine");
     let file = dir.join("samfile");
@@ -134,6 +135,7 @@ fn init() {
         }
     }
 }
+
 
 // Main function
 fn main() {
@@ -181,6 +183,8 @@ fn main() {
 
             eprintln!("Missing Argument after --tag!");
         }
+
+        // New samengine Project
 
         // When not found
         _ => {

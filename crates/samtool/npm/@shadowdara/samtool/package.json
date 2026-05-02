@@ -1,0 +1,17 @@
+{
+  "name": "@shadowdara/samtool",
+  "version": "0.1.1",
+  "bin": {
+    "samtool": "bin/samtool.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "optionalDependencies": {
+    "@shadowdara/samtool-linux-arm64": "0.1.1",
+    "@shadowdara/samtool-linux-arm64-musl": "0.1.1",
+    "@shadowdara/samtool-linux-x64": "0.1.1",
+    "@shadowdara/samtool-linux-x64-musl": "0.1.1",
+    "@shadowdara/samtool-win32-x64": "0.1.1"
+  }
+}

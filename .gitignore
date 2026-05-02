@@ -9,3 +9,5 @@ node_modules
 web/docs
 
 dist2/
+
+*.exe

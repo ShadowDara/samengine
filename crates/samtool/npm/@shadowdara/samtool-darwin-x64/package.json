@@ -1,0 +1,14 @@
+{
+  "name": "@shadowdara/samtool-darwin-x64",
+  "version": "0.1.0",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  }
+}

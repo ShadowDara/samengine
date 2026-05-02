@@ -1,6 +1,6 @@
 {
   "name": "samengine-build",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "description": "The build and export Tool for samengine.",
   "sideEffects": false,
   "files": [
@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "pack": "node ../scripts/clean.js && npm run build && npm pack && git push --follow-tags"
+    "pack": "node ../../scripts/clean.js && npm run build && npm pack && git push --follow-tags"
   },
   "exports": {
     ".": "./dist/index.js",

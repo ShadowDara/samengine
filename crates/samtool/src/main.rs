@@ -1,53 +1,18 @@
 use std::{collections::HashMap, env, fs, path::Path};
 
-use fluaterm::{self, BLUE, END, GREEN, PURPLE, RED, YELLOW, functions::{green, purple}};
+use fluaterm::{self, BLUE, END, GREEN, PURPLE, RED, YELLOW};
 use sakeparser::{parse, run_task, validate_all, RuntimeState};
 use win_utf8_rs::enable_utf8;
 
 mod linksaver;
 mod tags;
+mod sx;
+mod newproject;
+mod help;
+
+use crate::help::help;
 
 const PROGNAME: &str = "samtool";
-
-
-// Help Message
-fn help() {
-    println!(r#"{}
-███████╗ █████╗ ███╗   ███╗███████╗███╗   ██╗ ██████╗ ██╗███╗   ██╗███████╗
-██╔════╝██╔══██╗████╗ ████║██╔════╝████╗  ██║██╔════╝ ██║████╗  ██║██╔════╝
-███████╗███████║██╔████╔██║█████╗  ██╔██╗ ██║██║  ███╗██║██╔██╗ ██║█████╗  
-╚════██║██╔══██║██║╚██╔╝██║██╔══╝  ██║╚██╗██║██║   ██║██║██║╚██╗██║██╔══╝  
-███████║██║  ██║██║ ╚═╝ ██║███████╗██║ ╚████║╚██████╔╝██║██║ ╚████║███████╗
-╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝╚══════╝{}
-                   
-=== Help Menu ===
-
-{}:
-    This is a file which can be created in the .samengine directory, it
-    works a bit simmilliar to makefile and can used to make the build
-    process easier.
-    
-    Execute commands or scripts from it by running {}{}{} build, to run the
-    build script.
-    
-    PS: The File is named {}samfile{}
-    PS: Full Guide about it on {}https://samengine.vercel.app/docs/samfile{}
-    
-    Run with {}--init{} to create a new samefile in your project directory
-
-{}linksaver{}:
-    This is a Tool to save links for your project and then merge them into
-    one single file
-    
-    Use {}{}{} {} to get more Information
-    or {}-l{} instead of linksaver
-    check {}https://samengine.vercel.app/docs/linksaver{} for more Infos
-
-{}Tags{}:
-    Run {} or {} and then a Tag which should be added to the Git Repository
-    and pushed to Github.
-"#, RED, END, green("samefile"), YELLOW, PROGNAME, END, YELLOW, END, BLUE, END, PURPLE, END, GREEN, END, YELLOW, PROGNAME, END, purple("--linksaver -h"), PURPLE, END, BLUE, END, GREEN, END, purple("-t"), purple("--tag"));
-}
 
 
 // Run sth from the samfile
@@ -93,6 +58,7 @@ fn is_samfile_ignored(gitignore_content: &str) -> bool {
         .any(|line| line.trim() == "samfile")
 }
 
+// Create new samfile
 fn init() {
     let dir = std::path::Path::new(".samengine");
     let file = dir.join("samfile");
@@ -132,6 +98,7 @@ fn init() {
         }
     }
 }
+
 
 // Main function
 fn main() {
@@ -178,6 +145,16 @@ fn main() {
             }
 
             eprintln!("Missing Argument after --tag!");
+        }
+
+        // SX
+        "-x" | "--sx" => {
+            todo!("SX in RUST");
+        }
+
+        // New samengine Project
+        "-n" | "--new" => {
+            todo!("Create new samengine project");
         }
 
         // When not found

@@ -1,7 +1,7 @@
 use std::{collections::HashMap, env, fs, path::Path};
 
-use fluaterm::{self, BLUE, END, GREEN, PURPLE, RED, YELLOW};
-use sakeparser::{parse, run_task, validate_all, RuntimeState};
+use fluaterm::{self, BLUE, END, GREEN, PURPLE, RED, YELLOW, functions::{red}};
+use samfileparser::{parse, run_task, validate_all, RuntimeState};
 use win_utf8_rs::enable_utf8;
 
 mod linksaver;
@@ -11,6 +11,7 @@ mod newproject;
 mod help;
 
 use crate::help::help;
+use ::sx::bridge::ffi;
 
 const PROGNAME: &str = "samtool";
 
@@ -149,7 +150,17 @@ fn main() {
 
         // SX
         "-x" | "--sx" => {
-            todo!("SX in RUST");
+            let mut cmd = "";
+            if args.len() >= 3 {
+                cmd = &args[2];
+            }
+
+            ffi::load_commands();
+            if (ffi::command_exists(cmd)) {
+                ffi::execute_command(cmd, "");
+            } else {
+                println!("Command {} does not exist!", red(cmd))
+            }
         }
 
         // New samengine Project

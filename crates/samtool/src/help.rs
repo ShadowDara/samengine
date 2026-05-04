@@ -1,4 +1,4 @@
-use fluaterm::{self, BLUE, END, GREEN, PURPLE, RED, YELLOW};
+use fluaterm::{self, BLUE, END, GREEN, PURPLE, RED, YELLOW, functions::{green, purple}};
 
 use crate::PROGNAME;
 
@@ -35,8 +35,8 @@ pub fn help() {
     or {}-l{} instead of linksaver
     check {}https://samengine.vercel.app/docs/linksaver{} for more Infos
 
-{}Tags{}:
-    Run -t or --tag and then a Tag which should be added to the Git Repository
+{}:
+    Run {} or {} and then a Tag which should be added to the Git Repository
     and pushed to Github.
-"#, RED, END, GREEN, END, YELLOW, PROGNAME, END, YELLOW, END, BLUE, END, PURPLE, END, GREEN, END, YELLOW, PROGNAME, END, PURPLE, END, BLUE, END, GREEN, END);
+"#, RED, END, GREEN, END, YELLOW, PROGNAME, END, YELLOW, END, BLUE, END, PURPLE, END, GREEN, END, YELLOW, PROGNAME, END, PURPLE, END, BLUE, END, green("Tags"), purple("-t"), purple("--tag"));
 }

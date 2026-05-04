@@ -167,3 +167,21 @@ bool command_exists(rust::Str command_name)
         return false;
     }
 }
+
+// Delete the Data from the RAM
+int deinit_sx()
+{
+    try {
+        if (g_loaded_commands) {
+            delete g_loaded_commands;
+            g_loaded_commands = nullptr;
+        }
+
+        g_initialized = false;
+        return 0;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error during deinitialization: " << e.what() << "\n";
+        return 1;
+    }
+}

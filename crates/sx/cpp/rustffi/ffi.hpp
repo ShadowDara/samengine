@@ -35,3 +35,9 @@ bool command_exists(rust::Str command_name);
 /// Initialize the SX system with default configuration
 /// @return 0 on success, non-zero on error
 int init_sx();
+
+/// Delete the Data from the RAM
+/// Executing Commands afterwards will lead to an Error because
+/// they are not loaded anymore!
+/// @return 0 on success, non-zero on error
+int deinit_sx();

@@ -11,7 +11,7 @@ mod newproject;
 mod help;
 
 use crate::help::help;
-use ::sx::bridge::ffi;
+use ::sx::{load_commands, command_exists, execute_command};
 
 const PROGNAME: &str = "samtool";
 
@@ -155,9 +155,9 @@ fn main() {
                 cmd = &args[2];
             }
 
-            ffi::load_commands();
-            if (ffi::command_exists(cmd)) {
-                ffi::execute_command(cmd, "");
+            load_commands();
+            if (command_exists(cmd)) {
+                execute_command(cmd, "");
             } else {
                 println!("Command {} does not exist!", red(cmd))
             }

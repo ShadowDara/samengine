@@ -30,5 +30,11 @@ pub mod ffi {
         // Initialize the SX system with default config
         // Returns: 0 on success, non-zero on error
         pub fn init_sx() -> i32;
+
+        /// Delete the Data from the RAM
+        /// Executing Commands afterwards will lead to an Error because
+        /// they are not loaded anymore!
+        /// Rreturns:  0 on success, non-zero on error
+        pub fn deinit_sx() -> i32;
     }
 }

@@ -1,13 +1,14 @@
 #include "ffi.hpp"
-#include <fstream>
-#include <iostream>
+
+using namespace KeyValueParser2;
 
 // Global state for loaded commands
 static KVPMAP* g_loaded_commands = nullptr;
 static bool g_initialized = false;
 
 // Initialize the SX system
-int init_sx() {
+int init_sx()
+{
     if (g_initialized) {
         return 0; // Already initialized
     }
@@ -25,7 +26,8 @@ int init_sx() {
 }
 
 // Load all commands from the SX configuration file (following sx_lib.cpp pattern)
-int load_commands() {
+int load_commands()
+{
     if (!g_initialized) {
         if (init_sx() != 0) {
             return 1;
@@ -61,22 +63,26 @@ int load_commands() {
 }
 
 // Execute a command by its shortcut name
-int execute_command(const char* command_name, const char* args) {
+int execute_command(rust::Str command_name, rust::Str args)
+{
+    std::string cmd_name = std::string(command_name);
+    std::string args_c = std::string(args);
+
     if (!g_initialized || !g_loaded_commands) {
         std::cerr << "SX system not initialized. Call init_sx() and load_commands() first.\n";
         return 1;
     }
 
-    if (!command_name || command_name[0] == '\0') {
+    if (cmd_name.empty()) {
         std::cerr << "Error: command_name cannot be null or empty\n";
         return 1;
     }
 
     try {
         // Check if the command exists
-        auto val = g_loaded_commands->get(command_name);
+        auto val = g_loaded_commands->get(cmd_name);
         if (!val) {
-            std::cerr << "Shortcut not found: " << command_name << "\n";
+            std::cerr << "Shortcut not found: " << cmd_name << "\n";
             return 1;
         }
 
@@ -84,9 +90,9 @@ int execute_command(const char* command_name, const char* args) {
         std::string command = *val;
 
         // Append additional arguments if provided
-        if (args && args[0] != '\0') {
+        if (args_c[0] != '\0') {
             command += " ";
-            command += args;
+            command += args_c;
         }
 
         // Get the shell preferences from config
@@ -111,7 +117,8 @@ int execute_command(const char* command_name, const char* args) {
 }
 
 // Get all loaded commands as a string
-std::string get_loaded_commands() {
+rust::String get_loaded_commands()
+{
     if (!g_initialized || !g_loaded_commands) {
         return "SX system not initialized";
     }
@@ -129,7 +136,7 @@ std::string get_loaded_commands() {
             first = false;
         }
 
-        return result;
+        return rust::String(result);
     }
     catch (const std::exception& e) {
         std::cerr << "Error getting commands list: " << e.what() << "\n";
@@ -138,18 +145,21 @@ std::string get_loaded_commands() {
 }
 
 // Check if a specific command exists
-bool command_exists(const char* command_name) {
+bool command_exists(rust::Str command_name)
+{
+    auto cmd_name = std::string(command_name);
+
     if (!g_initialized || !g_loaded_commands) {
         std::cerr << "SX system not initialized\n";
         return false;
     }
 
-    if (!command_name || command_name[0] == '\0') {
+    if (cmd_name.empty()) {
         return false;
     }
 
     try {
-        auto val = g_loaded_commands->get(command_name);
+        auto val = g_loaded_commands->get(cmd_name);
         return val.has_value();
     }
     catch (const std::exception& e) {

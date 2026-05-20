@@ -27,10 +27,10 @@ yarn samengine-build --new newprojcet
 yarn samengine-build`,
 
   pnpm:
-`yarn init
-yarn install samengine samengine-build @shadowdara/samtool
-yarn samengine-build --new newprojcet
-yarn samengine-build`,
+`pnpm init
+pnpm install samengine samengine-build @shadowdara/samtool
+pnpm samengine-build --new newprojcet
+pnpm samengine-build`,
 };
 
 export default function StartPage() {

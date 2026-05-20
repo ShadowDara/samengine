@@ -108,7 +108,7 @@ export default function Home() {
           Start new with samengine and create a new high efficient webgame!
         </p>
 
-        <Link href="https://npmjs.com/samengine" target="_blank">
+        <Link href="/start">
           <button className="w-full sm:w-auto bg-white text-black px-8 py-4 rounded-xl font-semibold hover:bg-gray-200 transition">
             Start now
           </button>

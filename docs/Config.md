@@ -57,6 +57,15 @@ export default function defineConfig(): buildconfig {
     // The Webserver Port for the Develepment Server
     config.dev_server_port = 3000;
 
+    // Enable or disable Audio for the Game. Is turned off normally
+    // because it would make the Code size bigger
+    config.enable_audio = false;
+
+    // Samegui Config
+    config.settings = new_Settings();
+    // Show the Settings Button for samegui
+    config.settings.show_button = false;
+
     return config;
 }
 ```

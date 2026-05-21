@@ -11,7 +11,7 @@ const projects = [
     description:
       "A retro styled platformer built completely with samengine. Fast loading, tiny bundle size and smooth gameplay.",
     image: "/projects/pixel-adventure.png",
-    href: "#",
+    href: "/",
   },
   {
     title: "Space Arena",

@@ -2,6 +2,7 @@
 export { startEngine } from "./core.js";
 
 // Rendering
+export type { CharMap } from "./renderer.js";
 export {
     renderText,
     renderBitmapText,

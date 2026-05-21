@@ -2,17 +2,25 @@
 
 export interface buildconfig {
     htmlhead: string;
+    
     title: string;
     version: string;
+
     show_fullscreen_button: boolean;
+    
     entryname: string;
     outdir: string;
+
     markdown_notes: Paragraph[];
     gameauthor: string;
+    
     dev_server_port: number;
     settings: Settings;
+
+    enable_audio: boolean;
 }
 
+// Samegui Settigs
 export interface Settings {
     show_button: boolean;
 }
@@ -20,12 +28,18 @@ export interface Settings {
 export interface Paragraph {
     title: string;
     content: string;
-    style?: Style;
+    style?: MarkdownStyle;
 }
 
-export interface Style {
+export interface MarkdownStyle {
     color: string;
     bg_color: string;
+}
+
+export function new_Settings(): Settings {
+  return {
+    show_button: false,
+  }
 }
 
 export function new_buildconfig(): buildconfig {
@@ -39,11 +53,12 @@ export function new_buildconfig(): buildconfig {
         gameauthor: "DEV",
         htmlhead: `<link rel="icon" href="data:image/svg+xml;base64,${btoa(svgfile)}">`,
         dev_server_port: 3000,
-        settings: { show_button: false }
+        settings: new_Settings(),
+        enable_audio: false
     }
 }
 
-const svgfile = `<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+export const svgfile = `<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
   <style>
     .bg {
       fill: #0f1115;

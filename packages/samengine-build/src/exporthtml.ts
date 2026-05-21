@@ -19,6 +19,24 @@ function getStartScreen(config: buildconfig): string {
     </div>`;
 }
 
+// function to get the AudioCode
+function getAudioCode(c: buildconfig): string {
+    if (c.enable_audio == false) {
+        return "";
+    }
+
+    let content = `// 🔊 Audio freischalten
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            
+            const ctx = new AudioContext();
+            await ctx.resume();
+
+            // 👉 HIER rein!
+            window.__audioCtx = ctx;`;
+
+    return content;
+}
+
 // function to get the standard CSS
 function getStandardCSS(config: buildconfig): string {
     return `* {
@@ -377,14 +395,7 @@ ${getFullscreenButton(config)}
         const btn = document.getElementById("startBtn");
 
         btn.addEventListener("click", async () => {
-            // 🔊 Audio freischalten
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            
-            const ctx = new AudioContext();
-            await ctx.resume();
-
-            // 👉 HIER rein!
-            window.__audioCtx = ctx;
+            ${getAudioCode(config)}
 
             // Startscreen entfernen
             document.getElementById("startscreen").remove();
@@ -445,14 +456,7 @@ ${getSettingsButtonCSS(config)}
         const btn = document.getElementById("startBtn");
 
         btn.addEventListener("click", async () => {
-            // 🔊 Audio freischalten
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            
-            const ctx = new AudioContext();
-            await ctx.resume();
-
-            // 👉 HIER rein!
-            window.__audioCtx = ctx;
+            ${getAudioCode(config)}
 
             // Startscreen entfernen
             document.getElementById("startscreen").remove();

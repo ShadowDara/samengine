@@ -37,11 +37,14 @@ export interface MarkdownStyle {
 }
 
 export function new_Settings(): Settings {
-  return {
-    show_button: false,
-  }
+    return {
+        show_button: false,
+    }
 }
 
+// Function to create a buildconfig with the default values
+// Infos here:
+// https://samengine.vercel.app/docs/config
 export function new_buildconfig(): buildconfig {
     return {
         title: "My new Game",

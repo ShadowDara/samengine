@@ -19,6 +19,24 @@ function getStartScreen(config: buildconfig): string {
     </div>`;
 }
 
+// function to get the AudioCode
+function getAudioCode(c: buildconfig): string {
+    if (c.enable_audio == false) {
+        return "";
+    }
+
+    let content = `// 🔊 Audio freischalten
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            
+            const ctx = new AudioContext();
+            await ctx.resume();
+
+            // 👉 HIER rein!
+            window.__audioCtx = ctx;`;
+
+    return content;
+}
+
 // function to get the standard CSS
 function getStandardCSS(config: buildconfig): string {
     return `* {
@@ -222,101 +240,220 @@ function getFullscreenButtonHTML(config: buildconfig): string {
 
 
 function getSettingsButton(config: buildconfig): string {
-    let content = "";
 
-    if (config.settings.show_button) {
-        content = `
-<!-- Menü -->
-  <div id="menu">
-    <p>Option 1</p>
-    <p>Option 2</p>
-    <p>Option 3</p>
-  </div>
+    if (!config.htmlMenu.enable_menu) {
+        return "";
+    }
 
-<!-- Button -->
-<button id="fab">+</button>
+    let settingsHTML = "";
+
+    for (const setting of config.htmlMenu.settings) {
+
+        settingsHTML += `
+<div class="settingGroup">
+
+    <p>${setting.title}</p>
+`;
+
+        for (const option of setting.options) {
+
+            settingsHTML += `
+<button
+    class="settingBtn ${option.value === setting.default_value ? "active" : ""}"
+    data-setting="${setting.id}"
+    data-value="${option.value}"
+>
+    ${option.text}
+</button>
+`;
+        }
+
+        settingsHTML += `
+</div>
 `;
     }
 
-    return content;
+    return `
+<div id="settingsPopup">
+
+    <div id="settingsWindow">
+
+        <h2>Settings</h2>
+
+        ${settingsHTML}
+
+    </div>
+
+</div>
+
+<button id="settingsBtn">⚙</button>
+`;
 }
 
 
 function getSettingsButtonCSS(config: buildconfig): string {
-    let content = "";
 
-    if (config.settings.show_button) {
-        content = `/* Floating Button */
-    #fab {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 50px;
-      height: 50px;
-      border-radius: 15%;
-      background: rgba(0, 0, 0, 0.6);
-      color: white;
-      font-size: 30px;
-      border: none;
-      cursor: pointer;
+    if (!config.htmlMenu.enable_menu) {
+        return "";
     }
 
-    /* Menü */
-    #menu {
-      position: fixed;
-      bottom: 80px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      display: none;
-    }
+    return `
+#settingsBtn {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
 
-    #menu p {
-      margin: 5px 0;
-      cursor: pointer;
-    }
+    width: 40px;
+    height: 40px;
 
-    #menu p:hover {
-      color: #0070f3;
-    }`;
-    }
+    border: none;
+    border-radius: 12px;
 
-    return content;
+    font-size: 20px;
+
+    background: rgba(0,0,0,0.7);
+    color: white;
+
+    cursor: pointer;
+    z-index: 2000;
+}
+
+#settingsPopup {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.85);
+
+    display: none;
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 1999;
+}
+
+#settingsWindow {
+    width: 500px;
+    max-width: 90%;
+
+    background: #111827;
+
+    padding: 30px;
+
+    border-radius: 16px;
+
+    color: white;
+}
+
+.settingGroup {
+    margin-top: 20px;
+}
+
+.settingGroup p {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.settingBtn {
+    padding: 10px 16px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #1f2937;
+    color: white;
+
+    cursor: pointer;
+
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+.settingBtn.active {
+    background: #22c55e;
+    color: black;
+}
+`;
 }
 
 
 function getSettingsButtonJS(config: buildconfig): string {
-    let content = "";
 
-    if (config.settings.show_button) {
-        content = `
-<script>
-        const fab = document.getElementById("fab");
-    const menu = document.getElementById("menu");
-
-    fab.addEventListener("click", () => {
-      if (menu.style.display === "none" || menu.style.display === "") {
-        menu.style.display = "block";
-      } else {
-        menu.style.display = "none";
-      }
-    });
-
-    // Optional: Klick außerhalb schließt Menü
-    document.addEventListener("click", (e) => {
-      if (!fab.contains(e.target) && !menu.contains(e.target)) {
-        menu.style.display = "none";
-      }
-    });
-</script>
-`;
+    if (!config.htmlMenu.enable_menu) {
+        return "";
     }
 
-    return content;
+    const defaultSettings: Record<string, string> = {};
+
+    for (const setting of config.htmlMenu.settings) {
+        defaultSettings[setting.id] = setting.default_value;
+    }
+
+    return `
+<script>
+
+window.__GAMESETTINGS__ = ${JSON.stringify(defaultSettings, null, 4)};
+
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsPopup = document.getElementById("settingsPopup");
+
+settingsBtn.addEventListener("click", () => {
+
+    if (settingsPopup.style.display === "flex") {
+        settingsPopup.style.display = "none";
+    } else {
+        settingsPopup.style.display = "flex";
+    }
+
+});
+
+settingsPopup.addEventListener("click", (e) => {
+
+    if (e.target === settingsPopup) {
+        settingsPopup.style.display = "none";
+    }
+
+});
+
+document.querySelectorAll(".settingBtn").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        const setting = btn.dataset.setting;
+        const value = btn.dataset.value;
+
+        document.querySelectorAll(
+            '.settingBtn[data-setting="' + setting + '"]'
+        ).forEach(b => {
+            b.classList.remove("active");
+        });
+
+        btn.classList.add("active");
+
+        window.__GAMESETTINGS__[setting] = value;
+
+        console.log(window.__GAMESETTINGS__);
+
+    });
+
+});
+
+</script>
+`;
 }
 
+function getSettingsButtonJSrem(config: buildconfig): string {
+    if (!config.htmlMenu.enable_menu) {
+        return "";
+    }
+
+    return `// Settings Button Entfernen
+            document.getElementById("settingsBtn").remove();
+            
+            // Settings Popup Entfernen
+            document.getElementById("settingsPopup").remove();
+`;
+}
 
 //
 ///////////////////////////////////////////////////////////////////////////////////
@@ -360,12 +497,16 @@ ${getStandardCSS(config)}
 
 ${getFullscreenButton(config)}
 
+${getSettingsButtonCSS(config)}
+
 </style>
     </head>
     <body>
     ${getStartScreen(config)}
 
     ${getMDNotes(config)}
+
+    ${getSettingsButton(config)}
 
     <script>
         ${resourceLoaderScript}
@@ -377,17 +518,12 @@ ${getFullscreenButton(config)}
         const btn = document.getElementById("startBtn");
 
         btn.addEventListener("click", async () => {
-            // 🔊 Audio freischalten
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            
-            const ctx = new AudioContext();
-            await ctx.resume();
-
-            // 👉 HIER rein!
-            window.__audioCtx = ctx;
+            ${getAudioCode(config)}
 
             // Startscreen entfernen
             document.getElementById("startscreen").remove();
+
+            ${getSettingsButtonJSrem(config)}
 
             // Only when there are Markdown Notes
             ${config.markdown_notes.length > 0 ? `
@@ -399,6 +535,8 @@ document.getElementById("mdnotes").remove();
             window.__initializeGame();
         });
     </script>
+
+    ${getSettingsButtonJS(config)}
 
     ${getFullscreenButtonHTML(config)}
 
@@ -445,17 +583,12 @@ ${getSettingsButtonCSS(config)}
         const btn = document.getElementById("startBtn");
 
         btn.addEventListener("click", async () => {
-            // 🔊 Audio freischalten
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            
-            const ctx = new AudioContext();
-            await ctx.resume();
-
-            // 👉 HIER rein!
-            window.__audioCtx = ctx;
+            ${getAudioCode(config)}
 
             // Startscreen entfernen
             document.getElementById("startscreen").remove();
+
+            ${getSettingsButtonJSrem(config)}
             
             // Only when there are Markdown Notes
             ${config.markdown_notes.length > 0 ? `

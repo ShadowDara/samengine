@@ -8,7 +8,7 @@
     "**/.next/**": true,
     "web/docs": true,
     "web/next-env.d.ts": true,
-    "**/.samengine/config.mjs": true,
+    // "**/.samengine/config.mjs": true,
     // "**/.samengine": true,
     "**/out": true,
   },

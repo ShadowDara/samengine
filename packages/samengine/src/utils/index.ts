@@ -6,17 +6,17 @@ export { clamp, lerp, map, scale } from "./math.js";
 // Markdown Parser
 export type { ParseOptions as MarkdownParseOptions } from "./markdown.js";
 export {
-    parse as parseMarkdown,
-    parseToDocument as parseMarkdownToDocument,
-    exportcss as exportMarkdownCSS
+  parse as parseMarkdown,
+  parseToDocument as parseMarkdownToDocument,
+  exportcss as exportMarkdownCSS
 } from "./markdown.js";
 
 // JSON5 Parser
 export type {
-    JSONValue
+  JSONValue
 } from "./jsonc-parser.js";
 export {
-    parseJSONC
+  parseJSONC
 } from "./jsonc-parser.js";
 
 // Tiny Hash function
@@ -29,3 +29,13 @@ export function hash(str: string): number {
   return h;
 }
 
+// Make an array random
+export function shuffle<T>(array: T[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+
+  return array;
+}

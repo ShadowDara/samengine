@@ -31,6 +31,7 @@ Then install samengine and the buildtool.
 ```sh
 npm i samengine
 npm i samengine-build
+npm i @shadowdara/samtool
 ```
 
 Then create a new project by running

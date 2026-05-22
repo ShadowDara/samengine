@@ -35,7 +35,7 @@
 
 ## Future samengine () (Probaly 1.9.1)
 
-- added a has function
+- added a hash function
 - added a ImGUI inspired UI System
 - added CSV Parser
 

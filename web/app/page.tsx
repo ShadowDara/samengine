@@ -34,6 +34,12 @@ export default function Home() {
             </button>
           </Link>
 
+          <Link href="/awesome" className="w-full sm:w-auto">
+            <button className="w-full sm:w-auto border border-white px-6 py-3 rounded-xl hover:bg-white hover:text-black transition">
+              Awesome Projects
+            </button>
+          </Link>
+
           {/* <Link href="/changelog" className="w-full sm:w-auto">
             <button className="w-full sm:w-auto border border-white px-6 py-3 rounded-xl hover:bg-white hover:text-black transition">
               Changelog
@@ -108,7 +114,7 @@ export default function Home() {
           Start new with samengine and create a new high efficient webgame!
         </p>
 
-        <Link href="https://npmjs.com/samengine" target="_blank">
+        <Link href="/start">
           <button className="w-full sm:w-auto bg-white text-black px-8 py-4 rounded-xl font-semibold hover:bg-gray-200 transition">
             Start now
           </button>

@@ -1,3 +1,19 @@
 // Buildconfig Export and Version
-export type { buildconfig, Paragraph, Style } from "./buildconfig.js";
-export { new_buildconfig } from "./buildconfig.js";
+export type {
+    buildconfig,
+    Paragraph,
+    MarkdownStyle,
+    SameGUI,
+    HTMLMenuSettingOption,
+    HTMLMenuSetting,
+    HTMLMenu
+} from "./buildconfig.js";
+
+export {
+    newSameGUI,
+    new_buildconfig,
+    svgfile,
+    newHTMLMenu,
+    newDevProfile,
+    newReleaseProfile
+} from "./buildconfig.js";

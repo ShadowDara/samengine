@@ -1,0 +1,101 @@
+{
+  "configurations": [
+    {
+      "type": "default",
+      "name": "sx.exe help",
+      "project": "CMakeLists.txt",
+      "projectTarget": "sx.exe",
+      "args": [
+        "-h"
+      ]
+    },
+    {
+      "type": "default",
+      "name": "sx.exe info",
+      "project": "CMakeLists.txt",
+      "projectTarget": "sx.exe",
+      "args": [
+        "-i"
+      ]
+    },
+    {
+      "type": "default",
+      "name": "sx.exe version",
+      "project": "CMakeLists.txt",
+      "projectTarget": "sx.exe",
+      "args": [
+        "-v"
+      ]
+    },
+    {
+      "type": "default",
+      "name": "sx-multi.exe help",
+      "project": "CMakeLists.txt",
+      "projectTarget": "sx-multi.exe",
+      "args": [
+        "-h"
+      ]
+    },
+    {
+      "type": "default",
+      "name": "NumberGame",
+      "project": "CMakeLists.txt",
+      "projectTarget": "sx-multi.exe",
+      "args": [
+        "--numberguess"
+      ]
+    },
+    {
+      "type": "default",
+      "name": "Loadtime",
+      "project": "CMakeLists.txt",
+      "projectTarget": "sx-multi.exe",
+      "args": [
+        "--loadtime"
+      ]
+    },
+    {
+      "type": "default",
+      "name": "Loadtime Full Conf",
+      "project": "CMakeLists.txt",
+      "projectTarget": "sx-multi.exe",
+      "args": [
+        "--loadtime",
+        "\"example_sx.conf\""
+      ],
+      "currentDir": "${workspaceRoot}"
+    },
+    {
+      "type": "default",
+      "name": "Current Path",
+      "project": "CMakeLists.txt",
+      "projectTarget": "sx-multi.exe",
+      "args": [
+        "--viewfolder"
+      ],
+      "currentDir": "${workspaceRoot}"
+    },
+    {
+      "type": "default",
+      "name": "Foldersize",
+      "project": "CMakeLists.txt",
+      "projectTarget": "sx-multi.exe",
+      "args": [
+        "--foldersize"
+      ]
+    },
+    {
+      "type": "default",
+      "name": "View Empty Folder",
+      "project": "CMakeLists.txt",
+      "projectTarget": "sx-multi.exe",
+      "args": [
+        "viewempty",
+        "."
+      ],
+      "currentDir": "${workspaceRoot}"
+    }
+  ],
+  "defaults": {},
+  "version": "0.2.1"
+}

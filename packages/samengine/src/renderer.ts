@@ -17,7 +17,7 @@ export function renderText(
     ctx.fillText(text, x, y);
 }
 
-type CharMap = Record<string, Rect>;
+export type CharMap = Record<string, Rect>;
 
 export function renderBitmapText(
     ctx: CanvasRenderingContext2D,

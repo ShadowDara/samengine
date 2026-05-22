@@ -28,6 +28,7 @@ import { new_buildconfig } from "samengine-build";
 export default function defineConfig(): buildconfig {
     let config: buildconfig = new_buildconfig();
     config.title = "New Game";
+    config.description: "Your Game Description",
     return config;
 }
 ```
@@ -55,7 +56,20 @@ export default function defineConfig(): buildconfig {
     config.author = "you";
 
     // The Webserver Port for the Develepment Server
-    config.dev_server_port = 3000;
+    config.dev_server_port = 3001;
+
+    // Enable or disable Audio for the Game. Is turned off normally
+    // because it would make the Code size bigger
+    config.enable_audio = false;
+
+    // CSS Style for Mobile Devices
+    config.enable_mobile_css = false;
+
+    // Samegui Config
+    config.samegui = newSameGUI();
+
+    // Show the Settings Button for samegui
+    config.samegui.show_button = false;
 
     return config;
 }

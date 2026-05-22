@@ -48,6 +48,7 @@ export function isPointInRect(x: number, y: number, rect: Rect): boolean {
     );
 }
 
+// Is Rectangle Hovered
 export function isMouseInRect(mouse: Mouse, rect: Rect): boolean {
     return (
         mouse.x >= rect.x &&

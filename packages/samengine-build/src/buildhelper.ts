@@ -1,6 +1,7 @@
 import { readdirSync, statSync, mkdirSync, promises as fsPromises, existsSync } from "fs";
 import { join } from "path";
 
+// Logging function
 export const flog = (...args: any[]) => {
     const now = new Date();
     const time =
@@ -63,6 +64,9 @@ export async function scanResourcesAsDataURIs(resourceDir: string): Promise<Reco
 }
 
 // === Helper ===
+
+// Dev Server Helper
+
 export function getContentType(path: string): string {
     if (path.endsWith(".js")) return "application/javascript";
     if (path.endsWith(".ts")) return "application/typescript";

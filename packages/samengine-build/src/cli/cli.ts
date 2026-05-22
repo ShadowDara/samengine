@@ -21,7 +21,7 @@ import { getPackageVersion } from "../getversion.js";
 const version = getPackageVersion("samengine");
 
 // ================= BUILD =================
-function createBuilder(config: buildconfig, isRelease: boolean, isSingleFile: boolean = false) {
+function createBuilder(config: buildconfig, isRelease: boolean) {
     // Ensure that the Directories are created
     mkdir("resources", { recursive: true });
     mkdir("game", { recursive: true });
@@ -41,7 +41,7 @@ function createBuilder(config: buildconfig, isRelease: boolean, isSingleFile: bo
                 define: { "import.meta.env.DEV": JSON.stringify(!isRelease) },
             });
 
-            if (isSingleFile) {
+            if (isRelease && config.releaseMode.singlefile || !isRelease && config.devMode.singlefile) {
                 // Single-file export
                 const bundledJsPath = path.join(".", config.outdir, `${config.entryname.replace(/\.[^.]*$/, "")}.js`);
                 const bundledJsContent = await readFile(bundledJsPath, "utf-8");
@@ -175,7 +175,7 @@ async function main() {
     }
 
     const config = await loadUserConfig();
-    let builder = createBuilder(config, args.release, args.singlefile);
+    let builder = createBuilder(config, args.release);
 
     let isBuilding = false;
     let pendingRestart = false;
@@ -200,7 +200,7 @@ async function main() {
                 devServer = createDevServer(newConfig);
 
                 // New Builder (use the new Config)
-                builder = createBuilder(newConfig, args.release, args.singlefile);
+                builder = createBuilder(newConfig, args.release);
 
                 await builder.build();
 

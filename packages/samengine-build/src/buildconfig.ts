@@ -27,15 +27,12 @@ export interface buildconfig {
 
     enable_audio: boolean;
 
-    // TODO
     htmlMenu: HTMLMenu;
 
     // TODO
     enable_mobile_css: boolean;
 
-    // TODO
     devMode: profile;
-    // TODO
     releaseMode: profile;
 }
 
@@ -167,6 +164,8 @@ export function newHTMLMenu(): HTMLMenu {
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
+
+// Dev Profiles
 
 export interface profile {
     release: boolean;

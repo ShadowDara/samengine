@@ -303,13 +303,13 @@ function getSettingsButtonCSS(config: buildconfig): string {
     right: 20px;
     bottom: 20px;
 
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
 
     border: none;
     border-radius: 12px;
 
-    font-size: 26px;
+    font-size: 20px;
 
     background: rgba(0,0,0,0.7);
     color: white;

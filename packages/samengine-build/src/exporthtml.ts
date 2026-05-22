@@ -442,6 +442,19 @@ document.querySelectorAll(".settingBtn").forEach(btn => {
 `;
 }
 
+function getSettingsButtonJSrem(config: buildconfig): string {
+    if (!config.htmlMenu.enable_menu) {
+        return "";
+    }
+
+    return `// Settings Button Entfernen
+            document.getElementById("settingsBtn").remove();
+            
+            // Settings Popup Entfernen
+            document.getElementById("settingsPopup").remove();
+`;
+}
+
 //
 ///////////////////////////////////////////////////////////////////////////////////
 //
@@ -510,6 +523,8 @@ ${getSettingsButtonCSS(config)}
             // Startscreen entfernen
             document.getElementById("startscreen").remove();
 
+            ${getSettingsButtonJSrem(config)}
+
             // Only when there are Markdown Notes
             ${config.markdown_notes.length > 0 ? `
 // Markdown Info entfernen
@@ -572,6 +587,8 @@ ${getSettingsButtonCSS(config)}
 
             // Startscreen entfernen
             document.getElementById("startscreen").remove();
+
+            ${getSettingsButtonJSrem(config)}
             
             // Only when there are Markdown Notes
             ${config.markdown_notes.length > 0 ? `

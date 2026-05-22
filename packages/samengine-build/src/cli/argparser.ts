@@ -16,9 +16,6 @@ export function parseArgs(): CLIArgs {
     for (let i = 0; i < args.length; i++) {
         const arg = args[i];
         switch (arg) {
-            case "--single-file":
-                options.singlefile = true;
-                break;
             case "--release":
             case "-r":
                 options.release = true;

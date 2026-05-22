@@ -9,7 +9,7 @@ import { Vector2d } from "samengine/types";
 import { dlog } from "samengine";
 import { Key } from "samengine";
 
-import { HtmlUI } from "samengine/samegui";
+// import { HtmlUI } from "samengine/samegui";
 
 const { canvas, ctx, applyScaling, virtualWidth, virtualHeight } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
 setupInput(canvas, virtualWidth, virtualHeight);
@@ -26,7 +26,7 @@ let speed = 0.2; // seconds per cell
 let start = false;
 
 // New UI 
-const ui = new HtmlUI();
+// const ui = new HtmlUI();
 let enabled = false;
 
 async function gameStart() {
@@ -36,18 +36,18 @@ async function gameStart() {
 function gameLoop(dt: number) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ui.begin();
+    // ui.begin();
 
-    ui.text("Debug Menu");
+    // ui.text("Debug Menu");
 
-    if (ui.button("Toggle")) {
-        enabled = !enabled;
-        console.log("Button Pressed");
-    }
+    // if (ui.button("Toggle")) {
+    //     enabled = !enabled;
+    //     console.log("Button Pressed");
+    // }
 
-    enabled = ui.checkbox("Enabled", !enabled);
+    // enabled = ui.checkbox("Enabled", !enabled);
 
-    ui.end();
+    // ui.end();
 
     const mouse = getMouse();
 

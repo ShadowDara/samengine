@@ -3,11 +3,17 @@ export type {
     buildconfig,
     Paragraph,
     MarkdownStyle,
-    Settings
+    SameGUI,
+    HTMLMenuSettingOption,
+    HTMLMenuSetting,
+    HTMLMenu
 } from "./buildconfig.js";
 
 export {
-    new_Settings,
+    newSameGUI,
     new_buildconfig,
-    svgfile
+    svgfile,
+    newHTMLMenu,
+    newDevProfile,
+    newReleaseProfile
 } from "./buildconfig.js";

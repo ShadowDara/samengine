@@ -15,7 +15,9 @@ function getStartScreen(config: buildconfig): string {
         <p>${config.version}</p>
         <p>by ${config.gameauthor}</p>
 
-        <button class="startbutton" id="startBtn">Start</button>
+        <button class="startbutton" id="startBtn">${config.htmlMenu.text.startbutton}</button>
+
+        <p>${config.description}</p>
     </div>`;
 }
 
@@ -46,8 +48,8 @@ function getStandardCSS(config: buildconfig): string {
       }
 body {
     margin: 0;
-    background: #0f172a;
-    color: white;
+    background: ${config.htmlMenu.style.bgcolor};
+    color: ${config.htmlMenu.style.color};
     font-family: sans-serif;
     display: flex;
     justify-content: center;
@@ -72,41 +74,57 @@ h2 {
 }
 
 .startbutton {
-    margin-top: 2rem;
+    margin: 1.3rem 0;
     padding: 1rem 2rem;
     font-size: 1.2rem;
-    background: #22c55e;
+    background: ${config.htmlMenu.style.startbutton_bgcolor};
     border: none;
     border-radius: 8px;
     cursor: pointer;
 }
 
 .startbutton:hover {
-    background: #16a34a;
+    background: ${config.htmlMenu.style.startbutton_bgc_hover};
 }`;
 }
 
 // Function which formats the HTML for the Notes
 function getMDNotes(config: buildconfig): string {
-    let mdnotes_str: string = "";
+    let mdnotes_str = "";
 
     if (config.markdown_notes.length > 0) {
+
         mdnotes_str += '<div id="mdnotes">';
 
         for (let i = 0; i < config.markdown_notes.length; i++) {
-            mdnotes_str += "<details>";
-            mdnotes_str += "<summary>" + config.markdown_notes[i].title + "</summary>";
-            mdnotes_str += parseMarkdown(config.markdown_notes[i].content);
-            mdnotes_str += "</details>";
+
+            const note = config.markdown_notes[i];
+
+            let vars = "";
+
+            if (note.style?.bg) {
+                vars += `--note-bg:${note.style.bg};`;
+            }
+
+            if (note.style?.color) {
+                vars += `--note-color:${note.style.color};`;
+            }
+
+            mdnotes_str += `
+<details style="${vars}">
+    <summary>${note.title}</summary>
+    ${parseMarkdown(note.content)}
+</details>`;
         }
 
         mdnotes_str += "</div>";
+
         mdnotes_str += `
 <style>
 /* Markdown Notes Container */
-#mdnotes, #mdnotes div {
+#mdnotes {
     position: absolute;
-    bottom: 0px;
+    bottom: 0;
     left: 10px;
     max-width: 400px;
     max-height: 40vh;
@@ -118,7 +136,12 @@ function getMDNotes(config: buildconfig): string {
 
 /* Einzelne Note */
 #mdnotes details {
-    background: rgba(15, 23, 42, 0.85);
+    --note-bg: rgba(15,23,42,0.85);
+    --note-color: #e2e8f0;
+
+    background: var(--note-bg);
+    color: var(--note-color);
+
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 8px;
     margin-bottom: 8px;
@@ -130,8 +153,7 @@ function getMDNotes(config: buildconfig): string {
 #mdnotes summary {
     cursor: pointer;
     font-weight: bold;
-    color: #38bdf8;
-    outline: none;
+    color: inherit;
     list-style: none;
 }
 
@@ -322,7 +344,7 @@ function getSettingsButtonCSS(config: buildconfig): string {
     position: fixed;
     inset: 0;
 
-    background: rgba(0,0,0,0.85);
+    background: ${config.htmlMenu.style.settingsmenu_popup_bgcolor};
 
     display: none;
 
@@ -336,7 +358,7 @@ function getSettingsButtonCSS(config: buildconfig): string {
     width: 500px;
     max-width: 90%;
 
-    background: #111827;
+    background: ${config.htmlMenu.style.settingsmenu_bgcolor};
 
     padding: 30px;
 
@@ -360,7 +382,7 @@ function getSettingsButtonCSS(config: buildconfig): string {
     border: none;
     border-radius: 8px;
 
-    background: #1f2937;
+    background: ${config.htmlMenu.style.settingsmenu_button};
     color: white;
 
     cursor: pointer;
@@ -370,7 +392,7 @@ function getSettingsButtonCSS(config: buildconfig): string {
 }
 
 .settingBtn.active {
-    background: #22c55e;
+    background: ${config.htmlMenu.style.settingsmenu_button_clicked};
     color: black;
 }
 `;

@@ -50,13 +50,19 @@ export function newSameGUI(): SameGUI {
 export interface Paragraph {
     title: string;
     content: string;
-    style?: MarkdownStyle;
+    style: MarkdownStyle;
 }
 
-// TODO
 export interface MarkdownStyle {
     color: string;
-    bg_color: string;
+    bg: string;
+}
+
+export function newMarkdownStyle(): MarkdownStyle {
+    return {
+        color: "#38bdf8",
+        bg: "#0f172a",
+    }
 }
 
 // Function to create a buildconfig with the default values
@@ -142,6 +148,23 @@ export interface HTMLMenuSetting {
     options: HTMLMenuSettingOption[];
 }
 
+export interface HTMLMenuStyle {
+    bgcolor: string;
+    color: string;
+
+    settingsmenu_popup_bgcolor: string;
+    settingsmenu_bgcolor: string;
+    settingsmenu_button: string;
+    settingsmenu_button_clicked: string;
+
+    startbutton_bgcolor: string;
+    startbutton_bgc_hover: string;
+}
+
+export interface HTMLMenuText {
+    startbutton: string;
+}
+
 // Access Option via for example
 // window.__GAMESETTINGS__.graphics
 // window.__GAMESETTINGS__.sound
@@ -149,6 +172,9 @@ export interface HTMLMenu {
     enable_menu: boolean;
 
     settings: HTMLMenuSetting[];
+
+    style: HTMLMenuStyle;
+    text: HTMLMenuText;
 }
 
 export function newHTMLMenu(): HTMLMenu {
@@ -156,6 +182,22 @@ export function newHTMLMenu(): HTMLMenu {
         enable_menu: false,
 
         settings: [],
+
+        style: {
+            bgcolor: "#0f172a",
+            color: "white",
+
+            settingsmenu_popup_bgcolor: "rgba(0,0,0,0.85)",
+            settingsmenu_bgcolor: "#111827",
+            settingsmenu_button: "#1f2937",
+            settingsmenu_button_clicked: "#22c55e",
+
+            startbutton_bgcolor: "#22c55e",
+            startbutton_bgc_hover: "#16a34a",
+        },
+        text: {
+            startbutton: "Start",
+        }
     }
 }
 

@@ -6,7 +6,9 @@ export type {
     SameGUI,
     HTMLMenuSettingOption,
     HTMLMenuSetting,
-    HTMLMenu
+    HTMLMenu,
+    HTMLMenuStyle,
+    HTMLMenuText,
 } from "./buildconfig.js";
 
 export {

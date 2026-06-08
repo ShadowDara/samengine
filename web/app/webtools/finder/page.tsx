@@ -67,6 +67,7 @@ export default function App() {
             <FolderNode
               root
               folder={{
+                name: data.name, // 👈 FIX
                 folders: data.folders,
                 files: data.files
               }}

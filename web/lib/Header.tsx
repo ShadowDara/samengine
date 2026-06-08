@@ -68,6 +68,10 @@ const Header: React.FC = () => {
         <div className="webtools-logo">Web Tools</div>
 
         <nav className="webtools-nav">
+          <Link href="/" className="jquery-btn">
+            /
+          </Link>
+
           <Link href="/webtools" className="jquery-btn">
             Home
           </Link>

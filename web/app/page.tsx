@@ -42,6 +42,12 @@ export default function Home() {
             </button>
           </Link>
 
+          <Link href="/webtools" className="w-full sm:w-auto">
+            <button className="w-full sm:w-auto border border-white px-6 py-3 rounded-xl hover:bg-white hover:text-black transition">
+              Tools
+            </button>
+          </Link>
+
           {/* <Link href="/changelog" className="w-full sm:w-auto">
             <button className="w-full sm:w-auto border border-white px-6 py-3 rounded-xl hover:bg-white hover:text-black transition">
               Changelog

@@ -43,3 +43,10 @@ export interface FinderTemplate {
   files: FileTemplate[];
   folders: FolderTemplate[];
 }
+
+export interface tool {
+  slug: string;
+  title: string;
+  description: string;
+  icon: string;
+}

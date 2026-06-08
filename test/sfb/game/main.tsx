@@ -1,4 +1,4 @@
-// import { jsx, Fragment } from "../runtime";
+import { jsx, setInnerHTML } from "../runtime";
 import { parseMarkdown } from "samengine/utils";
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
       <button onclick="alert('läuft!')">
         Klick mich
       </button>
-      {parseMarkdown("# Hallo")}
+      {setInnerHTML(parseMarkdown("# Hallo"))}
     </div>
   )
   ;

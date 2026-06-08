@@ -31,6 +31,7 @@
 - fixed a Bug where the wrong config was used
 - fixed a Bug when no Markdown Notes where added
 - Markdown notes are now removed correctly on Game Start
+- added better Storage API
 
 
 ## Future samengine () (Probaly 1.9.1)

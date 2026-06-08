@@ -7,17 +7,6 @@ import { render } from "./runtime";
 async function build() {
   fs.mkdirSync("dist", { recursive: true });
 
-  await esbuild.build({
-    entryPoints: ["game/main.tsx"],
-    bundle: true,
-    outfile: "dist/app.js",
-    format: "iife",
-    platform: "browser",
-    jsx: "transform",
-    jsxFactory: "jsx",
-    jsxFragment: "Fragment",
-  });
-
   const ssrFile = path.resolve("dist/ssr.mjs");
   await esbuild.build({
     entryPoints: ["game/main.tsx"],
@@ -32,7 +21,6 @@ async function build() {
 
   const { default: App } = await import(pathToFileURL(ssrFile).href);
   const app = App();
-  const js = fs.readFileSync("dist/app.js", "utf-8");
 
   const html = `
 <!doctype html>
@@ -43,6 +31,8 @@ async function build() {
   <style>
     body { font-family: system-ui; padding: 20px; }
     .app { border: 1px solid #ddd; padding: 12px; }
+    textarea { box-sizing: border-box; min-height: 160px; width: 100%; }
+    #markdown-preview { border-top: 1px solid #ddd; margin-top: 16px; padding-top: 16px; }
     button { margin-top: 10px; padding: 8px 12px; }
   </style>
 </head>
@@ -52,13 +42,8 @@ async function build() {
 </html>
 `;
 
-// <script>
-  // ${js}
-  // </script>
-
   fs.writeFileSync("dist/index.html", html);
-  // fs.rmSync("dist/app.js", { force: true });
-  // fs.rmSync(ssrFile, { force: true });
+  fs.rmSync(ssrFile, { force: true });
 
   console.log("built dist/index.html");
 }

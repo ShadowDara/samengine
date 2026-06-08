@@ -25,11 +25,19 @@ export function setInnerHTML(html: any) {
   return { __html: String(html) };
 }
 
+export function setScript(code: any) {
+  return { __script: String(code) };
+}
+
 export function render(node: any): string {
   if (node == null || node === false) return "";
 
   if (node.__html != null) {
     return String(node.__html);
+  }
+
+  if (node.__script != null) {
+    return `<script>${escapeScript(String(node.__script))}</script>`;
   }
 
   if (typeof node === "string" || typeof node === "number") {
@@ -68,4 +76,8 @@ function escapeAttr(str: any) {
   return String(str)
     .replaceAll("&", "&amp;")
     .replaceAll('"', "&quot;");
+}
+
+function escapeScript(str: string) {
+  return str.replaceAll("</script", "<\\/script");
 }

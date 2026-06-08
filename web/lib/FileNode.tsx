@@ -1,0 +1,53 @@
+export default function FileNode({
+  file,
+  onChange,
+  onDelete
+}) {
+  return (
+    <div className="border rounded-xl p-4 bg-slate-50">
+      <div className="grid md:grid-cols-2 gap-4">
+        <input
+          className="border rounded-xl p-3"
+          placeholder="Dateiname"
+          value={file.name}
+          onChange={(e) =>
+            onChange({
+              ...file,
+              name: e.target.value
+            })
+          }
+        />
+
+        <select
+          className="border rounded-xl p-3"
+          value={file.existence}
+          onChange={(e) =>
+            onChange({
+              ...file,
+              existence: e.target.value
+            })
+          }
+        >
+          <option value="required">
+            required
+          </option>
+
+          <option value="optional">
+            optional
+          </option>
+
+          <option value="forbidden">
+            forbidden
+          </option>
+        </select>
+      </div>
+
+      <button
+        onClick={onDelete}
+        className="mt-4 bg-red-500 text-white px-4 py-2 rounded-xl"
+      >
+        Entfernen
+      </button>
+    </div>
+  );
+}

@@ -1,5 +1,7 @@
 // app/docs/[slug]/page.tsx
 
+'use client';
+
 // Make it static!
 export const dynamic = "force-static";
 

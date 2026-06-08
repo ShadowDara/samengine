@@ -1,6 +1,6 @@
 // app/changelog/page.tsx
 
-'use client';
+// 'use client';
 
 // Make it static!
 export const dynamic = "force-static";

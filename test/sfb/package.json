@@ -14,5 +14,8 @@
     "esbuild": "^0.28.0",
     "samengine": "^1.9.0",
     "typescript": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.2"
   }
 }

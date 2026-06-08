@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "tauri": "NEXT_CONFIG_FILE=next.config.tauri.ts tauri"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.19",
@@ -28,7 +29,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@tauri-apps/cli": "^2"
   },
   "ignoreScripts": [
     "sharp",

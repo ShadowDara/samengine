@@ -43,6 +43,7 @@ async function build() {
 `;
 
   fs.writeFileSync("dist/index.html", html);
+  fs.rmSync("dist/app.js", { force: true });
   fs.rmSync(ssrFile, { force: true });
 
   console.log("built dist/index.html");

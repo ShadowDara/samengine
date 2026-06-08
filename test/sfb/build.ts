@@ -22,7 +22,7 @@ async function build() {
   const { default: App } = await import(pathToFileURL(ssrFile).href);
   const app = App();
 
-  const html = `
+  const html = await minifyHtml(`
 <!doctype html>
 <html>
 <head>
@@ -40,7 +40,7 @@ async function build() {
   ${render(app)}
 </body>
 </html>
-`;
+`);
 
   fs.writeFileSync("dist/index.html", html);
   fs.rmSync("dist/app.js", { force: true });
@@ -50,3 +50,73 @@ async function build() {
 }
 
 build();
+
+async function minifyHtml(html: string) {
+  const blocks: string[] = [];
+
+  function keep(block: string) {
+    const token = `__SAMENGINE_KEEP_${blocks.length}__`;
+    blocks.push(block);
+    return token;
+  }
+
+  html = await minifyBlocks(
+    html,
+    /<script\b([^>]*)>([\s\S]*?)<\/script>/gi,
+    async (attrs, code) => {
+      const result = await esbuild.transform(code, {
+        loader: "js",
+        minify: true,
+        target: "es2018",
+      });
+
+      return keep(`<script${attrs}>${result.code.trim()}</script>`);
+    },
+  );
+
+  html = await minifyBlocks(
+    html,
+    /<style\b([^>]*)>([\s\S]*?)<\/style>/gi,
+    async (attrs, css) => {
+      const result = await esbuild.transform(css, {
+        loader: "css",
+        minify: true,
+      });
+
+      return keep(`<style${attrs}>${result.code.trim()}</style>`);
+    },
+  );
+
+  html = html.replace(
+    /<(textarea|pre|code)\b([^>]*)>([\s\S]*?)<\/\1>/gi,
+    (match) => keep(match),
+  );
+
+  html = html
+    .replace(/>\s+</g, "><")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+
+  blocks.forEach((block, index) => {
+    html = html.replace(`__SAMENGINE_KEEP_${index}__`, block);
+  });
+
+  return html;
+}
+
+async function minifyBlocks(
+  html: string,
+  pattern: RegExp,
+  minify: (attrs: string, content: string) => Promise<string>,
+) {
+  let output = "";
+  let lastIndex = 0;
+
+  for (const match of html.matchAll(pattern)) {
+    output += html.slice(lastIndex, match.index);
+    output += await minify(match[1], match[2]);
+    lastIndex = match.index! + match[0].length;
+  }
+
+  return output + html.slice(lastIndex);
+}

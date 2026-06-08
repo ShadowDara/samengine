@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    // "jsx": "preserve"
+    // "jsx": "react"
+    "jsx": "preserve"
     // "jsxImportSource": "./runtime"
-  }
+  },
+  "exclude": ["build.ts"]
 }

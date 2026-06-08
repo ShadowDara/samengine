@@ -1,4 +1,4 @@
-globalThis.jsx = function (tag, props, ...children) {
+(globalThis as any).jsx = function (tag: any, props: any, ...children: any[]) {
   return { tag, props, children };
 };
 

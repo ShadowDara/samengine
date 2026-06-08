@@ -1,16 +1,20 @@
-globalThis.jsx = function (tag, props) {
-  return { tag, props };
+globalThis.jsx = function (tag, props, ...children) {
+  return { tag, props, children };
 };
 
-export function jsx(tag: any, props: any, key?: any) {
+export function jsx(tag: any, props: any, ...children: any[]) {
+  const propChildren = props?.children;
+
   return {
     tag,
     props: props || {},
-    children: props?.children
-      ? Array.isArray(props.children)
-        ? props.children
-        : [props.children]
-      : []
+    children: children.length
+      ? children
+      : propChildren
+        ? Array.isArray(propChildren)
+          ? propChildren
+          : [propChildren]
+        : []
   };
 }
 

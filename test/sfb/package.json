@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx samengine-build",
-    "build": "npx samengine-build --release"
+    "build": "npx samengine-build --release",
+    "bundle": "bun build.ts"
   },
   "author": "",
   "license": "ISC",

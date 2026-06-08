@@ -6,7 +6,9 @@ export type {
     SameGUI,
     HTMLMenuSettingOption,
     HTMLMenuSetting,
-    HTMLMenu
+    HTMLMenu,
+
+    SingleFileBundlerConfig
 } from "./buildconfig.js";
 
 export {
@@ -15,5 +17,7 @@ export {
     svgfile,
     newHTMLMenu,
     newDevProfile,
-    newReleaseProfile
+    newReleaseProfile,
+
+    newSingleFileBundlerConfig
 } from "./buildconfig.js";

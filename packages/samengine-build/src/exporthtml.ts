@@ -615,3 +615,117 @@ document.getElementById("mdnotes").remove();
 
     return defaulthtml;
 }
+
+/////////////////////////////////////////////////////////////////////
+
+export function getSingleFileBundlerHTML(c: buildconfig, js: string): string {
+    return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Mini TSX Runtime</title>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script>
+    // -----------------------------
+    // MINI VIRTUAL DOM FORMAT
+    // -----------------------------
+    // { tag: "div", props: {}, children: [] }
+
+    function h(tag, props, ...children) {
+      return {
+        tag,
+        props: props || {},
+        children: children.flat()
+      };
+    }
+
+    // -----------------------------
+    // RENDER FUNCTION
+    // -----------------------------
+    function render(node) {
+      if (node == null || node === false) return "";
+
+      if (typeof node === "string" || typeof node === "number") {
+        return escapeHtml(String(node));
+      }
+
+      if (typeof node.tag === "function") {
+        return render(node.tag(node.props || {}));
+      }
+
+      const props = node.props || {};
+
+      const attrs = Object.entries(props)
+        .filter(([k]) => k !== "children")
+        .map(([k, v]) => \` \${k}="\${escapeAttr(v)}"\`)
+        .join("");
+
+      const children = (node.children || [])
+        .map(render)
+        .join("");
+
+      return \`<\${node.tag}\${attrs}>\${children}</\${node.tag}>\`;
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function escapeAttr(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("\\"", "&quot;");
+    }
+
+    // -----------------------------
+    // MINI "COMPONENTS"
+    // -----------------------------
+    function App() {
+      return h(
+        "div",
+        { class: "app" },
+        h("h1", null, "Hallo Welt"),
+        h("p", null, "Das ist eine Mini-TSX Runtime ohne React."),
+        h(
+          "button",
+          {
+            onclick: "alert('Hi!')"
+          },
+          "Klick mich"
+        )
+      );
+    }
+
+    // -----------------------------
+    // MOUNT
+    // -----------------------------
+    document.getElementById("app").innerHTML = render(h(App));
+  </script>
+
+  <style>
+    body {
+      font-family: system-ui;
+      padding: 20px;
+    }
+
+    .app {
+      border: 1px solid #ddd;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 8px 12px;
+    }
+  </style>
+</body>
+</html>`;
+}

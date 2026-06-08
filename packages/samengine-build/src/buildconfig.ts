@@ -34,6 +34,9 @@ export interface buildconfig {
 
     devMode: profile;
     releaseMode: profile;
+
+    // TODO
+    sfb: SingleFileBundlerConfig;
 }
 
 // Samegui Settigs
@@ -80,6 +83,7 @@ export function new_buildconfig(): buildconfig {
         enable_mobile_css: false,
         devMode: newDevProfile(),
         releaseMode: newReleaseProfile(),
+        sfb: newSingleFileBundlerConfig(),
     }
 }
 
@@ -183,5 +187,17 @@ export function newReleaseProfile(): profile {
     return {
         release: true,
         singlefile: false,
+    }
+}
+
+// SFB
+// SingleFileBundler Config
+export interface SingleFileBundlerConfig {
+    active: boolean;
+}
+
+export function newSingleFileBundlerConfig(): SingleFileBundlerConfig {
+    return {
+        active: false
     }
 }

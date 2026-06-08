@@ -11,7 +11,7 @@ import { WebSocket, WebSocketServer } from "ws";
 
 import { createProject } from "./new.js";
 import { copyFolder, flog, getContentType, scanResourcesAsDataURIs, filterResourcesByUsage } from "../buildhelper.js";
-import { GetDefaultHTML, GetSingleFileHTML } from "../exporthtml.js";
+import { GetDefaultHTML, getSingleFileBundlerHTML, GetSingleFileHTML } from "../exporthtml.js";
 import { loadUserConfig } from "./config.js";
 import { compressHTML } from "../utils/utils.js";
 import { parseArgs } from "./argparser.js";
@@ -65,7 +65,40 @@ function createBuilder(config: buildconfig, isRelease: boolean) {
                 await rm(`./${config.outdir}/main.js`, { recursive: true, force: true });
 
                 flog("✅ Single-file export created!");
-            } else {
+            }
+            
+            //
+            else if (config.sfb.active) {
+                // if (isRelease) 
+
+                // Static File Bundler
+
+                const bundledJsPath = path.join(".", config.outdir, `${config.entryname.replace(/\.[^.]*$/, "")}.js`);
+                const bundledJsContent = await readFile(bundledJsPath, "utf-8");
+                
+                // Scan resources and convert to data URIs
+                // let resourcesMap = await scanResourcesAsDataURIs("./resources");
+                
+                // Filter resources by usage in the bundled code
+                // resourcesMap = filterResourcesByUsage(bundledJsContent, resourcesMap);
+                
+                let html = getSingleFileBundlerHTML(config, bundledJsContent);
+                if (isRelease) html = await compressHTML(html);
+                
+                // Add comment at the beginning after minification
+                const htmlComment = `<!-- Game made with samengine v${version} - https://github.com/Shadowdara/samengine ${config.gameauthor} (Game Author) -->\n`;
+                html = htmlComment + html;
+                
+                await writeFile(`./${config.outdir}/index.html`, html);
+
+                // Delete the JS File
+                await rm(`./${config.outdir}/main.js`, { recursive: true, force: true });
+
+                flog("✅ Single-file export created!");
+            }
+            
+            // Esle
+            else {
                 // Multi-file export (original behavior)
                 let html = GetDefaultHTML(config, isRelease);
                 if (isRelease) html = await compressHTML(html);
@@ -174,8 +207,12 @@ async function main() {
         process.exit(0);
     }
 
-    const config = await loadUserConfig();
+    const config: buildconfig = await loadUserConfig();
     let builder = createBuilder(config, args.release);
+
+    if (!config.enable_audio) {
+        flog("[INFO]: Audio is disabled!");
+    }
 
     let isBuilding = false;
     let pendingRestart = false;
@@ -191,7 +228,7 @@ async function main() {
             pendingRestart = false;
             try {
                 // Load the New Config
-                const newConfig = await loadUserConfig();
+                const newConfig: buildconfig = await loadUserConfig();
 
                 // Dev Server Stoppen
                 devServer?.stop();

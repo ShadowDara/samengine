@@ -1,0 +1,17 @@
+{
+  "name": "sfb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx samengine-build",
+    "build": "npx samengine-build --release"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.28.0",
+    "samengine": "^1.9.0",
+    "typescript": "^6.0.3"
+  }
+}

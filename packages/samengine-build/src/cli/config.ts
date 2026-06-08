@@ -2,8 +2,9 @@ import { build } from "esbuild";
 import path from "path";
 import { pathToFileURL } from "url";
 import fs from "fs/promises";
+import { buildconfig } from "../buildconfig";
 
-export async function loadUserConfig() {
+export async function loadUserConfig(): Promise<buildconfig> {
     const root = process.cwd();
 
     const configPath = path.resolve(root, "samengine.config.ts");

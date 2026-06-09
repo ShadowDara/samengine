@@ -10,7 +10,7 @@ import { tool } from "@/lib/types";
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <div className="mx-auto max-w-7xl px-6 py-16">
+      <div className="mx-auto max-w-7xl px-6 py-12">
         <h1 className="text-5xl font-bold mb-4">
           Webtools
         </h1>

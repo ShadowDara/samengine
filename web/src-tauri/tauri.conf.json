@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "identifier": "com.dara.tauri-app",
   "build": {
+    "beforeDevCommand": "bun run dev",
+    "devUrl": "http://localhost:3000",
+    "beforeBuildCommand": "bun run build",
     "frontendDist": "../out"
   },
   "app": {

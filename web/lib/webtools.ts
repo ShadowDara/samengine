@@ -31,4 +31,10 @@ export const webtools: tool[] = [
     description: "A simple working Markdown Writer",
     icon: "✒",
   },
+  {
+    slug: "diff",
+    title: "Git Diff Viewer",
+    description: "A simple Viewer which compares 2 Texts about their changes",
+    icon: "▶",
+  },
 ];

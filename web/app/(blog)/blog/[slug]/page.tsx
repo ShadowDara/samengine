@@ -1,29 +1,60 @@
+import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { CustomMDX } from '@/components/mdx'
 import { formatDate, getBlogPosts } from '@/lib/utils'
 import { baseUrl } from '@/lib/sitemap'
 
-export async function generateStaticParams() {
-  let posts = getBlogPosts()
+type BlogPostMetadata = {
+  title: string
+  publishedAt: string
+  summary: string
+  image?: string
+  author: string
+}
+
+type BlogPost = {
+  slug: string
+  content: string
+  metadata: BlogPostMetadata
+}
+
+type Params = {
+  slug: string
+}
+
+type Props = {
+  params: Promise<Params>
+}
+
+export async function generateStaticParams(): Promise<Params[]> {
+  const posts = getBlogPosts() as BlogPost[]
 
   return posts.map((post) => ({
     slug: post.slug,
   }))
 }
 
-export function generateMetadata({ params }) {
-  let post = getBlogPosts().find((post) => post.slug === params.slug)
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata | undefined> {
+  const { slug } = await params
+
+  const post = (getBlogPosts() as BlogPost[]).find(
+    (post) => post.slug === slug
+  )
+
   if (!post) {
-    return
+    return undefined
   }
 
-  let {
+  const {
     title,
     publishedAt: publishedTime,
     summary: description,
     image,
   } = post.metadata
-  let ogImage = image
+
+  const ogImage = image
     ? image
     : `${baseUrl}/og?title=${encodeURIComponent(title)}`
 
@@ -51,16 +82,12 @@ export function generateMetadata({ params }) {
   }
 }
 
-type Props = {
-  params: Promise<{
-    slug: string
-  }>
-}
-
 export default async function Blog({ params }: Props) {
   const { slug } = await params
 
-  const post = getBlogPosts().find((post) => post.slug === slug)
+  const post = (getBlogPosts() as BlogPost[]).find(
+    (post) => post.slug === slug
+  )
 
   if (!post) {
     notFound()
@@ -90,14 +117,17 @@ export default async function Blog({ params }: Props) {
           }),
         }}
       />
+
       <h1 className="title font-semibold text-2xl tracking-tighter">
         {post.metadata.title}
       </h1>
+
       <div className="flex justify-between items-center mt-2 mb-8 text-sm">
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
           {formatDate(post.metadata.publishedAt)} - {post.metadata.author}
         </p>
       </div>
+
       <article className="prose">
         <CustomMDX source={post.content} />
       </article>

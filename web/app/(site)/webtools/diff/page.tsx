@@ -14,6 +14,36 @@ export default function Home() {
           Git Diff Viewer
         </h1>
 
+        <div className="flex gap-3 mb-6">
+          <button
+            onClick={() => {
+              setLeftText("");
+              setRightText("");
+            }}
+            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700"
+          >
+            Clean
+          </button>
+
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(leftText);
+            }}
+            className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700"
+          >
+            Copy Left
+          </button>
+
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(rightText);
+            }}
+            className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700"
+          >
+            Copy Right
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div>
             <label className="block mb-2 text-sm text-zinc-400">
@@ -24,7 +54,7 @@ export default function Home() {
               value={leftText}
               onChange={(e) => setLeftText(e.target.value)}
               className="w-full h-80 rounded-lg bg-zinc-900 border border-zinc-800 p-4 font-mono"
-              placeholder="Text hier einfügen..."
+              placeholder="Paste Text here..."
             />
           </div>
 

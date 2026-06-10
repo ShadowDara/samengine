@@ -1,14 +1,22 @@
 import Link from 'next/link'
-import Image from 'next/image'
-import { MDXRemote } from 'next-mdx-remote/rsc'
+import Image, { ImageProps } from 'next/image'
+import { MDXRemote, MDXRemoteProps } from 'next-mdx-remote/rsc'
 import { highlight } from 'sugar-high'
-import React from 'react'
+import React, { ReactNode } from 'react'
 
-function Table({ data }) {
-  let headers = data.headers.map((header, index) => (
+type TableProps = {
+  data: {
+    headers: string[]
+    rows: string[][]
+  }
+}
+
+function Table({ data }: TableProps) {
+  const headers = data.headers.map((header, index) => (
     <th key={index}>{header}</th>
   ))
-  let rows = data.rows.map((row, index) => (
+
+  const rows = data.rows.map((row, index) => (
     <tr key={index}>
       {row.map((cell, cellIndex) => (
         <td key={cellIndex}>{cell}</td>
@@ -26,47 +34,85 @@ function Table({ data }) {
   )
 }
 
-function CustomLink(props) {
-  let href = props.href
+type CustomLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+  href: string
+}
 
+function CustomLink({
+  href,
+  children,
+  ...props
+}: CustomLinkProps) {
   if (href.startsWith('/')) {
     return (
       <Link href={href} {...props}>
-        {props.children}
+        {children}
       </Link>
     )
   }
 
   if (href.startsWith('#')) {
-    return <a {...props} />
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    )
   }
 
-  return <a target="_blank" rel="noopener noreferrer" {...props} />
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      {...props}
+    >
+      {children}
+    </a>
+  )
 }
 
-function RoundedImage(props) {
-  return <Image alt={props.alt} className="rounded-lg" {...props} />
+function RoundedImage(props: ImageProps) {
+  return <Image className="rounded-lg" {...props} />
 }
 
-function Code({ children, ...props }) {
-  let codeHTML = highlight(children)
-  return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />
+type CodeProps = React.HTMLAttributes<HTMLElement> & {
+  children: string
 }
 
-function slugify(str) {
+function Code({ children, ...props }: CodeProps) {
+  const codeHTML = highlight(children)
+
+  return (
+    <code
+      dangerouslySetInnerHTML={{ __html: codeHTML }}
+      {...props}
+    />
+  )
+}
+
+function slugify(str: string): string {
   return str
-    .toString()
     .toLowerCase()
-    .trim() // Remove whitespace from both ends of a string
-    .replace(/\s+/g, '-') // Replace spaces with -
-    .replace(/&/g, '-and-') // Replace & with 'and'
-    .replace(/[^\w\-]+/g, '') // Remove all non-word characters except for -
-    .replace(/\-\-+/g, '-') // Replace multiple - with single -
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/&/g, '-and-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
 }
 
-function createHeading(level: number) {
-  const Heading = ({ children }) => {
-    let slug = slugify(children)
+function createHeading(level: 1 | 2 | 3 | 4 | 5 | 6) {
+  type HeadingProps = {
+    children: ReactNode
+  }
+
+  const Heading = ({ children }: HeadingProps) => {
+    const text =
+      typeof children === 'string'
+        ? children
+        : React.Children.toArray(children).join(' ')
+
+    const slug = slugify(text)
+
     return React.createElement(
       `h${level}`,
       { id: slug },
@@ -86,7 +132,7 @@ function createHeading(level: number) {
   return Heading
 }
 
-let components = {
+const components = {
   h1: createHeading(1),
   h2: createHeading(2),
   h3: createHeading(3),
@@ -99,11 +145,21 @@ let components = {
   Table,
 }
 
-export function CustomMDX(props) {
+type CustomMDXProps = MDXRemoteProps & {
+  components?: Record<string, React.ComponentType<any>>
+}
+
+export function CustomMDX({
+  components: customComponents,
+  ...props
+}: CustomMDXProps) {
   return (
     <MDXRemote
       {...props}
-      components={{ ...components, ...(props.components || {}) }}
+      components={{
+        ...components,
+        ...customComponents,
+      }}
     />
   )
 }

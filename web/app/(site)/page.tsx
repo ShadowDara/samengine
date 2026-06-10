@@ -61,14 +61,18 @@ export default function Home() {
           </Link> */}
         </div>
 
-        {/* <div className="flex gap-6 text-sm text-gray-500 mt-16">
-          <Link href="/changelog" className="hover:text-white transition">
+        <div className="flex gap-6 text-sm text-gray-500 mt-16">
+          {/* <Link href="/changelog" className="hover:text-white transition">
             Changelog
-          </Link>
+          </Link> */}
           <Link href="/source" className="hover:text-white transition">
             Source
           </Link>
-        </div> */}
+
+          <Link href="/blog" className="hover:text-white transition">
+            Blog
+          </Link>
+        </div>
 
       </section>
 

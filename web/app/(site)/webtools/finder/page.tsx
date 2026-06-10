@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import FolderNode from "@/lib/FolderNode";
+import FolderNode from "@/components/FolderNode";
 
 export default function App() {
   const [data, setData] = useState({

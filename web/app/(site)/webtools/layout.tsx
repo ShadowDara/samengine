@@ -1,6 +1,6 @@
 // app/dashboard/layout.tsx
 
-import Header from "@/lib/Header";
+import Header from "@/components/Header";
 
 export default function RootLayout({
   children,

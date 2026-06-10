@@ -1,5 +1,5 @@
 import FileNode from "./FileNode";
-import type { FileTemplate, FolderTemplate } from "./types";
+import type { FileTemplate, FolderTemplate } from "../lib/types";
 
 interface FolderNodeProps {
   folder: FolderTemplate;

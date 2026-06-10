@@ -1,4 +1,4 @@
-import { FileExistence } from "./types";
+import { FileExistence } from "../lib/types";
 
 interface FileNodeData {
   name: string;

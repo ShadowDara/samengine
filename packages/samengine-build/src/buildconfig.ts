@@ -156,6 +156,9 @@ export interface HTMLMenuStyle {
     settingsmenu_bgcolor: string;
     settingsmenu_button: string;
     settingsmenu_button_clicked: string;
+    settingsmenu_button_txt: string;
+    settingsmenu_button_txt_hover: string;
+    settingsmenu_button_hover: string;
 
     startbutton_bgcolor: string;
     startbutton_bgc_hover: string;
@@ -191,6 +194,9 @@ export function newHTMLMenu(): HTMLMenu {
             settingsmenu_bgcolor: "#111827",
             settingsmenu_button: "#1f2937",
             settingsmenu_button_clicked: "#22c55e",
+            settingsmenu_button_txt: "#ffffff",
+            settingsmenu_button_txt_hover: "",
+            settingsmenu_button_hover: "",
 
             startbutton_bgcolor: "#22c55e",
             startbutton_bgc_hover: "#16a34a",

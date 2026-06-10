@@ -383,7 +383,17 @@ function getSettingsButtonCSS(config: buildconfig): string {
     border-radius: 8px;
 
     background: ${config.htmlMenu.style.settingsmenu_button};
-    color: white;
+    color: ${config.htmlMenu.style.settingsmenu_button_txt};
+
+    /* Button Text Color on Hover */
+    ${
+        config.htmlMenu.style.settingsmenu_button_txt_hover.length != 0 ? "color: " + config.htmlMenu.style.settingsmenu_button_txt_hover + ";" : ""
+    }
+
+    /* Button Hover Color */
+    ${
+        config.htmlMenu.style.settingsmenu_button_hover.length != 0 ? "color: " + config.htmlMenu.style.settingsmenu_button_hover + ";" : ""
+    }
 
     cursor: pointer;
 

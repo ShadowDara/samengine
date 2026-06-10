@@ -17,5 +17,6 @@ export {
     svgfile,
     newHTMLMenu,
     newDevProfile,
-    newReleaseProfile
+    newReleaseProfile,
+    newMarkdownStyle
 } from "./buildconfig.js";

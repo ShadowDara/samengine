@@ -38,6 +38,11 @@ const packages = [
     description: "Some CLI tools which should with the Game Making Process. (The Package is in Progress)",
     link: "https://npmjs.com/package/samengine-build",
   },
+  {
+    name: "@shadowdara/samtool",
+    description: "The new CLI Tool for samengine. (The Package is in Progress) and written in Rust for speed!",
+    link: "https://npmjs.com/package/@shadowdara/samtool",
+  },
 ];
 
 export default function Packages() {

@@ -68,7 +68,9 @@ export default function Home() {
           <Link href="/source" className="hover:text-white transition">
             Source
           </Link>
-
+          <Link href="/packages" className="hover:text-white transition">
+            Packages
+          </Link>
           <Link href="/blog" className="hover:text-white transition">
             Blog
           </Link>
@@ -139,12 +141,12 @@ export default function Home() {
           <Link href="/changelog" className="hover:text-white transition">
             Changelog
           </Link>
-          <Link href="/packages" className="hover:text-white transition">
+          {/* <Link href="/packages" className="hover:text-white transition">
             Packages
           </Link>
           <Link href="/source" className="hover:text-white transition">
             Source
-          </Link>
+          </Link> */}
         </div>
 
         © {new Date().getFullYear()} samengine. All rights reserved.

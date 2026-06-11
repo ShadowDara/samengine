@@ -37,4 +37,10 @@ export const webtools: tool[] = [
     description: "A simple Viewer which compares 2 Texts about their changes",
     icon: "▶",
   },
+  {
+    slug: "copypanel",
+    title: "Copy Panel",
+    description: "a panel where you can paste text which you can the copy easily",
+    icon: "🔗",
+  },
 ];

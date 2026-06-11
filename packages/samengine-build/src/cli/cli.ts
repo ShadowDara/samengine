@@ -1,6 +1,16 @@
 #!/usr/bin/env node
 
-// Build Cli Tools for samengine
+/**
+ * CLI entry point for `samengine-build`.
+ *
+ * High-level flow:
+ * 1. Parse CLI arguments.
+ * 2. Optionally create a new project.
+ * 3. Load `samengine.config.ts`.
+ * 4. Bundle the game with esbuild.
+ * 5. Generate HTML and handle resources.
+ * 6. In development mode, start a local server and watch for changes.
+ */
 
 import { build as esbuild } from "esbuild";
 import { createServer } from "http";
@@ -21,6 +31,13 @@ import { getPackageVersion } from "../getversion.js";
 const version = getPackageVersion("samengine");
 
 // ================= BUILD =================
+/**
+ * Creates a build runner for one config object and one build mode.
+ *
+ * The returned `build` function owns the esbuild call, generated HTML, resource
+ * copying or embedding, release minification, and metadata comments. Dev builds
+ * keep source maps; release builds clean the output directory first.
+ */
 function createBuilder(config: buildconfig, isRelease: boolean) {
     // Ensure that the Directories are created
     mkdir("resources", { recursive: true });
@@ -95,6 +112,12 @@ function createBuilder(config: buildconfig, isRelease: boolean) {
 }
 
 // ================= SERVER & RELOAD =================
+/**
+ * Starts the local development server for the configured output directory.
+ *
+ * Static files are served from `config.outdir`. A WebSocket server is attached
+ * to the same HTTP server so future rebuilds can notify connected browsers.
+ */
 function createDevServer(config: buildconfig) {
     const sockets = new Set<WebSocket>();
     const server = createServer(async (req, res) => {
@@ -126,7 +149,7 @@ function createDevServer(config: buildconfig) {
 
         server.on("error", (err: any) => {
             if (err.code === "EADDRINUSE") {
-                flog(`⚠️ Port ${port} belegt, versuche ${port + 1}...`);
+                flog(`⚠️ Port ${port} is already in use, trying ${port + 1}...`);
                 startListening(port + 1);
             } else {
                 throw err;
@@ -153,6 +176,13 @@ function createDevServer(config: buildconfig) {
 }
 
 // ================= WATCHER =================
+/**
+ * Watches the `resources` and `game` folders recursively.
+ *
+ * The watcher delegates rebuild scheduling to `onChange`. The main function
+ * serializes rebuilds so multiple file-system events do not run overlapping
+ * builds.
+ */
 async function startWatcher(onChange: () => Promise<void>) {
     await mkdir("resources", { recursive: true });
     await mkdir("game", { recursive: true });
@@ -166,6 +196,13 @@ async function startWatcher(onChange: () => Promise<void>) {
 }
 
 // ================= CLI APP =================
+/**
+ * Runs the CLI application.
+ *
+ * Development mode starts with one build, then creates a server and watchers.
+ * Config changes trigger a full restart because output folder, port, menu, or
+ * other generated HTML settings may have changed.
+ */
 async function main() {
     const args = parseArgs();
 
@@ -225,7 +262,7 @@ async function main() {
     if (!args.release) {
         devServer = createDevServer(config);
 
-        // 🔥 HIER EINBAUEN
+        // Watch the config separately because changing it can require a server restart.
         watchFile("samengine.config.ts", { interval: 300 }, async () => {
             flog("⚙️ Config file changed → full restart");
 

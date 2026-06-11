@@ -1,63 +1,99 @@
-// Generate the HTML File
-// https://samengine.vercel.app/docs/config
-
-// Infos here:
-// https://samengine.vercel.app/docs/config
+/**
+ * Central build configuration types and defaults for samengine-build.
+ *
+ * Game projects usually import `new_buildconfig` in `samengine.config.ts`,
+ * change the fields they need, and return the resulting object. The CLI loads
+ * that object before every build and uses it to decide how HTML, assets,
+ * development mode, and release mode should behave.
+ *
+ * Documentation:
+ * https://samengine.vercel.app/docs/config
+ */
 export interface buildconfig {
+    /** Custom HTML inserted into the generated document `<head>`. */
     htmlhead: string;
 
+    /** Game title used in the browser tab and on the generated start screen. */
     title: string;
 
-    // TODO
+    /** Short description shown on the start screen. */
     description: string;
+
+    /** Game version shown on the start screen. */
     version: string;
 
+    /** Adds the generated fullscreen button when enabled. */
     show_fullscreen_button: boolean;
 
+    /** Entry file name inside the `game` folder, usually `main`. */
     entryname: string;
+
+    /** Output folder for the generated build, usually `dist`. */
     outdir: string;
 
+    /** Optional collapsible Markdown notes shown before the game starts. */
     markdown_notes: Paragraph[];
+
+    /** Author name written to the start screen and generated build comments. */
     gameauthor: string;
 
+    /** First port tried by the local development server. */
     dev_server_port: number;
 
-    // TODO
+    /** Options for samengine UI helpers outside the game canvas. */
     samegui: SameGUI;
 
+    /** Unlocks the browser AudioContext after the player clicks the start button. */
     enable_audio: boolean;
 
+    /** Optional HTML settings menu and start-button styling. */
     htmlMenu: HTMLMenu;
 
-    // TODO
+    /** Reserved flag for mobile CSS behavior. It is not currently consumed. */
     enable_mobile_css: boolean;
 
+    /** Build behavior used by the development command. */
     devMode: profile;
+
+    /** Build behavior used by the release command. */
     releaseMode: profile;
 }
 
-// Samegui Settigs
+/** Options for samengine GUI helpers that may be rendered outside the game. */
 export interface SameGUI {
+    /** Shows the samengine GUI button when the engine supports it. */
     show_button: boolean;
 }
 
+/** Creates default options for `samegui`. */
 export function newSameGUI(): SameGUI {
     return {
         show_button: false,
     }
 }
 
+/** A single Markdown note shown on the generated start screen. */
 export interface Paragraph {
+    /** The visible summary/title of the collapsible note. */
     title: string;
+
+    /** Markdown content rendered inside the note. */
     content: string;
+
+    /** Per-note color styling. */
     style: MarkdownStyle;
 }
 
+/** Color values used by generated Markdown notes. */
 export interface MarkdownStyle {
+    /** Text color of the note. */
     color: string;
+
+    /** Background color of the note. */
     bg: string;
 }
 
+/** Creates the default Markdown note colors. */
 export function newMarkdownStyle(): MarkdownStyle {
     return {
         color: "#38bdf8",
@@ -65,9 +101,13 @@ export function newMarkdownStyle(): MarkdownStyle {
     }
 }
 
-// Function to create a buildconfig with the default values
-// Infos here:
-// https://samengine.vercel.app/docs/config
+/**
+ * Creates a complete build configuration with safe defaults.
+ *
+ * This is the recommended starting point for `samengine.config.ts`. Keeping
+ * defaults centralized here makes new options easier to add without forcing
+ * every game project to define every field manually.
+ */
 export function new_buildconfig(): buildconfig {
     return {
         title: "My new Game",
@@ -89,6 +129,7 @@ export function new_buildconfig(): buildconfig {
     }
 }
 
+/** Default favicon as SVG text. `new_buildconfig` embeds it as a Data URI. */
 export const svgfile = `<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
   <style>
     .bg {
@@ -136,18 +177,31 @@ export const svgfile = `<svg width="512" height="512" viewBox="0 0 512 512" xmln
 
 // HTML MENU
 
+/** One selectable value in an HTML menu setting. */
 export interface HTMLMenuSettingOption {
+    /** Button label shown to the player. */
     text: string;
+
+    /** Value written into `window.__GAMESETTINGS__[setting.id]`. */
     value: string;
 }
 
+/** A group of related settings, such as graphics quality or sound mode. */
 export interface HTMLMenuSetting {
+    /** Technical key used in `window.__GAMESETTINGS__`. */
     id: string;
+
+    /** Visible title displayed above the option buttons. */
     title: string;
+
+    /** Initial value selected when the page loads. */
     default_value: string;
+
+    /** All selectable values for this setting. */
     options: HTMLMenuSettingOption[];
 }
 
+/** Colors used by the generated start button and settings menu. */
 export interface HTMLMenuStyle {
     bgcolor: string;
     color: string;
@@ -164,22 +218,33 @@ export interface HTMLMenuStyle {
     startbutton_bgc_hover: string;
 }
 
+/** Customizable text used by generated HTML menu controls. */
 export interface HTMLMenuText {
+    /** Label of the button that starts the game. */
     startbutton: string;
 }
 
-// Access Option via for example
-// window.__GAMESETTINGS__.graphics
-// window.__GAMESETTINGS__.sound
+/**
+ * Optional generated settings menu.
+ *
+ * Selected values are exposed globally, for example:
+ * `window.__GAMESETTINGS__.graphics` or `window.__GAMESETTINGS__.sound`.
+ */
 export interface HTMLMenu {
+    /** Enables the generated settings menu. */
     enable_menu: boolean;
 
+    /** Settings groups rendered inside the popup. */
     settings: HTMLMenuSetting[];
 
+    /** Visual styling for the menu. */
     style: HTMLMenuStyle;
+
+    /** Customizable visible text. */
     text: HTMLMenuText;
 }
 
+/** Creates the default configuration for the optional HTML settings menu. */
 export function newHTMLMenu(): HTMLMenu {
     return {
         enable_menu: false,
@@ -215,11 +280,16 @@ export function newHTMLMenu(): HTMLMenu {
 
 // Dev Profiles
 
+/** Build profile used by development and release modes. */
 export interface profile {
+    /** Whether the profile represents a release build. */
     release: boolean;
+
+    /** Embeds the bundle and used resources into one generated HTML file. */
     singlefile: boolean;
 }
 
+/** Default development profile: multi-file output, no release minification. */
 export function newDevProfile(): profile {
     return {
         release: false,
@@ -227,6 +297,7 @@ export function newDevProfile(): profile {
     }
 }
 
+/** Default release profile: release mode enabled, still multi-file by default. */
 export function newReleaseProfile(): profile {
     return {
         release: true,

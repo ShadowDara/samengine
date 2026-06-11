@@ -1,0 +1,42 @@
+{
+  "name": "samengine-build-web",
+  "version": "1.0.0",
+  "description": "Web bundler integration for compiling samengine inside React, Vue, Svelte, and other website projects.",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "pack": "node ../../scripts/clean.js && npm run build && npm pack && git push --follow-tags"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./next": "./dist/next.js",
+    "./vite": "./dist/vite.js"
+  },
+  "author": "Shadowdara",
+  "type": "module",
+  "peerDependencies": {
+    "samengine": "^1.9.1",
+    "vite": "^5.0.0 || ^6.0.0 || ^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.2",
+    "typescript": "^6.0.3"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shadowdara/samengine",
+    "directory": "packages/samengine-build-web"
+  },
+  "bugs": {
+    "url": "https://github.com/shadowdara/samengine/issues"
+  }
+}

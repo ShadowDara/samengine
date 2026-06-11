@@ -3,6 +3,9 @@
 import { Mouse } from "../input.js";
 import { type Vector2d } from "./vector2d.js";
 
+/**
+ * Triangle shape represented by three points.
+ */
 export type Triangle = {
     x1: number;
     y1: number;
@@ -12,7 +15,9 @@ export type Triangle = {
     y3: number
 };
 
-// Function to create an Object of Type triangle
+/**
+ * Creates a triangle from three points.
+ */
 export function makeTriangle(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): Triangle {
     return {
         x1: x1,
@@ -29,7 +34,9 @@ function getTriangleArea(x1: number, y1: number, x2: number, y2: number, x3: num
     return Math.abs((x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2.0);
 }
 
-// Function to get the Center of the Triangle
+/**
+ * Returns the centroid of the triangle.
+ */
 export function centerTriangle(triangle: Triangle): Vector2d {
     return {
         x: (triangle.x1 + triangle.x2 + triangle.x3) / 3,
@@ -37,7 +44,11 @@ export function centerTriangle(triangle: Triangle): Vector2d {
     };
 }
 
-// Check if a Point is in the Triangle using barycentric coordinates
+/**
+ * Checks whether a point lies inside the triangle.
+ *
+ * Uses an area comparison with a small tolerance to avoid floating point noise.
+ */
 export function isPointInTriangle(x: number, y: number, triangle: Triangle): boolean {
     const areaTriangle = getTriangleArea(
         triangle.x1, triangle.y1,
@@ -52,17 +63,23 @@ export function isPointInTriangle(x: number, y: number, triangle: Triangle): boo
     return Math.abs(areaTriangle - (area1 + area2 + area3)) < 0.01;
 }
 
-// Check if Mouse is in the Triangle
+/**
+ * Checks whether the current mouse position is inside the triangle.
+ */
 export function isMouseInTriangle(mouse: Mouse, triangle: Triangle): boolean {
     return isPointInTriangle(mouse.x, mouse.y, triangle);
 }
 
-// Function to check if a Triangle is clicked
+/**
+ * Checks whether the triangle was clicked during the current frame.
+ */
 export function isTriangleClicked(mouse: Mouse, triangle: Triangle): boolean {
     return isMouseInTriangle(mouse, triangle) && mouse.justPressed;
 }
 
-// Get the Perimeter of the Triangle
+/**
+ * Returns the perimeter length of the triangle.
+ */
 export function getTrianglePerimeter(triangle: Triangle): number {
     const side1 = Math.sqrt(
         (triangle.x2 - triangle.x1) * (triangle.x2 - triangle.x1) +

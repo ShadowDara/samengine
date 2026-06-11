@@ -1,16 +1,22 @@
 // Key Value Save
 /**
+ * Old save data shape used by the legacy save helpers.
+ *
  * @deprecated Use samengine/storage instead
  */
 export type SaveData = Record<string, any>;
 
 // Please rename the SaveKey
 /**
+ * localStorage key used by the legacy save helpers.
+ *
  * @deprecated Use samengine/storage instead
  */
 export let SAVE_KEY = "my_game_save";
 
 /**
+ * Stores save data as JSON under `SAVE_KEY`.
+ *
  * @deprecated Use samengine/storage instead
  */
 export function saveGame(data: SaveData): void {
@@ -24,6 +30,8 @@ export function saveGame(data: SaveData): void {
 }
 
 /**
+ * Loads and parses JSON save data from `SAVE_KEY`.
+ *
  * @deprecated Use samengine/storage instead
  */
 export function loadGame(): SaveData | null {
@@ -38,6 +46,8 @@ export function loadGame(): SaveData | null {
 }
 
 /**
+ * Removes the current save entry from localStorage.
+ *
  * @deprecated Use samengine/storage instead
  */
 export function clearSave(): void {
@@ -46,6 +56,8 @@ export function clearSave(): void {
 }
 
 /**
+ * Downloads the current save data as `savegame.json`.
+ *
  * @deprecated Use samengine/storage instead
  */
 export function exportSave(): void {

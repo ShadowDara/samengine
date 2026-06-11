@@ -5,6 +5,7 @@ node_modules
 
 **/.webgameengine/config.mjs
 **/.samengine/config.mjs
+**/.samengine/links.*
 
 web/docs
 

@@ -1,18 +1,88 @@
-use std::path::PathBuf;
-use std::{collections::HashMap};
-use std::collections::HashSet;
+//! Parser and lightweight runner for Samfiles.
+//!
+//! A Samfile is a small, Makefile-inspired task file. It contains named tasks,
+//! optional dependencies between those tasks, and indented commands that are
+//! executed in order.
+//!
+//! # File format
+//!
+//! ```text
+//! # comments can start with #, //, or --
+//! build:
+//!     run cargo build
+//!
+//! test: build
+//!     run cargo test
+//! ```
+//!
+//! Task headers start at the beginning of a line and use `name: dep dep`.
+//! Command lines must be indented with at least one space. Empty lines and
+//! comments are ignored.
+//!
+//! Supported commands are:
+//!
+//! - `cd PATH` changes the working directory for following commands.
+//! - `env KEY=VALUE` sets an environment variable.
+//! - `run PROGRAM ARG...` runs a process in the current runtime directory.
+//!
+//! # Example
+//!
+//! ```no_run
+//! use samfileparser::{parse, run_task, validate_all, RuntimeState};
+//! use std::collections::{HashMap, HashSet};
+//!
+//! let content = r#"
+//! build:
+//!     run cargo build
+//!
+//! test: build
+//!     run cargo test
+//! "#;
+//!
+//! let tasks = parse(content);
+//! validate_all(&tasks);
+//!
+//! let mut state = RuntimeState {
+//!     cwd: std::env::current_dir().unwrap(),
+//!     env: HashMap::new(),
+//! };
+//! let mut visited = HashSet::new();
+//!
+//! run_task(&tasks, "test", &mut visited, &mut state);
+//! ```
 
-// Commands
+use std::collections::{HashMap, HashSet};
+use std::path::PathBuf;
+
+/// A single executable instruction inside a [`Task`].
+///
+/// Commands are created by [`parse`] from indented Samfile lines.
 pub enum Command {
+    /// Change the current runtime directory.
+    ///
+    /// Relative paths are resolved against the current runtime directory.
     Cd(String),
+
+    /// Run a program with whitespace-separated arguments.
+    ///
+    /// For example, `run cargo test` becomes `Run("cargo test")`.
     Run(String),
+
+    /// Set an environment variable as `KEY=VALUE`.
     Env(String, String),
 }
 
 type Tasks = HashMap<String, Task>;
 
+/// A named task with dependencies and commands.
+///
+/// Dependencies are task names that should run before this task. Commands are
+/// executed in the order in which they appear in the Samfile.
 pub struct Task {
+    /// Names of tasks that must run before this task.
     pub deps: Vec<String>,
+
+    /// Commands belonging to this task.
     pub commands: Vec<Command>,
 }
 
@@ -23,9 +93,18 @@ enum VisitState {
     Visited,
 }
 
-// Runtime Path for every Script
+/// Mutable runtime context used while executing tasks.
+///
+/// The runner uses `cwd` as the process working directory for [`Command::Run`]
+/// and updates it when a [`Command::Cd`] command succeeds.
 pub struct RuntimeState {
+    /// Current working directory for task execution.
     pub cwd: PathBuf,
+
+    /// Environment values associated with the runtime.
+    ///
+    /// The current runner clones this map for dependency execution. `env`
+    /// commands also set variables on the process environment.
     pub env: HashMap<String, String>,
 }
 
@@ -78,7 +157,17 @@ fn detect_cycles(
 }
 
 
-// To detect Cycles
+/// Validate task dependencies.
+///
+/// This checks every task for:
+///
+/// - dependencies that do not exist in the parsed task map
+/// - dependency cycles such as `a -> b -> a`
+///
+/// # Panics
+///
+/// Panics when a task references an unknown dependency or when a dependency
+/// cycle is found.
 pub fn validate_all(tasks: &Tasks) {
     let mut state = HashMap::new();
     let mut stack = vec![];
@@ -141,7 +230,17 @@ fn parse_task_header(line: &str) -> (String, Vec<String>) {
 }
 
 
-// Function to Parse the File
+/// Parse Samfile content into tasks.
+///
+/// The parser is intentionally small and permissive:
+///
+/// - empty lines are ignored
+/// - comments beginning with `#`, `//`, or `--` are ignored
+/// - task headers are non-indented lines containing `:`
+/// - command lines are indented with at least one leading space
+/// - unknown command lines are ignored and reported as warnings
+///
+/// The returned map is keyed by task name.
 pub fn parse(content: &str) -> Tasks {
     let mut tasks = HashMap::new();
     let mut current: Option<String> = None;
@@ -200,7 +299,21 @@ pub fn parse(content: &str) -> Tasks {
 }
 
 
-// Function to run a Task
+/// Run a task and its dependencies.
+///
+/// Dependencies run before the requested task. The `visited` set prevents the
+/// same task from running more than once during a call tree.
+///
+/// Call [`validate_all`] before running user-provided files if you want missing
+/// dependencies and cycles to fail early with clearer messages.
+///
+/// # Panics
+///
+/// Panics when:
+///
+/// - a `cd` command points to a path that does not exist
+/// - a `run` command cannot be started
+/// - a process exits with a non-success status
 pub fn run_task(
     tasks: &Tasks,
     name: &str,

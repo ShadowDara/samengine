@@ -2,7 +2,7 @@
 export { startEngine } from "./core.js";
 
 // Rendering
-export type { CharMap } from "./renderer.js";
+export type { CharMap, ParallaxLayer } from "./renderer.js";
 export {
     renderText,
     renderBitmapText,
@@ -12,6 +12,8 @@ export {
     drawCircleOutline,
     drawTriangle,
     drawTriangleOutline,
+    renderParallaxBackground,
+    renderParallaxLayers,
 } from "./renderer.js";
 
 // Input System

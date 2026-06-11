@@ -9,6 +9,7 @@ mod tags;
 mod sx;
 mod newproject;
 mod help;
+mod birthdaytool;
 
 use crate::help::help;
 use ::sx::{load_commands, command_exists, execute_command};
@@ -166,6 +167,11 @@ fn main() {
         // New samengine Project
         "-n" | "--new" => {
             todo!("Create new samengine project");
+        }
+
+        // Birthday Tool
+        "-b" | "--birthday" => {
+            birthdaytool::bmain();
         }
 
         // When not found

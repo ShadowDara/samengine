@@ -4,6 +4,13 @@ type KeyState = {
     justReleased: boolean;
 };
 
+/**
+ * Snapshot of the current mouse state in virtual canvas coordinates.
+ *
+ * The left mouse button uses `pressed`, `justPressed`, and `justReleased`.
+ * The right mouse button uses the matching `right...` fields. `wheelDelta`
+ * stores the most recent wheel event delta and is reset by `resetInput`.
+ */
 export type Mouse = {
     x: number;
     y: number;
@@ -45,6 +52,20 @@ let canvasRef: HTMLCanvasElement;
 let virtualWidth = 800;
 let virtualHeight = 800;
 
+/**
+ * Installs keyboard and mouse listeners for the engine.
+ *
+ * Mouse coordinates are converted into the virtual coordinate system used by
+ * `createCanvas({ scaling: "fit" })`. Pass the same virtual width and height
+ * here that you use for canvas scaling, otherwise mouse hit tests will not line
+ * up with rendered objects.
+ *
+ * Call this once during game setup.
+ *
+ * @param canvas Canvas that should receive mouse events.
+ * @param vWidth Width of the virtual game area. Defaults to 800.
+ * @param vHeight Height of the virtual game area. Defaults to 800.
+ */
 export function setupInput(canvas: HTMLCanvasElement, vWidth = 800, vHeight = 800): void {
     canvasRef = canvas;
     virtualWidth = vWidth;
@@ -127,25 +148,52 @@ export function setupInput(canvas: HTMLCanvasElement, vWidth = 800, vHeight = 80
     });
 }
 
-// ===== KEY HELPERS =====
+/**
+ * Returns whether the given keyboard code is currently held down.
+ *
+ * Use values from the `Key` enum for autocomplete-friendly input names.
+ */
 export function isKeyPressed(code: string): boolean {
     return keys[code]?.pressed || false;
 }
 
+/**
+ * Returns true only during the frame in which a key became pressed.
+ *
+ * Call `resetInput()` once at the end of each game loop frame so this one-frame
+ * flag can be cleared.
+ */
 export function isKeyJustPressed(code: string): boolean {
     return keys[code]?.justPressed || false;
 }
 
+/**
+ * Returns true only during the frame in which a key was released.
+ *
+ * Call `resetInput()` once at the end of each game loop frame so this one-frame
+ * flag can be cleared.
+ */
 export function isKeyJustReleased(code: string): boolean {
     return keys[code]?.justReleased || false;
 }
 
-// ===== MOUSE =====
+/**
+ * Returns a read-only copy of the current mouse state.
+ *
+ * A copy is returned so game code cannot accidentally mutate the internal input
+ * state. Use this object for hit tests such as `isMouseInRect` or
+ * `isRectClicked`.
+ */
 export function getMouse(): Readonly<Mouse> {
     return { ...mouse };
 }
 
-// ===== RESET =====
+/**
+ * Clears all one-frame input flags.
+ *
+ * This should usually be called once at the end of each frame, after your game
+ * logic has consumed `justPressed`, `justReleased`, and `wheelDelta`.
+ */
 export function resetInput(): void {
     for (const k in keys) {
         keys[k].justPressed = false;

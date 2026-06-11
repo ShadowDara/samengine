@@ -1,5 +1,9 @@
-// keys.ts
-// to view the Keys easily with the Autocomplete Feature
+/**
+ * Common `KeyboardEvent.code` values for autocomplete-friendly input checks.
+ *
+ * Use these values with `isKeyPressed`, `isKeyJustPressed`, and
+ * `isKeyJustReleased`.
+ */
 export enum Key {
     ArrowUp = "ArrowUp",
     ArrowDown = "ArrowDown",

@@ -2,13 +2,17 @@
 
 import { clamp, lerp, map, scale } from "../utils/math.js";
 
-// 2d Vector
+/**
+ * Two-dimensional vector for positions, directions, velocities, and sizes.
+ */
 export type Vector2d = {
     x: number;
     y: number
 };
 
-// Function to create an Object of Type Vector2D
+/**
+ * Creates a new 2D vector.
+ */
 export function makeVector2d(x: number, y: number): Vector2d {
     return {
         x: x,
@@ -16,7 +20,9 @@ export function makeVector2d(x: number, y: number): Vector2d {
     }
 }
 
-// Function to add 2 Vectors together
+/**
+ * Adds two vectors and returns a new vector.
+ */
 export function add2d(vector1: Vector2d, vector2: Vector2d): Vector2d {
     return {
         x: vector1.x + vector2.x,
@@ -24,7 +30,9 @@ export function add2d(vector1: Vector2d, vector2: Vector2d): Vector2d {
     }
 }
 
-// Function to subtract 2 Vectors from each other
+/**
+ * Subtracts `vector2` from `vector1` and returns a new vector.
+ */
 export function subtract2d(vector1: Vector2d, vector2: Vector2d): Vector2d {
     return {
         x: vector1.x - vector2.x,
@@ -32,7 +40,9 @@ export function subtract2d(vector1: Vector2d, vector2: Vector2d): Vector2d {
     }
 }
 
-// Function to get the length from an Vector
+/**
+ * Returns the Euclidean length/magnitude of a vector.
+ */
 export function length2d(vector: Vector2d): number {
     let produkt = vector.x * vector.x + vector.y * vector.y;
     let root = Math.sqrt(produkt);
@@ -40,7 +50,12 @@ export function length2d(vector: Vector2d): number {
     return root;
 }
 
-// Function to normalize a Vector 2d
+/**
+ * Normalizes a vector to length `1`.
+ *
+ * Important: this function mutates and returns the original vector object. Zero
+ * vectors are returned unchanged.
+ */
 export function normalize2d(vector: Vector2d): Vector2d {
     // Check if the Vector is zero because then you dont need to
     // calculate sth
@@ -56,20 +71,27 @@ export function normalize2d(vector: Vector2d): Vector2d {
     return vector;
 }
 
-// Function to make scalar produkt from an Vector
+/**
+ * Returns the dot product of two vectors.
+ */
 export function dot2d(v1: Vector2d, v2: Vector2d): number {
     return (v1.x * v2.x + v1.y * v2.y);
 }
 
 // crossprodukt (only for 3 Dimensinal Vectors)
 
-// Calculate the Distance between 2 Vectors
+/**
+ * Returns the distance between two vector positions.
+ */
 export function distance2d(v1: Vector2d, v2: Vector2d): number {
     let tmp: Vector2d = subtract2d(v1, v2);
     return length2d(tmp);
 }
 
-// Function to clamp a Vector 2d
+/**
+ * Clamps each component of `vector` between the matching `min` and `max`
+ * component.
+ */
 export function clamp2d(vector: Vector2d, min: Vector2d, max: Vector2d): Vector2d {
     return {
         x: clamp(vector.x, min.x, max.x),
@@ -77,7 +99,11 @@ export function clamp2d(vector: Vector2d, min: Vector2d, max: Vector2d): Vector2
     };
 }
 
-// Lerp for a 2d Vector
+/**
+ * Linearly interpolates each component from `start` to `end`.
+ *
+ * `t.x` controls x interpolation and `t.y` controls y interpolation.
+ */
 export function lerp2d(start: Vector2d, end: Vector2d, t: Vector2d): Vector2d {
     return {
         x: lerp(start.x, end.x, t.x),
@@ -85,7 +111,9 @@ export function lerp2d(start: Vector2d, end: Vector2d, t: Vector2d): Vector2d {
     };
 }
 
-// Map Function for a 2d Vector
+/**
+ * Maps each vector component from one numeric range into another range.
+ */
 export function map2d(
     value: Vector2d,
     inMin: Vector2d,
@@ -99,7 +127,9 @@ export function map2d(
     }
 }
 
-// Function to scale a Vector
+/**
+ * Multiplies both vector components by a scalar.
+ */
 export function scale2d(value: Vector2d, vscale: number): Vector2d {
     return {
         x: scale(value.x, vscale),

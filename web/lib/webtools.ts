@@ -19,12 +19,12 @@ export const webtools: tool[] = [
     description: "Generate mailto links easily.",
     icon: "🔄",
   },
-  {
-    slug: "desktopapp",
-    title: "Webtools Desktop App",
-    description: "A Desktop App for Webtools which can be used offline",
-    icon: "💻",
-  },
+  // {
+  //   slug: "desktopapp",
+  //   title: "Webtools Desktop App",
+  //   description: "A Desktop App for Webtools which can be used offline",
+  //   icon: "💻",
+  // },
   {
     slug: "markdown",
     title: "Markdown Editor / Writer",

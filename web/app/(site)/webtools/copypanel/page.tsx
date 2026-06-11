@@ -1,10 +1,10 @@
 "use client";
 
-import { site } from "@/lib/data";
+import { description, site } from "@/lib/data";
 import { useEffect, useState } from "react";
 import { StorageLib } from "samengine/storage";
 
-const STORAGE_KEY = "copy-panel-entries";
+const STORAGE_KEY = "copypanel-entries";
 
 type Entry = {
   id: string;
@@ -63,6 +63,7 @@ export default function Home() {
   useEffect(() => {
     const saved = StorageLib.get<Entry[]>(STORAGE_KEY);
     StorageLib.set("website", site)
+    StorageLib.set("description", description)
 
     if (saved) {
       setEntries(saved);

@@ -16,7 +16,7 @@ export default function HomePage() {
         </h1>
 
         <p className="text-slate-400 mb-12">
-          Sammlung kleiner Tools und Helfer.
+          A Collection with little Webtools!
         </p>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

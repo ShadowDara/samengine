@@ -1,9 +1,18 @@
 // Key Value Save
+/**
+ * @deprecated Use samengine/storage instead
+ */
 export type SaveData = Record<string, any>;
 
 // Please rename the SaveKey
+/**
+ * @deprecated Use samengine/storage instead
+ */
 export let SAVE_KEY = "my_game_save";
 
+/**
+ * @deprecated Use samengine/storage instead
+ */
 export function saveGame(data: SaveData): void {
     try {
         const json = JSON.stringify(data);
@@ -14,6 +23,9 @@ export function saveGame(data: SaveData): void {
     }
 }
 
+/**
+ * @deprecated Use samengine/storage instead
+ */
 export function loadGame(): SaveData | null {
     try {
         const json = localStorage.getItem(SAVE_KEY);
@@ -25,11 +37,17 @@ export function loadGame(): SaveData | null {
     }
 }
 
+/**
+ * @deprecated Use samengine/storage instead
+ */
 export function clearSave(): void {
     localStorage.removeItem(SAVE_KEY);
     console.log("Save cleared!");
 }
 
+/**
+ * @deprecated Use samengine/storage instead
+ */
 export function exportSave(): void {
     try {
         const json = localStorage.getItem(SAVE_KEY);

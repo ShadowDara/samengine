@@ -140,3 +140,53 @@ export function drawTriangleOutline(
     ctx.closePath();
     ctx.stroke();
 }
+
+// Function to render a parallax background layer
+export function renderParallaxBackground(
+    ctx: CanvasRenderingContext2D,
+    image: HTMLImageElement,
+    cameraX: number,
+    speed = 0.5,
+    canvasWidth = ctx.canvas.width,
+    canvasHeight = ctx.canvas.height
+): void {
+    if (!image.complete) return;
+
+    const offsetX = -(cameraX * speed) % image.width;
+
+    // Draw enough copies to fill the screen
+    for (
+        let x = offsetX - image.width;
+        x < canvasWidth;
+        x += image.width
+    ) {
+        ctx.drawImage(
+            image,
+            x,
+            0,
+            image.width,
+            canvasHeight
+        );
+    }
+}
+
+export interface ParallaxLayer {
+    image: HTMLImageElement;
+    speed: number;
+}
+
+// Render multiple paralax Layers
+export function renderParallaxLayers(
+    ctx: CanvasRenderingContext2D,
+    layers: ParallaxLayer[],
+    cameraX: number
+): void {
+    for (const layer of layers) {
+        renderParallaxBackground(
+            ctx,
+            layer.image,
+            cameraX,
+            layer.speed
+        );
+    }
+}

@@ -18,5 +18,6 @@ export type {
 } from "./next.js";
 
 export {
+    DEFAULT_NEXT_RESOURCE_MANIFEST_MODULE,
     withSamengine,
 } from "./next.js";

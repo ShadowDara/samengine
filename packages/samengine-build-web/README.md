@@ -9,6 +9,11 @@ want a complete samengine game project with generated HTML, start screen, local
 server, and release export. Use `samengine-build-web` when a website framework
 already owns the page and build process.
 
+The optional HTML export adapter comes from `samengine-build` itself. This
+package adapts it for website projects instead of copying the start screen,
+settings menu, fullscreen button, and single-file export logic. Projects that do
+not import `samengine-build-web/html` do not need `samengine-build` at runtime.
+
 ## Installation
 
 ```bash
@@ -54,7 +59,7 @@ export default withSamengine({
 ```
 
 The Next.js helper copies `resources` to `public/samengine/resources` and maps
-`virtual:samengine/resources` to a generated manifest module.
+`samengine-build-web/resources` to a generated manifest module.
 
 A more complete Next.js App Router example:
 
@@ -91,7 +96,7 @@ export default function GamePage() {
 
 import { useEffect, useRef } from "react";
 import { drawRect, startEngine } from "samengine";
-import { getResource } from "virtual:samengine/resources";
+import { getResource } from "samengine-build-web/resources";
 
 export default function SamengineGame() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -148,6 +153,18 @@ declare module "virtual:samengine/resources" {
 }
 ```
 
+For Next.js, declare the Next-friendly resource module instead:
+
+```ts
+// types/samengine-resources.d.ts
+declare module "samengine-build-web/resources" {
+  const resources: Record<string, string>;
+  export default resources;
+  export function getResource(path: string): string | null;
+  export function loadResource(path: string): string | null;
+}
+```
+
 Next.js does not have one universal plugin API like Vite. Many Next packages are
 configuration wrappers around `next.config`, for example `withMDX(...)` or
 bundle analyzer helpers. This package follows that same pattern with
@@ -171,6 +188,55 @@ import resources, { getResource } from "virtual:samengine/resources";
 console.log(resources["player.png"]);
 console.log(getResource("player.png"));
 ```
+
+## Export HTML Adapter
+
+Use the HTML adapter when a website build still wants the same generated page as
+`samengine-build`.
+
+Install `samengine-build` only in projects that use this adapter:
+
+```bash
+npm install -D samengine-build
+```
+
+```ts
+import { createSamengineExportHtml } from "samengine-build-web/html";
+
+const html = createSamengineExportHtml({
+  release: true,
+  config: {
+    title: "My Website Game",
+    description: "A samengine game inside a website build",
+    gameauthor: "Shadowdara",
+    entryname: "assets/game.js",
+  },
+});
+```
+
+For single-file exports, pass the already bundled JavaScript and optional
+embedded resources:
+
+```ts
+import { createSamengineExportHtml } from "samengine-build-web/html";
+
+const html = createSamengineExportHtml({
+  release: true,
+  singlefile: true,
+  bundledJsContent: bundledGameCode,
+  resources: {
+    "player.png": "data:image/png;base64,...",
+  },
+  config: {
+    title: "Single File Game",
+  },
+});
+```
+
+Frameworks such as Next.js should usually keep their own document shell and use
+samengine inside a client component. The export HTML adapter is best for static
+game pages, custom build scripts, or Vite/Rollup pipelines where samengine owns
+the whole page.
 
 The values are browser URLs, so they can be passed to samengine loaders or used
 with normal browser APIs.

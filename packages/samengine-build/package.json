@@ -12,6 +12,7 @@
   },
   "exports": {
     ".": "./dist/index.js",
+    "./html": "./dist/exporthtml.js",
     "./utils": "./dist/utils/index.js"
   },
   "bin": {

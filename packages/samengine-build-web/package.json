@@ -12,6 +12,7 @@
   },
   "exports": {
     ".": "./dist/index.js",
+    "./html": "./dist/html.js",
     "./next": "./dist/next.js",
     "./vite": "./dist/vite.js"
   },
@@ -19,9 +20,13 @@
   "type": "module",
   "peerDependencies": {
     "samengine": "^1.9.1",
+    "samengine-build": ">=1.9.5",
     "vite": "^5.0.0 || ^6.0.0 || ^7.0.0"
   },
   "peerDependenciesMeta": {
+    "samengine-build": {
+      "optional": true
+    },
     "vite": {
       "optional": true
     }

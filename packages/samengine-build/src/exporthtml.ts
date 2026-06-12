@@ -618,6 +618,7 @@ document.getElementById("mdnotes").remove();
  */
 export function GetDefaultHTML(config: buildconfig, releasemode: boolean): string {
     let frameworkVersion = version;
+    const entryScript = config.entryname.endsWith(".js") ? config.entryname : `${config.entryname}.js`;
 
     const defaulthtml: string = `<!DOCTYPE html>
 <html>
@@ -661,7 +662,7 @@ document.getElementById("mdnotes").remove();
 ` : ""}
 
             // Load the game bundle.
-            import("./${config.entryname}.js");
+            import("./${entryScript}");
         });
 
         window.__samengine__ = {

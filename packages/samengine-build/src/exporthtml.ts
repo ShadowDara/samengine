@@ -679,3 +679,78 @@ document.getElementById("mdnotes").remove();
 
     return defaulthtml;
 }
+
+/**
+ * Creates an HTML document for Vite projects.
+ *
+ * Vite still owns development, HMR, dependency optimization, and production
+ * bundling. The generated page only provides the samengine start screen and
+ * loads the Vite entry module after the player clicks the start button.
+ */
+export function GetViteHTML(config: buildconfig, entryModules: string[]): string {
+    let frameworkVersion = version;
+
+    const imports = entryModules
+        .map((entry) => `            await import(${JSON.stringify(entry)});`)
+        .join("\n");
+
+    const defaulthtml: string = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>${config.title}</title>
+    <!-- Mobile viewport setup -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    ${config.htmlhead}
+    <style>
+${getStandardCSS(config)}
+
+${getFullscreenButton(config)}
+
+${getSettingsButtonCSS(config)}
+
+</style>
+    </head>
+    <body>
+    ${getStartScreen(config)}
+
+    ${getMDNotes(config)}
+
+    ${getSettingsButton(config)}
+
+    <script type="module">
+        const btn = document.getElementById("startBtn");
+
+        btn.addEventListener("click", async () => {
+            ${getAudioCode(config)}
+
+            // Remove the start screen.
+            document.getElementById("startscreen").remove();
+
+            ${getSettingsButtonJSrem(config)}
+
+            // Only when there are Markdown notes.
+            ${config.markdown_notes.length > 0 ? `
+// Remove Markdown notes.
+document.getElementById("mdnotes").remove();
+` : ""}
+
+            // Load the Vite game entry.
+${imports}
+        });
+
+        window.__samengine__ = {
+            version: "${frameworkVersion}"
+        };
+    </script>
+
+    ${getSettingsButtonJS(config)}
+
+    ${getFullscreenButtonHTML(config)}
+
+  </body>
+</html>
+`;
+
+    return defaulthtml;
+}

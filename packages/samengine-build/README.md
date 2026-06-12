@@ -143,6 +143,44 @@ Additional utilities are available from `samengine-build/utils`:
 import { compressHTML } from "samengine-build/utils";
 ```
 
+## Vite Adapter
+
+Vite projects can use the samengine start page directly through the Vite plugin:
+
+```ts
+// vite.config.ts
+import { defineConfig } from "vite";
+import { samengineVite } from "samengine-build/vite";
+
+export default defineConfig({
+  plugins: [samengineVite()],
+});
+```
+
+Keep the normal Vite module script in `index.html`:
+
+```html
+<script type="module" src="/src/main.ts"></script>
+```
+
+The plugin replaces `index.html` with the samengine page, keeps Vite in charge
+of dev mode and production bundling, and loads the game entry after the start
+button is clicked. You can pass a config object if you want to reuse samengine
+page settings:
+
+```ts
+import { defineConfig } from "vite";
+import { new_buildconfig } from "samengine-build";
+import { samengineVite } from "samengine-build/vite";
+
+const samengine = new_buildconfig();
+samengine.title = "My Vite Game";
+
+export default defineConfig({
+  plugins: [samengineVite({ config: samengine })],
+});
+```
+
 Learn more about samengine on
 [GitHub](https://github.com/ShadowDara/samengine) or
 [NPM](https://www.npmjs.com/package/samengine).

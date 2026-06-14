@@ -1,7 +1,10 @@
 "use client";
 
+import { description, site } from "@/lib/data";
 import { useEffect, useState } from "react";
 import { StorageLib } from "samengine/storage";
+
+const STORAGE_KEY = "color";
 
 type ColorItem = {
     id: number;
@@ -49,7 +52,7 @@ export default function Home() {
             StorageLib.importFromJson(json, true);
 
             const saved =
-                StorageLib.get<ColorItem[]>("ui-colors");
+                StorageLib.get<ColorItem[]>(STORAGE_KEY);
 
             if (saved) {
                 setColors(saved);
@@ -64,7 +67,9 @@ export default function Home() {
     };
 
     useEffect(() => {
-        const savedColors = localStorage.getItem("ui-colors");
+        const savedColors = localStorage.getItem(STORAGE_KEY);
+        StorageLib.set("website", site)
+        StorageLib.set("description", description)
 
         if (savedColors) {
             setColors(JSON.parse(savedColors) as ColorItem[]);
@@ -72,7 +77,7 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
-        localStorage.setItem("ui-colors", JSON.stringify(colors));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(colors));
     }, [colors]);
 
     const addColor = (): void => {
@@ -154,7 +159,7 @@ export default function Home() {
                             onClick={addColor}
                             className="bg-blue-600 hover:bg-blue-700 transition rounded-lg font-semibold"
                         >
-                            Farbe hinzufügen
+                            add Color
                         </button>
                     </div>
 
@@ -220,7 +225,7 @@ export default function Home() {
                                     onClick={() => deleteColor(item.id)}
                                     className="w-full mt-3 bg-red-600 hover:bg-red-700 rounded-lg p-3 transition"
                                 >
-                                    Löschen
+                                    Delete
                                 </button>
                             </div>
                         </div>
@@ -229,7 +234,7 @@ export default function Home() {
 
                 {colors.length === 0 && (
                     <div className="text-center text-zinc-500 mt-16">
-                        Noch keine Farben gespeichert.
+                        Saved no Colors
                     </div>
                 )}
             </div>

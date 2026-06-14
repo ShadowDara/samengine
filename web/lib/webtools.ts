@@ -43,4 +43,10 @@ export const webtools: tool[] = [
     description: "a panel where you can paste text which you can the copy easily",
     icon: "🔗",
   },
+  {
+    slug: "color",
+    title: "Color Panel",
+    description: "a panel where you can save colors to copy and view them",
+    icon: "✨",
+  },
 ];

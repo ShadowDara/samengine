@@ -25,6 +25,13 @@ jobs:
         working-directory: web
 
     steps:
+
+      - name: Debug
+        run: |
+          pwd
+          ls -la
+          cat package.json
+        working-directory: web
       - name: Checkout repository
         uses: actions/checkout@v4
 

@@ -20,6 +20,10 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
 
+    defaults:
+      run:
+        working-directory: web
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -63,4 +67,4 @@ jobs:
             Automatisch erzeugter Release für ${{ github.ref_name }}
           releaseDraft: false
           prerelease: false
-          projectPath: web
+          projectPath: "."

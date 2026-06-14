@@ -1,6 +1,8 @@
 import { baseUrl } from '@/lib/sitemap'
 import { getBlogPosts } from '@/lib/utils'
 
+export const dynamic = "force-static"
+
 export async function GET() {
   let allBlogs = await getBlogPosts()
 

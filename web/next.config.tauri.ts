@@ -1,4 +1,4 @@
 module.exports = {
-  output: undefined,
+  output: "export",
   images: { unoptimized: false },
 };

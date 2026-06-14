@@ -67,4 +67,4 @@ jobs:
             Automatisch erzeugter Release für ${{ github.ref_name }}
           releaseDraft: false
           prerelease: false
-          projectPath: "."
+          projectPath: web

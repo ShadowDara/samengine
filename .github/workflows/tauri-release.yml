@@ -25,13 +25,6 @@ jobs:
         working-directory: web
 
     steps:
-
-      - name: Debug
-        run: |
-          pwd
-          ls -la
-          cat package.json
-        working-directory: web
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -74,4 +67,4 @@ jobs:
             Automatisch erzeugter Release für ${{ github.ref_name }}
           releaseDraft: false
           prerelease: false
-          projectPath: web
+          projectPath: "web"

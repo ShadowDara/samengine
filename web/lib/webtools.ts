@@ -19,12 +19,12 @@ export const webtools: tool[] = [
     description: "Generate mailto links easily.",
     icon: "🔄",
   },
-  // {
-  //   slug: "desktopapp",
-  //   title: "Webtools Desktop App",
-  //   description: "A Desktop App for Webtools which can be used offline",
-  //   icon: "💻",
-  // },
+  {
+    slug: "desktopapp",
+    title: "Webtools Desktop App",
+    description: "A Desktop App for Webtools which can be used offline",
+    icon: "💻",
+  },
   {
     slug: "markdown",
     title: "Markdown Editor / Writer",
@@ -49,4 +49,10 @@ export const webtools: tool[] = [
     description: "a panel where you can save colors to copy and view them",
     icon: "✨",
   },
+  // {
+  //   slug: "samtool",
+  //   title: "Samtool",
+  //   description: "A Desktop App for Webtools which can be used offline",
+  //   icon: "💻",
+  // },
 ];

@@ -1,4 +1,6 @@
 module.exports = {
   output: "export",
-  images: { unoptimized: false },
+  images: {
+    unoptimized: false
+  },
 };

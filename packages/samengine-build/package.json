@@ -37,7 +37,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/shadowdara/samengine",
-    "directory": "samengine-build"
+    "directory": "packages/samengine-build"
   },
   "bugs": {
     "url": "https://github.com/shadowdara/samengine/issues"

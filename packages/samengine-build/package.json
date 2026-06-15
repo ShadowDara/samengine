@@ -12,7 +12,8 @@
   },
   "exports": {
     ".": "./dist/index.js",
-    "./utils": "./dist/utils/index.js"
+    "./utils": "./dist/utils/index.js",
+    "./html": "./dist/html/index.js"
   },
   "bin": {
     "samengine-build": "dist/cli/cli.js"

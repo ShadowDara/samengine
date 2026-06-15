@@ -9,11 +9,8 @@
  * - `GetSingleFileHTML` embeds the bundled JavaScript and optional resource
  *   Data URIs directly into one HTML document.
  */
-import type { buildconfig } from "./buildconfig.js";
+import type { buildconfig } from "../buildconfig.js";
 import { parseMarkdown } from "samengine/utils";
-import { getPackageVersion } from "./getversion.js";
-
-const version = getPackageVersion("samengine");
 
 /** Builds the start screen shown before the game code runs. */
 function getStartScreen(config: buildconfig): string {
@@ -522,7 +519,7 @@ function getSettingsButtonJSrem(config: buildconfig): string {
  * until the player clicks the start button. This allows the generated page to
  * show the start screen, unlock audio, and remove temporary UI first.
  */
-export function GetSingleFileHTML(config: buildconfig, bundledJsContent: string, resourcesMap: Record<string, string> = {}): string {
+export function GetSingleFileHTML(config: buildconfig, bundledJsContent: string, version: string, resourcesMap: Record<string, string> = {}): string {
     let frameworkVersion = version;
 
     // Embed resource lookup helpers for games that need assets in single-file builds.
@@ -594,7 +591,7 @@ ${getSettingsButtonCSS(config)}
 document.getElementById("mdnotes").remove();
 ` : ""}
 
-            // Initialize the game.
+            /* Initialize the game. */
             window.__initializeGame();
         });
     </script>
@@ -616,7 +613,7 @@ document.getElementById("mdnotes").remove();
  * This page contains the generated start screen and optional menu UI. The game
  * bundle is loaded with a dynamic import only after the start button is clicked.
  */
-export function GetDefaultHTML(config: buildconfig, releasemode: boolean): string {
+export function GetDefaultHTML(config: buildconfig, releasemode: boolean, version: string): string {
     let frameworkVersion = version;
 
     const defaulthtml: string = `<!DOCTYPE html>

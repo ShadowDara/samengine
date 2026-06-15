@@ -26,8 +26,3 @@ export {
     newReleaseProfile,
     newMarkdownStyle
 } from "./buildconfig.js";
-
-export {
-    GetDefaultHTML,
-    GetSingleFileHTML    
-} from "./exporthtml.js";

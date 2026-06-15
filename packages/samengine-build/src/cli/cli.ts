@@ -21,7 +21,7 @@ import { WebSocket, WebSocketServer } from "ws";
 
 import { createProject } from "./new.js";
 import { copyFolder, flog, getContentType, scanResourcesAsDataURIs, filterResourcesByUsage } from "../buildhelper.js";
-import { GetDefaultHTML, GetSingleFileHTML } from "../exporthtml.js";
+import { GetDefaultHTML, GetSingleFileHTML } from "../html/exporthtml.js";
 import { loadUserConfig } from "./config.js";
 import { compressHTML } from "../utils/utils.js";
 import { parseArgs } from "./argparser.js";
@@ -69,7 +69,7 @@ function createBuilder(config: buildconfig, isRelease: boolean) {
                 // Filter resources by usage in the bundled code
                 resourcesMap = filterResourcesByUsage(bundledJsContent, resourcesMap);
                 
-                let html = GetSingleFileHTML(config, bundledJsContent, resourcesMap);
+                let html = GetSingleFileHTML(config, bundledJsContent, getPackageVersion("samengine"), resourcesMap);
                 if (isRelease) html = await compressHTML(html);
                 
                 // Add comment at the beginning after minification
@@ -84,7 +84,7 @@ function createBuilder(config: buildconfig, isRelease: boolean) {
                 flog("✅ Single-file export created!");
             } else {
                 // Multi-file export (original behavior)
-                let html = GetDefaultHTML(config, isRelease);
+                let html = GetDefaultHTML(config, isRelease, getPackageVersion("samengine"));
                 if (isRelease) html = await compressHTML(html);
                 
                 // Add HTML comment at the beginning after minification

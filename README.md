@@ -189,7 +189,10 @@ IDEAS
 
 -->
 
-
 ## Webtools
 
 - releases are made on tags which are starting with `webtools-v*`
+
+## IGN
+
+Git ignore Adder Infos are [here](crates/easy-git-ignore/README.md)

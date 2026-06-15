@@ -59,14 +59,14 @@ jobs:
       - name: Install dependencies
         run: bun i
       
-      - name: Read release notes
-        id: notes
-        shell: bash
-        run: |
-          {
-            cat ${{ github.ref_name }}.md
-            echo EOF
-          } >> "$GITHUB_OUTPUT"
+      # - name: Read release notes
+      #   id: notes
+      #   shell: bash
+      #   run: |
+      #     {
+      #       cat ${{ github.ref_name }}.md
+      #       echo EOF
+      #     } >> "$GITHUB_OUTPUT"
 
       - name: Build and Publish Tauri App
         uses: tauri-apps/tauri-action@v0.5
@@ -77,8 +77,7 @@ jobs:
           releaseName: Release ${{ github.ref_name }} - Webtools Desktop
           releaseBody: |
             Automatic Release for Webtools Desktop Version ${{ github.ref_name }}. Download links are down below!
-
-            ${{ steps.notes.outputs.RELEASE_NOTES }}
           releaseDraft: false
+          generateReleaseNotes: true
           prerelease: false
           projectPath: "web"

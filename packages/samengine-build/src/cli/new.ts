@@ -5,6 +5,13 @@ import chalk from 'chalk';
 import { flog } from "../buildhelper.js";
 
 // ================= NEW PROJECT =================
+/**
+ * Creates the basic folder and file structure for a new samengine project.
+ *
+ * The generated project always gets `game`, `resources`, `dist`,
+ * `game/main.ts`, and `samengine.config.ts`. By default the game file contains a
+ * small Snake example; when `empty` is true it contains a minimal blank starter.
+ */
 export async function createProject(name: string, empty: boolean) {
     flog(`📦 Create new Project: ${name}`);
 
@@ -114,7 +121,7 @@ function gameLoop(dt: number) {
             lastMove = 0;
             const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
 
-            // Kollision mit Walls
+            // Collision with walls
             if (head.x < 0 || head.y < 0 || head.x >= canvas.width / gridSize || head.y >= canvas.height / gridSize) {
                 snake = [{ x: 10, y: 10 }];
                 dir = { x: 1, y: 0 };
@@ -122,7 +129,7 @@ function gameLoop(dt: number) {
                 return;
             }
 
-            // Kollision mit sich selbst
+            // Collision with itself
             if (snake.some(s => s.x === head.x && s.y === head.y)) {
                 snake = [{ x: 10, y: 10 }];
                 dir = { x: 1, y: 0 };
@@ -140,7 +147,7 @@ function gameLoop(dt: number) {
             }
         }
 
-        // Zeichnen
+        // Draw the game state
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         ctx.fillStyle = "black";
@@ -203,7 +210,7 @@ export default function defineConfig(): buildconfig {
     //     )
     // );
 
-    flog("✅ Projekt created!");
+    flog("✅ Project created!");
     // flog(`👉 cd ${name}`);
     // flog(`👉 npm install`);
     // flog(`👉 npm run dev`);

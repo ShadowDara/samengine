@@ -2,14 +2,18 @@
 
 import { clamp, lerp, map } from "../utils/math.js";
 
-// Vector 3d
+/**
+ * Three-dimensional vector for positions, directions, and velocities.
+ */
 export type Vector3d = {
     x: number;
     y: number;
     z: number;
 };
 
-// Function to create an Object of Type Vector3D
+/**
+ * Creates a new 3D vector.
+ */
 export function makeVector3d(x: number, y: number, z: number): Vector3d {
     return {
         x: x,
@@ -18,7 +22,9 @@ export function makeVector3d(x: number, y: number, z: number): Vector3d {
     }
 }
 
-// Function to add 2 Vectors together
+/**
+ * Adds two vectors and returns a new vector.
+ */
 export function add3d(vector1: Vector3d, vector2: Vector3d): Vector3d {
     return {
         x: vector1.x + vector2.x,
@@ -27,7 +33,9 @@ export function add3d(vector1: Vector3d, vector2: Vector3d): Vector3d {
     }
 }
 
-// Function to subtract 2 Vectors from each other
+/**
+ * Subtracts `vector2` from `vector1` and returns a new vector.
+ */
 export function subtract3d(vector1: Vector3d, vector2: Vector3d): Vector3d {
     return {
         x: vector1.x - vector2.x,
@@ -36,7 +44,9 @@ export function subtract3d(vector1: Vector3d, vector2: Vector3d): Vector3d {
     }
 }
 
-// Function to get the length from an Vector
+/**
+ * Returns the Euclidean length/magnitude of a 3D vector.
+ */
 export function length3d(vector: Vector3d): number {
     let produkt = vector.x * vector.x + vector.y * vector.y + vector.z * vector.z;
     let root = Math.sqrt(produkt);
@@ -44,7 +54,11 @@ export function length3d(vector: Vector3d): number {
     return root;
 }
 
-// Function to normalize a Vector 2d
+/**
+ * Normalizes a vector to length `1`.
+ *
+ * Important: this function mutates and returns the original vector object.
+ */
 export function normalize3d(vector: Vector3d): Vector3d {
     // Check if the Vector is zero because then you dont need to
     // calculate sth
@@ -61,12 +75,16 @@ export function normalize3d(vector: Vector3d): Vector3d {
     return vector;
 }
 
-// Function to make scalar produkt from an Vector
+/**
+ * Returns the dot product of two vectors.
+ */
 export function dot3d(v1: Vector3d, v2: Vector3d): number {
     return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
 }
 
-// Function to calculate the cross produkt
+/**
+ * Returns the cross product of two 3D vectors.
+ */
 export function crossprodukt3d(v1: Vector3d, v2: Vector3d): Vector3d {
     return {
         x: (v1.y * v2.z - v1.z * v2.y),
@@ -75,14 +93,18 @@ export function crossprodukt3d(v1: Vector3d, v2: Vector3d): Vector3d {
     }
 }
 
-// Calculate the Distance between 2 Vectors
+/**
+ * Returns the distance between two 3D vector positions.
+ */
 export function distance3d(v1: Vector3d, v2: Vector3d): number {
     let tmp: Vector3d = subtract3d(v1, v2);
     return length3d(tmp);
 }
 
 
-// Function to clamp a Vector 3d
+/**
+ * Clamps vector components between the matching `min` and `max` components.
+ */
 export function clamp3d(vector: Vector3d, min: Vector3d, max: Vector3d): Vector3d {
     return {
         x: clamp(vector.x, min.x, max.x),
@@ -91,7 +113,9 @@ export function clamp3d(vector: Vector3d, min: Vector3d, max: Vector3d): Vector3
     };
 }
 
-// Lerp for a 3d Vector
+/**
+ * Linearly interpolates each component from `start` to `end`.
+ */
 export function lerp3d(start: Vector3d, end: Vector3d, t: Vector3d): Vector3d {
     return {
         x: lerp(start.x, end.x, t.x),
@@ -100,7 +124,9 @@ export function lerp3d(start: Vector3d, end: Vector3d, t: Vector3d): Vector3d {
     };
 }
 
-// Map Function for a 3d Vector
+/**
+ * Maps each vector component from one numeric range into another range.
+ */
 export function map3d(
     value: Vector3d,
     inMin: Vector3d,

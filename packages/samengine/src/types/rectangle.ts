@@ -3,6 +3,12 @@
 import { type Mouse } from "../input.js";
 import { type Vector2d } from "./vector2d.js";
 
+/**
+ * Axis-aligned rectangle used for drawing, UI, and simple hit tests.
+ *
+ * `x` and `y` describe the top-left corner. `width` and `height` extend to the
+ * right and downward in normal canvas coordinates.
+ */
 export type Rect = {
     x: number;
     y: number;
@@ -11,7 +17,9 @@ export type Rect = {
     borderRadius?: number;
 };
 
-// Function to create an Object of Type rect
+/**
+ * Creates a rectangle object.
+ */
 export function makeRect(x: number, y: number, width: number, height: number, borderRadius: number = 0): Rect {
     return {
         x: x,
@@ -22,23 +30,31 @@ export function makeRect(x: number, y: number, width: number, height: number, bo
     }
 }
 
-// Function to get the Center of the Width of the Object
+/**
+ * Returns the horizontal center coordinate of a rectangle.
+ */
 export function centerRectX(rect: Rect): number {
     return (rect.x + (rect.width / 2));
 }
 
-// Function to get the Center of the Height of the Object
+/**
+ * Returns the vertical center coordinate of a rectangle.
+ */
 export function centerRectY(rect: Rect): number {
     return (rect.y + (rect.height / 2));
 }
 
-// Get the Center of a Rectangle
+/**
+ * Returns the rectangle center as a `Vector2d`.
+ */
 export function centerRect(rect: Rect): Vector2d {
     let vector: Vector2d = { x: centerRectX(rect), y: centerRectY(rect) };
     return vector;
 }
 
-// Check if a Point in the Rectangle
+/**
+ * Checks whether a point is inside or on the border of a rectangle.
+ */
 export function isPointInRect(x: number, y: number, rect: Rect): boolean {
     return (
         x >= rect.x &&
@@ -48,7 +64,9 @@ export function isPointInRect(x: number, y: number, rect: Rect): boolean {
     );
 }
 
-// Is Rectangle Hovered
+/**
+ * Checks whether the current mouse position is inside a rectangle.
+ */
 export function isMouseInRect(mouse: Mouse, rect: Rect): boolean {
     return (
         mouse.x >= rect.x &&
@@ -58,7 +76,11 @@ export function isMouseInRect(mouse: Mouse, rect: Rect): boolean {
     );
 }
 
-// Function to check if a Rectangle is clicked  
+/**
+ * Checks whether a rectangle was clicked during the current frame.
+ *
+ * This depends on `mouse.justPressed`, so call it before `resetInput()`.
+ */
 export function isRectClicked(mouse: Mouse, rect: Rect): boolean {
     return isMouseInRect(mouse, rect) && mouse.justPressed;
 }

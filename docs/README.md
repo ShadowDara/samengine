@@ -19,6 +19,8 @@
 
 This is the Documentation for sameninge!
 
+**INFO: THE DOCS IS NOT COMPLETE! PLEASE USE THE DOCS INSIDE THE CODE OF THE TS PACKAGES!**
+
 **[Getting Started](../docs/Get-Started)**
 
 The Docs is Work in Progress!

@@ -1,0 +1,83 @@
+name: Tauri Release
+
+on:
+  push:
+    tags:
+      - 'webtools-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish-tauri:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu-22.04
+          - platform: windows-latest
+          - platform: macos-latest
+
+    runs-on: ${{ matrix.platform }}
+
+    defaults:
+      run:
+        working-directory: web
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      - name: Install dependencies
+        run: bun i
+      
+      # - name: Read release notes
+      #   id: notes
+      #   shell: bash
+      #   run: |
+      #     {
+      #       cat ${{ github.ref_name }}.md
+      #       echo EOF
+      #     } >> "$GITHUB_OUTPUT"
+
+      - name: Build and Publish Tauri App
+        uses: tauri-apps/tauri-action@v0.5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Release ${{ github.ref_name }} - Webtools Desktop
+          releaseBody: |
+            Automatic Release for Webtools Desktop Version ${{ github.ref_name }}. Download links are down below!
+          releaseDraft: false
+          generateReleaseNotes: true
+          prerelease: false
+          projectPath: "web"

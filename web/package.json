@@ -6,22 +6,28 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "tauri": "NEXT_CONFIG_FILE=next.config.tauri.ts tauri"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.19",
+    "geist": "^1.7.2",
     "gray-matter": "^4.0.3",
     "next": "16.2.4",
+    "next-mdx-remote": "^6.0.0",
     "react": "19.2.4",
+    "react-diff-viewer-continued": "^4.2.2",
     "react-dom": "19.2.4",
     "react-markdown": "^10.1.0",
     "rehype-highlight": "^7.0.2",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "samengine": "^1.7.9"
+    "samengine": "^1.9.1",
+    "sugar-high": "^0.6.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tauri-apps/cli": "^2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

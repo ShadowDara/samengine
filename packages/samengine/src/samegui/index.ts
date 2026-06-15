@@ -4,11 +4,21 @@ import { hash } from "../utils/index.js";
 
 export type UIElementType = "button" | "text" | "checkbox";
 
+/**
+ * Stored DOM node for one immediate-mode UI element.
+ */
 export type UIElement = {
     el: HTMLElement;
     type: UIElementType;
 };
 
+/**
+ * Tiny immediate-mode HTML overlay for debug tools and simple in-game menus.
+ *
+ * Call `begin()` before emitting UI for the frame, then call `button`, `text`,
+ * and `checkbox` in a stable order, and finally call `end()`. Elements are
+ * backed by real DOM nodes but identified by hashed labels or explicit ids.
+ */
 export class HtmlUI {
     private root: HTMLDivElement;
     private panel: HTMLDivElement;
@@ -39,10 +49,16 @@ export class HtmlUI {
         this.root.appendChild(this.panel);
     }
 
+    /**
+     * Starts a new UI frame and records which controls are used this frame.
+     */
     begin() {
         this.frameIds = [];
     }
 
+    /**
+     * Ends the UI frame and clears one-frame button click states.
+     */
     end() {
         // reset clicks AFTER frame
         for (const id of this.frameIds) {
@@ -73,6 +89,11 @@ export class HtmlUI {
         return e.el as HTMLButtonElement;
     }
 
+    /**
+     * Creates or updates a button.
+     *
+     * @returns `true` during the frame after the DOM button was clicked.
+     */
     button(label: string, idOverride?: string): boolean {
         const id = hash(idOverride ?? label);
         this.frameIds.push(id);
@@ -89,6 +110,9 @@ export class HtmlUI {
         return this.clicked.get(id) === true;
     }
 
+    /**
+     * Creates or updates a text label in the overlay panel.
+     */
     text(label: string, idOverride?: string) {
         const id = hash(idOverride ?? label);
         this.frameIds.push(id);
@@ -107,6 +131,11 @@ export class HtmlUI {
         e.el.textContent = label;
     }
 
+    /**
+     * Creates or updates a checkbox and returns its current value.
+     *
+     * `defaultValue` is only used the first time the checkbox id appears.
+     */
     checkbox(label: string, defaultValue: boolean, idOverride?: string): boolean {
         const id = hash(idOverride ?? label);
         this.frameIds.push(id);

@@ -1,4 +1,10 @@
-// Buildconfig Export and Version
+/**
+ * Public package API for configuration files.
+ *
+ * Game projects import these types and factory functions from
+ * `samengine-build` when defining `samengine.config.ts`. The executable CLI is
+ * separate from this entry point and lives under `src/cli`.
+ */
 export type {
     buildconfig,
     Paragraph,
@@ -6,7 +12,9 @@ export type {
     SameGUI,
     HTMLMenuSettingOption,
     HTMLMenuSetting,
-    HTMLMenu
+    HTMLMenu,
+    HTMLMenuStyle,
+    HTMLMenuText,
 } from "./buildconfig.js";
 
 export {
@@ -15,5 +23,6 @@ export {
     svgfile,
     newHTMLMenu,
     newDevProfile,
-    newReleaseProfile
+    newReleaseProfile,
+    newMarkdownStyle
 } from "./buildconfig.js";

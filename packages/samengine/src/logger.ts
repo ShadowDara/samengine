@@ -1,4 +1,10 @@
-// Debug Log Function
+/**
+ * Debug logger used by samengine internals.
+ *
+ * In the current release build this is intentionally a no-op, so calls can stay
+ * in code without producing console output. The commented implementation above
+ * shows the development logger that can be re-enabled when needed.
+ */
 export const dlog =
     // (import.meta.env?.DEV ?? true) // Default true, falls undefined
     // ? (...args: any[]) => {

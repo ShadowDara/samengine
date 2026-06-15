@@ -19,7 +19,12 @@ export {
   parseJSONC
 } from "./jsonc-parser.js";
 
-// Tiny Hash function
+/**
+ * Creates a small deterministic 32-bit hash from a string.
+ *
+ * Used internally by the immediate-mode HTML UI to turn labels into stable
+ * numeric ids. This is not a cryptographic hash.
+ */
 export function hash(str: string): number {
   let h = 0;
   for (let i = 0; i < str.length; i++) {
@@ -29,7 +34,11 @@ export function hash(str: string): number {
   return h;
 }
 
-// Make an array random
+/**
+ * Shuffles an array in place using the Fisher-Yates algorithm.
+ *
+ * The same array instance is returned for convenient chaining.
+ */
 export function shuffle<T>(array: T[]) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

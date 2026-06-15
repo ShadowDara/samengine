@@ -1,0 +1,17 @@
+{
+  "projectname": "samengine",
+  "pretty": true,
+  "links": [
+    {
+      "name": "portfolio-starter-kit",
+      "link": "https://portfolio-blog-starter.vercel.app/",
+      "description": "",
+      "license": "MIT?",
+      "author": "Vercel.com",
+      "licenselink": "https://mit-license.org/",
+      "showinlist": true,
+      "changenotice": true
+    }
+  ],
+  "links2": []
+}

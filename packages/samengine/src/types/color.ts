@@ -1,4 +1,9 @@
-// Color Type
+/**
+ * RGBA color object.
+ *
+ * `r`, `g`, and `b` are expected in the 0-255 range. `a` is optional and can be
+ * used by callers as an alpha channel value.
+ */
 export type Color = {
     r: number;
     g: number;
@@ -6,7 +11,9 @@ export type Color = {
     a?: number
 };
 
-// Function to create an Object of Type Color
+/**
+ * Creates a color object.
+ */
 export function makeColor(r: number, g: number, b: number, a?: number): Color {
     return {
         r: r,
@@ -16,6 +23,9 @@ export function makeColor(r: number, g: number, b: number, a?: number): Color {
     }
 }
 
+/**
+ * Returns the RGB inverse of a color while preserving alpha if it exists.
+ */
 export function invertcolor(color: Color): Color {
     return {
         r: 255 - color.r,
@@ -25,6 +35,11 @@ export function invertcolor(color: Color): Color {
     };
 }
 
+/**
+ * Inverts a hex color in `#rrggbb` or `rrggbb` format.
+ *
+ * The returned value always starts with `#`.
+ */
 export function invertHexColor(hex: string): string {
     // Entferne das führende #
     const cleanHex = hex.replace('#','');

@@ -1,14 +1,25 @@
-// Arguments for the CLI Tool
-
 // ================= ARG PARSING =================
+/** Parsed command-line options for the `samengine-build` executable. */
 export interface CLIArgs {
+    /** True when the user passed `--release` or `-r`. */
     release: boolean;
+
+    /** Reserved for a CLI-level single-file flag. The config currently controls this. */
     singlefile: boolean;
+
+    /** Project name passed to `--new` or `--new-empty`; otherwise `null`. */
     newProject: string | null;
+
+    /** True when `--new-empty` should create an empty starter instead of the example game. */
     empty: boolean;
 }
 
-// Function to parse the Args for the CLI Tools
+/**
+ * Parses CLI arguments from `process.argv`.
+ *
+ * Unknown arguments are reported as warnings instead of crashing the process, so
+ * the CLI stays forgiving while still making mistakes visible.
+ */
 export function parseArgs(): CLIArgs {
     const args = process.argv.slice(2);
     const options: CLIArgs = { release: false, singlefile: false, newProject: null, empty: false };

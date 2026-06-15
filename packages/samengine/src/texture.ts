@@ -3,14 +3,28 @@ import { Rect } from "./types/rectangle.js";
 
 const textures: Record<string, HTMLImageElement> = {};
 
+/**
+ * Loaded texture image.
+ *
+ * `undefined` means the texture was not loaded or the cache key does not exist.
+ */
 export type Texture = HTMLImageElement | undefined;
 
+/**
+ * Optional drawing settings used by texture, atlas, and animation rendering.
+ */
 export type DrawOptions = {
+    /** Target width before `scale` is applied. Defaults to source width. */
     width?: number;
+    /** Target height before `scale` is applied. Defaults to source height. */
     height?: number;
+    /** Rotation in radians around the rendered image center. */
     rotation?: number;
+    /** Mirrors the image horizontally around its center. */
     flipX?: boolean;
+    /** Mirrors the image vertically around its center. */
     flipY?: boolean;
+    /** Multiplies the final rendered width and height. */
     scale?: number;
 };
 
@@ -18,7 +32,17 @@ function getresourcepath(path: string): string {
     return "/resources/" + path;
 }
 
-// Function to load a Texture Async
+/**
+ * Loads an image and stores it in the texture cache.
+ *
+ * Normal builds load from `/resources/${src}`. Single-file exports can provide
+ * embedded resources through `window.__resources`; if a matching key exists,
+ * that data URL is used instead. The cache key always remains the original
+ * `src` string, so `getTexture(src)` works the same in both modes.
+ *
+ * @param src Resource path relative to the resources folder.
+ * @returns Promise resolving to the loaded `HTMLImageElement`.
+ */
 export function loadTextureAsync(src: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
         // Wenn schon geladen
@@ -54,12 +78,23 @@ export function loadTextureAsync(src: string): Promise<HTMLImageElement> {
     });
 }
 
-// Function to get the Texture
+/**
+ * Reads a texture from the cache.
+ *
+ * This does not start loading by itself. Call `loadTextureAsync` first or handle
+ * the `undefined` result.
+ */
 export function getTexture(src: string): Texture {
     return textures[src];
 }
 
-// Function to draw a texture to the Screen
+/**
+ * Draws a texture to the canvas.
+ *
+ * The image is drawn around its center for rotation and flipping, but `x` and
+ * `y` still describe the top-left target position. If the texture is missing,
+ * a magenta fallback rectangle is drawn to make missing assets visible.
+ */
 export function drawTexture(
     ctx: CanvasRenderingContext2D,
     texture: Texture,
@@ -102,23 +137,30 @@ export function drawTexture(
     ctx.restore();
 }
 
-// Texture Atlas Type
+/**
+ * A spritesheet image plus named frame rectangles inside that image.
+ */
 export type TextureAtlas = {
+    /** Spritesheet image. */
     image: HTMLImageElement;
+    /** Named source rectangles inside `image`. */
     frames: Record<string, Rect>;
 };
 
-// Funtion to load an Atlas
-//
-// JSON Format for the LoadAtlas Function
-//
-// {
-//   "frames": {
-//     "player_idle_0": { "x": 0, "y": 0, "w": 32, "h": 32 },
-//     "player_idle_1": { "x": 32, "y": 0, "w": 32, "h": 32 }
-//   }
-// }
-//
+/**
+ * Loads a texture atlas image and its JSON frame data.
+ *
+ * The JSON file is fetched from the resources folder and must contain a
+ * `frames` object with frame names mapped to rectangles:
+ *
+ * ```json
+ * {
+ *   "frames": {
+ *     "player_idle_0": { "x": 0, "y": 0, "width": 32, "height": 32 }
+ *   }
+ * }
+ * ```
+ */
 export async function loadAtlas(
     imageSrc: string,
     dataSrc: string
@@ -134,6 +176,11 @@ export async function loadAtlas(
     };
 }
 
+/**
+ * Draws one named frame from a texture atlas.
+ *
+ * Missing frame names are logged through `dlog` and skipped.
+ */
 export function drawAtlasFrame(
     ctx: CanvasRenderingContext2D,
     atlas: TextureAtlas,
@@ -186,40 +233,28 @@ export function drawAtlasFrame(
     ctx.restore();
 }
 
-//
-//
-// Animation Player
-//
-//
-//
-// // Define Animation
-// const walkAnimation: Animation = {
-//     frames: ["walk_0", "walk_1", "walk_2", "walk_3"],
-//     fps: 8,
-//     loop: true
-// };
-//
-// const player = new AnimationPlayer(walkAnimation);
-//
-// // Game Loop
-// function update(dt: number) {
-//     player.update(dt);
-// }
-//
-// function render(ctx: CanvasRenderingContext2D) {
-//     drawAnimation(ctx, atlas, player, 100, 100, 64, 64);
-// }
-//
-//
-// Animation Player Class
+/**
+ * Keeps track of time and current frame for a named-frame animation.
+ *
+ * The player only stores animation state. It does not draw anything by itself;
+ * call `drawAnimation` after `update(dt)` to render the current atlas frame.
+ */
 export class AnimationPlayer {
     private time = 0;
     private currentFrameIndex = 0;
     private finished = false;
 
-    // Konstruktor Function
+    /**
+     * Creates a player for the given animation definition.
+     */
     constructor(public animation: Animation) { }
 
+    /**
+     * Advances the animation by `deltaTime` seconds.
+     *
+     * Looping animations wrap back to the first frame. Non-looping animations
+     * stop on their final frame and then report `isFinished() === true`.
+     */
     update(deltaTime: number): void {
         if (this.finished) return;
 
@@ -242,28 +277,45 @@ export class AnimationPlayer {
         }
     }
 
+    /**
+     * Returns the frame name that should currently be rendered from the atlas.
+     */
     getCurrentFrame(): string {
         return this.animation.frames[this.currentFrameIndex];
     }
 
+    /**
+     * Restarts the animation from the first frame.
+     */
     reset(): void {
         this.time = 0;
         this.currentFrameIndex = 0;
         this.finished = false;
     }
 
+    /**
+     * Returns whether a non-looping animation reached its final frame.
+     */
     isFinished(): boolean {
         return this.finished;
     }
 }
 
-// Animation Type
+/**
+ * Animation definition based on named frames inside a `TextureAtlas`.
+ */
 export type Animation = {
+    /** Frame names in playback order. */
     frames: string[];
+    /** Playback speed in frames per second. */
     fps: number;
+    /** Whether playback should wrap to the first frame. Defaults to false-like. */
     loop?: boolean;
 };
 
+/**
+ * Draws the current frame of an `AnimationPlayer`.
+ */
 export function drawAnimation(
     ctx: CanvasRenderingContext2D,
     atlas: TextureAtlas,
@@ -284,6 +336,11 @@ export function drawAnimation(
     );
 }
 
+/**
+ * Helper for side-view sprites.
+ *
+ * Returns `true` when a negative direction should flip a sprite horizontally.
+ */
 export function getFlipFromDirection(dir: number): boolean {
     return dir < 0; // links = true
 }

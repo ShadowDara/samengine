@@ -188,3 +188,8 @@ IDEAS
 - SVG Generator
 
 -->
+
+
+## Webtools
+
+- releases are made on tags which are starting with `webtools-v*`

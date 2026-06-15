@@ -2,10 +2,21 @@ import { add2d, dot2d, length2d, makeVector2d, normalize2d, scale2d, subtract2d,
 import { clamp } from "../utils/math.js";
 import { PhysicsObject } from "./physicsObject.js";
 
+/**
+ * Collision shape used by `PhysicsObject`.
+ *
+ * Circle and box colliders are centered on `body.position`. Box width and height
+ * are full extents, not half extents.
+ */
 export type Collider =
     | { type: "circle"; radius: number }
     | { type: "box"; width: number; height: number };
 
+/**
+ * Tests two axis-aligned box colliders for overlap.
+ *
+ * @returns Collision normal and penetration depth, or `null` when separated.
+ */
 export function aabbCollision(a: PhysicsObject, b: PhysicsObject) {
     const posA = a.body.position;
     const posB = b.body.position;
@@ -39,6 +50,11 @@ export function aabbCollision(a: PhysicsObject, b: PhysicsObject) {
     return null;
 }
 
+/**
+ * Tests two circle colliders for overlap.
+ *
+ * @returns Collision normal from `a` to `b` and penetration depth, or `null`.
+ */
 export function circleCollision(a: PhysicsObject, b: PhysicsObject) {
     const posA = a.body.position;
     const posB = b.body.position;
@@ -59,6 +75,11 @@ export function circleCollision(a: PhysicsObject, b: PhysicsObject) {
     return null;
 }
 
+/**
+ * Tests a circle collider against a box collider.
+ *
+ * The returned normal points from the closest box point toward the circle.
+ */
 export function circleBoxCollision(circleObj: PhysicsObject, boxObj: PhysicsObject) {
     const circle = circleObj.collider as any;
     const box = boxObj.collider as any;
@@ -100,6 +121,12 @@ export function circleBoxCollision(circleObj: PhysicsObject, boxObj: PhysicsObje
     return null;
 }
 
+/**
+ * Applies an impulse to two bodies so their velocities respond to a collision.
+ *
+ * Static bodies are treated as having inverse mass `0`, so only dynamic bodies
+ * receive velocity changes.
+ */
 export function resolveCollision(a: PhysicsObject, b: PhysicsObject, normal: Vector2d) {
     const rv = subtract2d(b.body.velocity, a.body.velocity);
 
@@ -128,6 +155,12 @@ export function resolveCollision(a: PhysicsObject, b: PhysicsObject, normal: Vec
         b.body.velocity = add2d(b.body.velocity, scale2d(impulse, invMassB));
 }
 
+/**
+ * Moves overlapping bodies apart to remove visible penetration.
+ *
+ * The correction is distributed by inverse mass, so lighter dynamic bodies move
+ * more than heavier ones and static bodies do not move.
+ */
 export function positionalCorrection(
     a: PhysicsObject,
     b: PhysicsObject,

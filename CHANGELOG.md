@@ -38,6 +38,7 @@
 - added a hash function
 - added a ImGUI inspired UI System
 - added CSV Parser
+- added better Storage API
 
 
 ## samengine-build (1.9.2) (22.04.2026)

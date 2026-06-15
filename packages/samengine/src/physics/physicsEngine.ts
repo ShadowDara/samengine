@@ -25,10 +25,22 @@ import { PhysicsObject } from "./physicsObject.js";
 // }
 
 
+/**
+ * Simple 2D physics simulation.
+ *
+ * `step(dt)` applies gravity, integrates positions, checks all object pairs, and
+ * resolves circle/box collisions. The implementation is intentionally small and
+ * best suited for arcade-style games rather than physically exact simulation.
+ */
 export class PhysicsWorld {
     objects: PhysicsObject[] = [];
     gravity = makeVector2d(0, 500); // px/s²
 
+    /**
+     * Advances the simulation by `dt` seconds.
+     *
+     * Use the delta time from `startEngine` for frame-rate independent motion.
+     */
     step(dt: number) {
         // Bewegung
         for (const obj of this.objects) {
@@ -110,6 +122,12 @@ export class PhysicsWorld {
 }
 
 
+/**
+ * Sets gravity by direction and strength.
+ *
+ * `x` and `y` describe the direction vector and do not need to be normalized.
+ * `strength` becomes the final acceleration magnitude.
+ */
 export function setGravityDirection(world: PhysicsWorld, x: number, y: number, strength: number) {
     const len = Math.sqrt(x * x + y * y);
 

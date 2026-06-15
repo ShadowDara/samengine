@@ -1,7 +1,13 @@
 import { readdirSync, statSync, mkdirSync, promises as fsPromises, existsSync } from "fs";
 import { join } from "path";
 
-// Logging function
+/**
+ * Logs CLI messages with a timestamp down to milliseconds.
+ *
+ * The build tool can receive several file-system events in quick succession
+ * while watching a project. Timestamped logs make it easier to understand which
+ * rebuild, copy operation, or server action happened first.
+ */
 export const flog = (...args: any[]) => {
     const now = new Date();
     const time =
@@ -13,8 +19,15 @@ export const flog = (...args: any[]) => {
     console.log(time, ...args);
 }
 
+/**
+ * Recursively copies a folder from `src` to `dest`.
+ *
+ * The multi-file build uses this to copy `resources` into the output directory.
+ * Files are copied as raw buffers so binary assets such as images and audio are
+ * preserved exactly.
+ */
 export async function copyFolder(src: string, dest: string): Promise<void> {
-    // Zielordner erstellen
+    // Create the target folder before copying nested entries into it.
     mkdirSync(dest, { recursive: true });
 
     const entries = readdirSync(src, { withFileTypes: true });
@@ -33,7 +46,13 @@ export async function copyFolder(src: string, dest: string): Promise<void> {
     }
 }
 
-// Scan resources folder and convert to data URIs (base64)
+/**
+ * Scans a resource folder and converts every file into a Base64 Data URI.
+ *
+ * The returned object uses paths relative to `resourceDir`, for example
+ * `sprites/player.png`. Single-file builds embed this map into the generated
+ * HTML so the game can load assets without separate files.
+ */
 export async function scanResourcesAsDataURIs(resourceDir: string): Promise<Record<string, string>> {
     const resourceMap: Record<string, string> = {};
 
@@ -65,8 +84,7 @@ export async function scanResourcesAsDataURIs(resourceDir: string): Promise<Reco
 
 // === Helper ===
 
-// Dev Server Helper
-
+/** Returns the Content-Type used by the local development server. */
 export function getContentType(path: string): string {
     if (path.endsWith(".js")) return "application/javascript";
     if (path.endsWith(".ts")) return "application/typescript";
@@ -77,6 +95,12 @@ export function getContentType(path: string): string {
     return "text/plain";
 }
 
+/**
+ * Returns the MIME type used when embedding a resource as a Data URI.
+ *
+ * Unknown file extensions fall back to `application/octet-stream`, which keeps
+ * the resource loadable even when the type is not explicitly listed here.
+ */
 export function getMimeType(filename: string): string {
     const ext = filename.toLowerCase().split(".").pop() || "";
     const mimeTypes: Record<string, string> = {
@@ -97,7 +121,14 @@ export function getMimeType(filename: string): string {
     return mimeTypes[ext] || "application/octet-stream";
 }
 
-// Filter resources by checking if they are actually used in the bundled code
+/**
+ * Removes resources that do not appear to be referenced by the bundled code.
+ *
+ * The check intentionally stays simple: it looks for the full relative resource
+ * path or just the filename inside the JavaScript bundle. This keeps
+ * single-file exports smaller, but it can only detect assets whose names remain
+ * visible as strings in the bundle.
+ */
 export function filterResourcesByUsage(bundledJsContent: string, resourcesMap: Record<string, string>): Record<string, string> {
     const filteredResources: Record<string, string> = {};
     const unusedResources: string[] = [];

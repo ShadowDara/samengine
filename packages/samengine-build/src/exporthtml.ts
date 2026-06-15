@@ -1,13 +1,21 @@
-// Function to create the Export HTML for the Build
-
-// Function to create the Export HTML for the Build
+/**
+ * HTML generation for samengine-build.
+ *
+ * This module creates the complete `index.html` written into the output folder.
+ * There are two build shapes:
+ *
+ * - `GetDefaultHTML` creates a normal multi-file page that imports the bundled
+ *   game JavaScript after the player clicks the start button.
+ * - `GetSingleFileHTML` embeds the bundled JavaScript and optional resource
+ *   Data URIs directly into one HTML document.
+ */
 import type { buildconfig } from "./buildconfig.js";
 import { parseMarkdown } from "samengine/utils";
 import { getPackageVersion } from "./getversion.js";
 
 const version = getPackageVersion("samengine");
 
-// function to get the startscreen
+/** Builds the start screen shown before the game code runs. */
 function getStartScreen(config: buildconfig): string {
     return `<div id="startscreen">
         <h2>made with samengine</h2>
@@ -15,29 +23,35 @@ function getStartScreen(config: buildconfig): string {
         <p>${config.version}</p>
         <p>by ${config.gameauthor}</p>
 
-        <button class="startbutton" id="startBtn">Start</button>
+        <button class="startbutton" id="startBtn">${config.htmlMenu.text.startbutton}</button>
+
+        <p>${config.description}</p>
     </div>`;
 }
 
-// function to get the AudioCode
+/**
+ * Returns optional JavaScript that unlocks browser audio after a user click.
+ *
+ * Most browsers block audio playback until the page receives a user gesture.
+ * Running this inside the start-button handler gives the game an AudioContext it
+ * can reuse through `window.__audioCtx`.
+ */
 function getAudioCode(c: buildconfig): string {
     if (c.enable_audio == false) {
         return "";
     }
 
-    let content = `// 🔊 Audio freischalten
+    return `// Unlock browser audio after the start click.
             const AudioContext = window.AudioContext || window.webkitAudioContext;
-            
+
             const ctx = new AudioContext();
             await ctx.resume();
 
-            // 👉 HIER rein!
+            // Expose the shared audio context for the game runtime.
             window.__audioCtx = ctx;`;
-
-    return content;
 }
 
-// function to get the standard CSS
+/** Creates the base CSS for the generated page, start screen, and start button. */
 function getStandardCSS(config: buildconfig): string {
     return `* {
         margin: 0;
@@ -46,14 +60,14 @@ function getStandardCSS(config: buildconfig): string {
       }
 body {
     margin: 0;
-    background: #0f172a;
-    color: white;
+    background: ${config.htmlMenu.style.bgcolor};
+    color: ${config.htmlMenu.style.color};
     font-family: sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    overflow: hidden; /* 🔥 verhindert Scrollbars */
+    overflow: hidden; /* Prevent scrollbars around fullscreen game content. */
 }
 
 #startscreen {
@@ -72,41 +86,62 @@ h2 {
 }
 
 .startbutton {
-    margin-top: 2rem;
+    margin: 1.3rem 0;
     padding: 1rem 2rem;
     font-size: 1.2rem;
-    background: #22c55e;
+    background: ${config.htmlMenu.style.startbutton_bgcolor};
     border: none;
     border-radius: 8px;
     cursor: pointer;
 }
 
 .startbutton:hover {
-    background: #16a34a;
+    background: ${config.htmlMenu.style.startbutton_bgc_hover};
 }`;
 }
 
-// Function which formats the HTML for the Notes
+/**
+ * Converts configured Markdown notes into collapsible `<details>` sections.
+ *
+ * Each note can provide CSS variables for its own text and background color.
+ * The Markdown itself is rendered through `samengine/utils`.
+ */
 function getMDNotes(config: buildconfig): string {
-    let mdnotes_str: string = "";
+    let mdnotes_str = "";
 
     if (config.markdown_notes.length > 0) {
+
         mdnotes_str += '<div id="mdnotes">';
 
         for (let i = 0; i < config.markdown_notes.length; i++) {
-            mdnotes_str += "<details>";
-            mdnotes_str += "<summary>" + config.markdown_notes[i].title + "</summary>";
-            mdnotes_str += parseMarkdown(config.markdown_notes[i].content);
-            mdnotes_str += "</details>";
+
+            const note = config.markdown_notes[i];
+
+            let vars = "";
+
+            if (note.style?.bg) {
+                vars += `--note-bg:${note.style.bg};`;
+            }
+
+            if (note.style?.color) {
+                vars += `--note-color:${note.style.color};`;
+            }
+
+            mdnotes_str += `
+<details style="${vars}">
+    <summary>${note.title}</summary>
+    ${parseMarkdown(note.content)}
+</details>`;
         }
 
         mdnotes_str += "</div>";
+
         mdnotes_str += `
 <style>
-/* Markdown Notes Container */
-#mdnotes, #mdnotes div {
+/* Markdown notes container */
+#mdnotes {
     position: absolute;
-    bottom: 0px;
+    bottom: 0;
     left: 10px;
     max-width: 400px;
     max-height: 40vh;
@@ -116,9 +151,14 @@ function getMDNotes(config: buildconfig): string {
     width: 60%;
 }
 
-/* Einzelne Note */
+/* Single note */
 #mdnotes details {
-    background: rgba(15, 23, 42, 0.85);
+    --note-bg: rgba(15,23,42,0.85);
+    --note-color: #e2e8f0;
+
+    background: var(--note-bg);
+    color: var(--note-color);
+
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 8px;
     margin-bottom: 8px;
@@ -126,21 +166,20 @@ function getMDNotes(config: buildconfig): string {
     backdrop-filter: blur(6px);
 }
 
-/* Titel (Summary) */
+/* Note title */
 #mdnotes summary {
     cursor: pointer;
     font-weight: bold;
-    color: #38bdf8;
-    outline: none;
+    color: inherit;
     list-style: none;
 }
 
-/* Pfeil entfernen (optional cleaner look) */
+/* Hide the browser default marker for a cleaner custom toggle. */
 #mdnotes summary::-webkit-details-marker {
     display: none;
 }
 
-/* Custom Pfeil */
+/* Custom toggle marker */
 #mdnotes summary::before {
     content: "▶";
     display: inline-block;
@@ -148,12 +187,12 @@ function getMDNotes(config: buildconfig): string {
     transition: transform 0.2s ease;
 }
 
-/* Pfeil gedreht wenn offen */
+/* Rotate the marker when the note is open. */
 #mdnotes details[open] summary::before {
     transform: rotate(90deg);
 }
 
-/* Markdown Content */
+/* Markdown content */
 #mdnotes details p {
     margin: 8px 0;
     line-height: 1.4;
@@ -196,7 +235,7 @@ function getMDNotes(config: buildconfig): string {
     return mdnotes_str;
 }
 
-
+/** Creates CSS for the optional fullscreen button. */
 function getFullscreenButton(config: buildconfig): string {
     let fullscreenbutton = "";
 
@@ -226,7 +265,7 @@ function getFullscreenButton(config: buildconfig): string {
     return fullscreenbutton;
 }
 
-
+/** Creates HTML for the optional fullscreen button. */
 function getFullscreenButtonHTML(config: buildconfig): string {
     let fullscreenBtn = "";
 
@@ -238,7 +277,7 @@ function getFullscreenButtonHTML(config: buildconfig): string {
     return fullscreenBtn;
 }
 
-
+/** Builds the optional settings popup from `config.htmlMenu.settings`. */
 function getSettingsButton(config: buildconfig): string {
 
     if (!config.htmlMenu.enable_menu) {
@@ -290,7 +329,7 @@ function getSettingsButton(config: buildconfig): string {
 `;
 }
 
-
+/** Creates CSS for the settings button, modal popup, and option buttons. */
 function getSettingsButtonCSS(config: buildconfig): string {
 
     if (!config.htmlMenu.enable_menu) {
@@ -322,7 +361,7 @@ function getSettingsButtonCSS(config: buildconfig): string {
     position: fixed;
     inset: 0;
 
-    background: rgba(0,0,0,0.85);
+    background: ${config.htmlMenu.style.settingsmenu_popup_bgcolor};
 
     display: none;
 
@@ -336,7 +375,7 @@ function getSettingsButtonCSS(config: buildconfig): string {
     width: 500px;
     max-width: 90%;
 
-    background: #111827;
+    background: ${config.htmlMenu.style.settingsmenu_bgcolor};
 
     padding: 30px;
 
@@ -360,8 +399,18 @@ function getSettingsButtonCSS(config: buildconfig): string {
     border: none;
     border-radius: 8px;
 
-    background: #1f2937;
-    color: white;
+    background: ${config.htmlMenu.style.settingsmenu_button};
+    color: ${config.htmlMenu.style.settingsmenu_button_txt};
+
+    /* Button text color on hover */
+    ${
+        config.htmlMenu.style.settingsmenu_button_txt_hover.length != 0 ? "color: " + config.htmlMenu.style.settingsmenu_button_txt_hover + ";" : ""
+    }
+
+    /* Button hover color */
+    ${
+        config.htmlMenu.style.settingsmenu_button_hover.length != 0 ? "color: " + config.htmlMenu.style.settingsmenu_button_hover + ";" : ""
+    }
 
     cursor: pointer;
 
@@ -370,13 +419,19 @@ function getSettingsButtonCSS(config: buildconfig): string {
 }
 
 .settingBtn.active {
-    background: #22c55e;
+    background: ${config.htmlMenu.style.settingsmenu_button_clicked};
     color: black;
 }
 `;
 }
 
-
+/**
+ * Creates runtime JavaScript for the optional settings menu.
+ *
+ * Default setting values are written to `window.__GAMESETTINGS__`. When the
+ * player clicks an option, the active button state and the global settings
+ * object are updated together.
+ */
 function getSettingsButtonJS(config: buildconfig): string {
 
     if (!config.htmlMenu.enable_menu) {
@@ -442,27 +497,35 @@ document.querySelectorAll(".settingBtn").forEach(btn => {
 `;
 }
 
+/** Removes settings UI after the game starts so it does not overlap the canvas. */
 function getSettingsButtonJSrem(config: buildconfig): string {
     if (!config.htmlMenu.enable_menu) {
         return "";
     }
 
-    return `// Settings Button Entfernen
+    return `// Remove the settings button after the game starts.
             document.getElementById("settingsBtn").remove();
-            
-            // Settings Popup Entfernen
+
+            // Remove the settings popup after the game starts.
             document.getElementById("settingsPopup").remove();
 `;
 }
 
-//
-///////////////////////////////////////////////////////////////////////////////////
-//
-//
+/**
+ * Creates a complete single-file HTML document.
+ *
+ * `bundledJsContent` is the already bundled game code from esbuild.
+ * `resourcesMap` contains optional Data URIs that are exposed through
+ * `window.__resources`, `window.__getResource`, and `window.__loadResource`.
+ *
+ * The bundled game is wrapped in `window.__initializeGame` so it does not run
+ * until the player clicks the start button. This allows the generated page to
+ * show the start screen, unlock audio, and remove temporary UI first.
+ */
 export function GetSingleFileHTML(config: buildconfig, bundledJsContent: string, resourcesMap: Record<string, string> = {}): string {
     let frameworkVersion = version;
 
-    // Create a resource loader function that will be embedded in the HTML
+    // Embed resource lookup helpers for games that need assets in single-file builds.
     const resourceLoaderScript = `window.__resources = ${JSON.stringify(resourcesMap)};
 window.__getResource = function(path) {
     return window.__resources[path] || null;
@@ -479,7 +542,7 @@ window.__samengine__ = {
     version: "${frameworkVersion}"
 };`;
 
-    // Wrap bundled JS in a function to prevent auto-execution
+    // Wrap bundled JS in a function to prevent auto-execution before the start click.
     const wrappedGameCode = `function __initializeGame() {
 ${bundledJsContent.split('\n').map(line => '  ' + line).join('\n')}
 }`;
@@ -489,7 +552,7 @@ ${bundledJsContent.split('\n').map(line => '  ' + line).join('\n')}
   <head>
     <meta charset="UTF-8" />
     <title>${config.title}</title>
-    <!-- Für Mobile Viewports -->
+    <!-- Mobile viewport setup -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     ${config.htmlhead}
     <style>
@@ -520,18 +583,18 @@ ${getSettingsButtonCSS(config)}
         btn.addEventListener("click", async () => {
             ${getAudioCode(config)}
 
-            // Startscreen entfernen
+            // Remove the start screen.
             document.getElementById("startscreen").remove();
 
             ${getSettingsButtonJSrem(config)}
 
-            // Only when there are Markdown Notes
+            // Only when there are Markdown notes.
             ${config.markdown_notes.length > 0 ? `
-// Markdown Info entfernen
+// Remove Markdown notes.
 document.getElementById("mdnotes").remove();
 ` : ""}
 
-            // Initialize the game
+            // Initialize the game.
             window.__initializeGame();
         });
     </script>
@@ -547,11 +610,12 @@ document.getElementById("mdnotes").remove();
     return defaulthtml;
 }
 
-
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-//
+/**
+ * Creates the normal multi-file HTML document.
+ *
+ * This page contains the generated start screen and optional menu UI. The game
+ * bundle is loaded with a dynamic import only after the start button is clicked.
+ */
 export function GetDefaultHTML(config: buildconfig, releasemode: boolean): string {
     let frameworkVersion = version;
 
@@ -560,7 +624,7 @@ export function GetDefaultHTML(config: buildconfig, releasemode: boolean): strin
   <head>
     <meta charset="UTF-8" />
     <title>${config.title}</title>
-    <!-- Für Mobile Viewports -->
+    <!-- Mobile viewport setup -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     ${config.htmlhead}
     <style>
@@ -585,18 +649,18 @@ ${getSettingsButtonCSS(config)}
         btn.addEventListener("click", async () => {
             ${getAudioCode(config)}
 
-            // Startscreen entfernen
+            // Remove the start screen.
             document.getElementById("startscreen").remove();
 
             ${getSettingsButtonJSrem(config)}
-            
-            // Only when there are Markdown Notes
+
+            // Only when there are Markdown notes.
             ${config.markdown_notes.length > 0 ? `
-// Markdown Info entfernen
+// Remove Markdown notes.
 document.getElementById("mdnotes").remove();
 ` : ""}
 
-            // Game laden
+            // Load the game bundle.
             import("./${config.entryname}.js");
         });
 

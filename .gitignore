@@ -12,3 +12,4 @@ web/docs
 dist2/
 
 *.exe
+/crates/easy-git-ignore/target/

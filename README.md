@@ -188,3 +188,7 @@ IDEAS
 - SVG Generator
 
 -->
+
+## IGN
+
+Git ignore Adder Infos are [here](crates/easy-git-ignore/README.md)

@@ -14,6 +14,7 @@ import { type Triangle } from "./types/triangle.js";
  * @param y Vertical canvas coordinate.
  * @param color Fill color used for the text. Defaults to white.
  * @param font Canvas font string, for example `"20px Arial"`.
+ * @deprecated Use samengine/text instead!
  */
 export function renderText(
     ctx: CanvasRenderingContext2D,

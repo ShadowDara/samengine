@@ -55,4 +55,10 @@ export const webtools: tool[] = [
   //   description: "A Desktop App for Webtools which can be used offline",
   //   icon: "💻",
   // },
+  {
+    slug: "html",
+    title: "HTML Preview",
+    description: "A simple Website to paste HTML to view it",
+    icon: "🎩",
+  },
 ];

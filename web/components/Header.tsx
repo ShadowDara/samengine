@@ -59,7 +59,7 @@ const Header: React.FC = () => {
         }
 
         main {
-          margin: 0 10px;
+          margin: 0 0px;
           padding-top: 60px;
         }
       `}</style>

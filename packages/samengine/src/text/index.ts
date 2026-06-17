@@ -1,5 +1,11 @@
 import { type Rect } from "../types/index.js";
 
+
+/**
+ * For Text Input: Use canvasinput-ts
+ */
+
+
 export interface TextStyle {
     color: string;
     font: string;

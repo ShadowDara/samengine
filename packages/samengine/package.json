@@ -23,8 +23,7 @@
     "./physics": "./dist/physics/index.js",
     "./samegui": "./dist/samegui/index.js",
     "./storage": "./dist/storage/index.js",
-    "./text": "./dist/text/index.js",
-    "./text/input": "./dist/text/input/index.js"
+    "./text": "./dist/text/index.js"
   },
   "keywords": [
     "game",

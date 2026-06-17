@@ -1,151 +1,116 @@
+import {
+    createCanvas,
+    setupInput,
+    startEngine,
+    getMouse
+} from "samengine";
 
-// A mini Snake Clone with my Webframework
+import {
+    drawButton,
+    makeButton,
+    makeRect,
+    isButtonpressed
+} from "samengine/types";
 
-import { createCanvas, enableFullscreen, setupFullscreenButton, getMouse } from "samengine";
-import { setupInput, isKeyJustPressed, resetInput } from "samengine";
-import { startEngine } from "samengine";
-import { renderText } from "samengine";
-import { drawButton, makeButton, makeRect, Vector2d, isButtonpressed } from "samengine/types";
-import { dlog } from "samengine";
-import { Key } from "samengine";
-import { CanvasTextInput } from "samengine/text/input";
+import { CanvasInput } from "canvasinput-ts";
 
-// import { HtmlUI } from "samengine/samegui";
+const {
+    canvas,
+    ctx,
+    applyScaling,
+    virtualWidth,
+    virtualHeight
+} = createCanvas({
+    fullscreen: true,
+    scaling: "fit",
+    virtualWidth: window.innerWidth,
+    virtualHeight: window.innerHeight
+});
 
-const { canvas, ctx, applyScaling, virtualWidth, virtualHeight } = createCanvas({fullscreen: true, scaling: "fit", virtualWidth: window.innerWidth, virtualHeight: window.innerHeight});
 setupInput(canvas, virtualWidth, virtualHeight);
 
-enableFullscreen(canvas);
-setupFullscreenButton(canvas);
+// ----------------------------
+// Inputs
+// ----------------------------
 
-let snake: Vector2d[] = [{ x: 10, y: 10 }];
-let dir: Vector2d = { x: 1, y: 0 };
-let food: Vector2d = { x: 15, y: 10 };
-let gridSize = 20;
-let lastMove = 0;
-let speed = 0.2; // seconds per cell
-let start = false;
-
-// New UI 
-// const ui = new HtmlUI();
-let enabled = false;
-
-async function gameStart() {
-    dlog("Snake gestartet");
-}
-
-const input = new CanvasTextInput({
+const nameInput = new CanvasInput({
+    canvas,
     x: 100,
     y: 100,
     width: 300,
     height: 40,
-
-    placeholder: "Name eingeben...",
-    maxLength: 32
+    placeHolder: "Name",
+    fontSize: 18,
+    backgroundColor: "#ffffff"
 });
 
+const emailInput = new CanvasInput({
+    canvas,
+    x: 100,
+    y: 160,
+    width: 300,
+    height: 40,
+    placeHolder: "Email",
+    fontSize: 18,
+    backgroundColor: "#ffffff"
+});
+
+const messageInput = new CanvasInput({
+    canvas,
+    x: 100,
+    y: 220,
+    width: 300,
+    height: 40,
+    placeHolder: "Nachricht",
+    fontSize: 18,
+    backgroundColor: "#ffffff"
+});
+
+// ----------------------------
+// Button
+// ----------------------------
+
+const submitButton = makeButton(
+    makeRect(100, 300, 300, 60),
+    "Absenden"
+);
+
 function gameLoop(dt: number) {
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // ui.begin();
-
-    // ui.text("Debug Menu");
-
-    // if (ui.button("Toggle")) {
-    //     enabled = !enabled;
-    //     console.log("Button Pressed");
-    // }
-
-    // enabled = ui.checkbox("Enabled", !enabled);
-
-    // ui.end();
-
-    const mouse = getMouse();
-
-    let button = makeButton(makeRect(100, 100, 200, 200), "Hallo");
 
     applyScaling();
 
-    input.update(dt);
+    const mouse = getMouse();
 
-    if (isKeyJustPressed(Key.Escape)) {
-        start = !start
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+    // Inputs zeichnen
+    nameInput.render();
+    emailInput.render();
+    messageInput.render();
+
+    // Button zeichnen
+    drawButton(submitButton, ctx);
+
+    // Button Klick
+    if (isButtonpressed(submitButton, mouse)) {
+
+        console.clear();
+
+        console.log("=== FORMULAR ===");
+        console.log("Name:", nameInput.value());
+        console.log("Email:", emailInput.value());
+        console.log("Nachricht:", messageInput.value());
+        console.log("================");
     }
-
-    if (!start) {
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        renderText(ctx, "Snake", 10, 10, "black", "24px Arial");
-        renderText(ctx, "Press ESC to start or Pause the Game!", 10, 50, "black", "24px Arial");
-
-        // return;
-    } else {
-
-        // Input
-        if (isKeyJustPressed(Key.ArrowUp) && dir.y === 0) dir = { x: 0, y: -1 };
-        if (isKeyJustPressed(Key.ArrowDown) && dir.y === 0) dir = { x: 0, y: 1 };
-        if (isKeyJustPressed(Key.ArrowLeft) && dir.x === 0) dir = { x: -1, y: 0 };
-        if (isKeyJustPressed(Key.ArrowRight) && dir.x === 0) dir = { x: 1, y: 0 };
-
-        lastMove += dt;
-
-        if (lastMove >= speed) {
-            lastMove = 0;
-            const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-
-            // Kollision mit Walls
-            if (head.x < 0 || head.y < 0 || head.x >= canvas.width / gridSize || head.y >= canvas.height / gridSize) {
-                snake = [{ x: 10, y: 10 }];
-                dir = { x: 1, y: 0 };
-                dlog("Game Over");
-                return;
-            }
-
-            // Kollision mit sich selbst
-            if (snake.some(s => s.x === head.x && s.y === head.y)) {
-                snake = [{ x: 10, y: 10 }];
-                dir = { x: 1, y: 0 };
-                dlog(`Game Over! Highscore: ${snake.length - 1}`);
-                return;
-            }
-
-            snake.unshift(head);
-
-            // Food Check
-            if (head.x === food.x && head.y === food.y) {
-                food = { x: Math.floor(Math.random() * (canvas.width / gridSize)), y: Math.floor(Math.random() * (canvas.height / gridSize)) };
-            } else {
-                snake.pop();
-            }
-        }
-
-        if (isButtonpressed(button, mouse)) {
-            console.log("Button Pressed!");
-        }
-
-        // Zeichnen
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        input.render(ctx);
-
-        // drawButton(button, ctx);
-
-        ctx.fillStyle = "green";
-        snake.forEach(s => ctx.fillRect(s.x * gridSize, s.y * gridSize, gridSize, gridSize));
-
-        ctx.fillStyle = "red";
-        ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
-
-        renderText(ctx, "Score: " + (snake.length - 1), 10, 10, "yellow", "24px Arial");
-    }
-
-    // Reset Input
-    resetInput();
 }
 
-// Because start Game is Async
-startEngine(() => { gameStart().then(() => {/* ready */}) }, gameLoop);
+startEngine(
+    () => {},
+    gameLoop
+);

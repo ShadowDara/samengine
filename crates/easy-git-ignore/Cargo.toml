@@ -10,11 +10,23 @@ include = ["LICENSE", "README.md", "Cargo.toml", "/src/", "build.rs"]
 keywords = ["git", "ignore", "samengine"]
 repository = "https://github.com/shadowdara/samengine"
 
+# Git ignore adder
 [[bin]]
 name = "git-ign"
-path = "src/main.rs"
+path = "src/bin/ign.rs"
+
+# Git Branch Viewer
+[[bin]]
+name = "git-viewb"
+path = "src/bin/viewb.rs"
+
+# Git Tag Viewer
+[[bin]]
+name = "git-tags"
+path = "src/bin/tags.rs"
 
 [dependencies]
+colored = "2"
 
 [build-dependencies]
 cc = "1"

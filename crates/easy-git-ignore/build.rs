@@ -1,6 +1,8 @@
 fn main() {
     cc::Build::new()
-        .file("src/main.c")
-        .file("src/oscore.c")
-        .compile("mein_tool");
+        .file("c/ign/main.c")
+        .file("c/ign/oscore.c")
+        .compile("ign");
+
+    cc::Build::new().file("c/tags/main.c").compile("tags");
 }

@@ -14,7 +14,8 @@ int help()
            "Adds entries to the .gitignore of a Git repository.\n"
            "Usage: ./git-ign <entry1> <entry2> ...\n"
            "Example: ./git-ign build/ temp.log\n"
-           "-h shows this help.\n\n"
+           "-h shows this help.\n"
+           "\n"
            "More Infos are here:\n"
            "https://samengine.vercel.app/r/p/ign\n"
            "https://samengine.js.org/r/p/ign\n"
@@ -87,6 +88,33 @@ int find_git_root(char *found_path, int maxlen) {
     return 0;
 }
 
+// Check if the line already exists
+int line_exists(const char *filename, const char *line)
+{
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        return 0;
+    }
+
+    char buffer[PATH_MAX_LEN];
+
+    while (fgets(buffer, sizeof(buffer), file))
+    {
+        // Newline entfernen
+        buffer[strcspn(buffer, "\r\n")] = '\0';
+
+        if (strcmp(buffer, line) == 0)
+        {
+            fclose(file);
+            return 1;
+        }
+    }
+
+    fclose(file);
+    return 0;
+}
+
+// Main function
 int app_main(int argc, char *argv[])
 {
     // Check for arguments
@@ -154,14 +182,18 @@ int app_main(int argc, char *argv[])
         snprintf(entry, sizeof(entry), "%s/%s", relative, argv[i]);
         normalize_path(entry);
 
-        if (strlen(relative) > 0) {
-            fprintf(file, "%s\n", entry);
-        } else {
-            fprintf(file, "%s\n", argv[i]);
+        const char *final_entry =
+            strlen(relative) > 0 ? entry : argv[i];
+
+        if (line_exists(gitignore_path, final_entry)) {
+            printf("%s already exists in .gitignore.\n", final_entry);
+            continue;
         }
-        printf("%s added to .gitignore.\n",
-            strlen(relative) > 0 ? entry : argv[i]);
+
+        fprintf(file, "%s\n", final_entry);
+        printf("%s added to .gitignore.\n", final_entry);
     }
+
     fclose(file);
     return 0;
 }

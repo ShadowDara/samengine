@@ -13,3 +13,4 @@ dist2/
 
 *.exe
 /crates/easy-git-ignore/target/
+/.samengine/tags.txt

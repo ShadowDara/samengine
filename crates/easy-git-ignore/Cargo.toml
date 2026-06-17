@@ -18,7 +18,12 @@ path = "src/bin/ign.rs"
 # Git Branch Viewer
 [[bin]]
 name = "git-viewb"
-path = "src/bin/branch.rs"
+path = "src/bin/viewb.rs"
+
+# Git Tag Viewer
+[[bin]]
+name = "git-tags"
+path = "src/bin/tags.rs"
 
 [dependencies]
 colored = "2"

@@ -80,5 +80,7 @@ export {
     type Button,
     makeButton,
     clickedButton,
-    drawButton
+    drawButton,
+    isButtonhovered,
+    isButtonpressed
 } from "./button.js";

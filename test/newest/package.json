@@ -1,0 +1,16 @@
+{
+  "name": "new",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx samengine-build",
+    "build": "npx samengine-build --release"
+  },
+  "dependencies": {
+    "@shadowdara/samtool": "^0.1.1",
+    "canvasinput-ts": "^1.0.0",
+    "samengine": "file:../../packages/samengine",
+    "samengine-build": "file:../../packages/samengine-build"
+  }
+}

@@ -5,7 +5,6 @@
       "name": "samengine",
       "devDependencies": {
         "@types/node": "^25.6.0",
-        "automatic-md-index": "^1.3.6",
         "chalk": "^5.6.2",
         "typescript": "^6.0.3",
       },
@@ -13,8 +12,6 @@
   },
   "packages": {
     "@types/node": ["@types/node@25.6.0", "", { "dependencies": { "undici-types": "~7.19.0" } }, "sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ=="],
-
-    "automatic-md-index": ["automatic-md-index@1.3.6", "", { "bin": { "md-index": "dist/index.js" } }, "sha512-9D+zgYlK77d8uqwWjGYzjpawegVpHNHEhhWPjGLBzuwUVXUVAThFxU1+fS4TK0XKGvgWj0XQ4UE1GT82MJLdcQ=="],
 
     "chalk": ["chalk@5.6.2", "", {}, "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA=="],
 

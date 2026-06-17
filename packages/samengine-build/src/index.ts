@@ -15,6 +15,7 @@ export type {
     HTMLMenu,
     HTMLMenuStyle,
     HTMLMenuText,
+    esbuildCommentMode,
 } from "./buildconfig.js";
 
 export {

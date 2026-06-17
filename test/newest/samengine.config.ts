@@ -3,6 +3,7 @@
 
 import type { buildconfig } from "samengine-build";
 import { new_buildconfig } from "samengine-build";
+import { licenseMaker } from "samengine-build/utils";
 
 export default function defineConfig(): buildconfig {
     let config: buildconfig = new_buildconfig();
@@ -52,6 +53,8 @@ export default function defineConfig(): buildconfig {
             },
         ],
     });
+
+    config.markdown_notes = [licenseMaker({})]
 
     config.releaseMode.singlefile = true;
 

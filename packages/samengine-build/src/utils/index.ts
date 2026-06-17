@@ -6,3 +6,5 @@
  */
 
 export { compressHTML } from "./utils.js";
+
+export { type licenseconfig, licenseMaker } from "./license.js";

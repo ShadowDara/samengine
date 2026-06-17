@@ -56,6 +56,7 @@ function createBuilder(config: buildconfig, isRelease: boolean) {
                 minify: isRelease,
                 sourcemap: !isRelease,
                 define: { "import.meta.env.DEV": JSON.stringify(!isRelease) },
+                legalComments: isRelease ? config.releaseMode.commentmode : config.devMode.commentmode,
             });
 
             if (isRelease && config.releaseMode.singlefile || !isRelease && config.devMode.singlefile) {

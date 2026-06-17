@@ -287,6 +287,8 @@ export interface profile {
 
     /** Embeds the bundle and used resources into one generated HTML file. */
     singlefile: boolean;
+
+    commentmode: esbuildCommentMode;
 }
 
 /** Default development profile: multi-file output, no release minification. */
@@ -294,6 +296,7 @@ export function newDevProfile(): profile {
     return {
         release: false,
         singlefile: false,
+        commentmode: "inline"
     }
 }
 
@@ -302,5 +305,8 @@ export function newReleaseProfile(): profile {
     return {
         release: true,
         singlefile: false,
+        commentmode: "eof",
     }
 }
+
+export type esbuildCommentMode = "external" | "linked" | "inline" | "none" | "eof" | undefined;

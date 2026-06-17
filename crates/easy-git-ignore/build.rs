@@ -1,6 +1,6 @@
 fn main() {
     cc::Build::new()
-        .file("src/main.c")
-        .file("src/oscore.c")
+        .file("c/main.c")
+        .file("c/oscore.c")
         .compile("mein_tool");
 }

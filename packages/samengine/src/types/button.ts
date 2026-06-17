@@ -1,6 +1,6 @@
 // Button
 
-import { Rect } from "./rectangle.js";
+import { isMouseInRect, Rect } from "./rectangle.js";
 import { getMouse, Mouse } from "../input.js";
 import { isRectClicked } from "./rectangle.js";
 import { drawRect } from "../renderer.js";
@@ -56,4 +56,18 @@ export function drawButton(
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     renderText(ctx, btn.text, textX, textY, textColor, font);
+}
+
+/**
+ * Check if the Button is hovered
+ */
+export function isButtonhovered(btn: Button, mouse: Mouse): boolean {
+    return isMouseInRect(mouse, btn.form);
+}
+
+/**
+ * Check if the Button is pressed!
+ */
+export function isButtonpressed(btn: Button, mouse: Mouse): boolean {
+    return isRectClicked(mouse, btn.form);
 }

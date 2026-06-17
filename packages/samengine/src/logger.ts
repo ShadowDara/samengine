@@ -4,6 +4,7 @@
  * In the current release build this is intentionally a no-op, so calls can stay
  * in code without producing console output. The commented implementation above
  * shows the development logger that can be re-enabled when needed.
+ * @deprecated Use samengine/utils/logger instead!
  */
 export const dlog =
     // (import.meta.env?.DEV ?? true) // Default true, falls undefined

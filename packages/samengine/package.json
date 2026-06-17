@@ -18,11 +18,13 @@
     "./sound": "./dist/sound/index.js",
     "./utils": "./dist/utils/index.js",
     "./utils/csv": "./dist/utils/csv/index.js",
+    "./utils/logger": "./dist/utils/logger/index.js",
     "./build": "./dist/build/index.js",
     "./physics": "./dist/physics/index.js",
     "./samegui": "./dist/samegui/index.js",
     "./storage": "./dist/storage/index.js",
-    "./text": "./dist/text/index.js"
+    "./text": "./dist/text/index.js",
+    "./text/input": "./dist/text/input/index.js"
   },
   "keywords": [
     "game",

@@ -5,4 +5,8 @@ fn main() {
         .compile("ign");
 
     cc::Build::new().file("c/tags/main.c").compile("tags");
+
+    cc::Build::new()
+        .file("c/tag_push/main.c")
+        .compile("tag_push");
 }

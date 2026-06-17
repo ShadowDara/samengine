@@ -71,9 +71,9 @@ export default function Home() {
           <Link href="/packages" className="hover:text-white transition">
             Packages
           </Link>
-          <Link href="/blog" className="hover:text-white transition">
+          <a href="/blog" className="hover:text-white transition">
             Blog
-          </Link>
+          </a>
         </div>
 
       </section>

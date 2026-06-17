@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h> // for strcmp
 #include "oscore.h"
+#include "../colors.h"
 
 // Prints a help message
 int help()
@@ -19,13 +20,13 @@ int help()
            "More Infos are here:\n"
            "https://samengine.vercel.app/r/p/ign\n"
            "https://samengine.js.org/r/p/ign\n"
-           "https://github.com/shadowdara/samengine#ign"
+           "https://github.com/shadowdara/samengine#ign\n"
            "\n"
            "This is the Version from cargo, there are other executables\n"
            "in the package too:\n"
-           "git-tagp   to create a tag and push it\n"
-           "git-tags   to save all tags into a txt File\n"
-           "viewb      to view the selected branch for every git repository in the directory\n"
+           GREEN "git-tagp" END "   to create a tag and push it\n"
+           GREEN "git-tags" END "   to save all tags into a txt File\n"
+           GREEN "viewb   " END "   to view the selected branch for every git repository in the directory\n"
         );
     return 0;
 }

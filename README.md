@@ -189,6 +189,10 @@ IDEAS
 
 -->
 
+## Project Templates
+
+Project Templates can be found [here](https://github.com/ShadowDara/samengine-project-templates)
+
 ## Webtools
 
 - releases are made on tags which are starting with `webtools-v*`

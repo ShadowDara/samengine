@@ -30,6 +30,10 @@ path = "src/bin/tags.rs"
 name = "git-tagp"
 path = "src/bin/tagp.rs"
 
+[[bin]]
+name = "git-unpush"
+path = "src/bin/unpush.rs"
+
 [dependencies]
 colored = "2"
 

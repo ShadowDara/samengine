@@ -35,6 +35,9 @@ A lightweight, TypeScript-first web game engine framework for building
   - [More Addons in the Game Library](#more-addons-in-the-game-library)
   - [More Tools for samengine and Game Making by me lol](#more-tools-for-samengine-and-game-making-by-me-lol)
   - [Commit Tags](#commit-tags)
+  - [Project Templates](#project-templates)
+  - [Webtools](#webtools)
+  - [IGN](#ign)
 <!-- Index by Automatic MD Index -->
 <!--$$MD_INDEX_END$$-->
 

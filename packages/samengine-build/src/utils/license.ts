@@ -9,5 +9,9 @@ export function licenseMaker(c: licenseconfig): Paragraph {
 # Open Source Notices for $$Game Name
     `;
 
+    // Linksaver file auslesen
+
+    // package.json auslesen
+
     return p;
 }

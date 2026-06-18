@@ -12,7 +12,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "samengine": "^1.6.5",
-    "samengine-build": "^1.6.5"
+    "samengine": "file:../../packages/samengine",
+    "samengine-build": "file:../../packages/samengine-build",
+    "canvasinput-ts": "^1.0.0"
   }
 }

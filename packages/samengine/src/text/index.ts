@@ -26,6 +26,15 @@ function findLargestFittingChunk(
 }
 
 /**
+ * return type for the rendertext function
+ */
+export interface RenderTextResult {
+  renderedChars: number;
+  consumedChars: number;
+  hasOverflow: boolean;
+}
+
+/**
  * TextStyle interface
  * Text size is in PX
  */
@@ -45,10 +54,13 @@ export function renderTextBox(
   text: string,
   style: TextStyle,
   padding: number = 4,
-): void {
+): RenderTextResult {
   ctx.fillStyle = style.color;
   ctx.font = `${style.size}px ${style.font}`;
   ctx.textBaseline = "top";
+
+  let renderedChars = 0;
+  let consumedChars = 0;
 
   const maxWidth = rect.width - padding * 2;
   const lineHeight = style.size * 1.2;
@@ -57,20 +69,29 @@ export function renderTextBox(
 
   const paragraphs = text.split("\n");
 
-  for (const paragraph of paragraphs) {
+  for (let p = 0; p < paragraphs.length; p++) {
+    const paragraph = paragraphs[p];
+
     let line = "";
 
     const words = paragraph.split(" ");
 
-    for (let word of words) {
-      // Wenn bereits Text in der Zeile steht und das nächste Wort
-      // alleine schon zu breit ist, zuerst die aktuelle Zeile ausgeben.
+    for (let w = 0; w < words.length; w++) {
+      const originalWord = words[w];
+      let word = originalWord;
+
       if (line.length > 0 && ctx.measureText(word).width > maxWidth) {
         if (y + lineHeight > rect.y + rect.height) {
-          return;
+          return {
+            renderedChars,
+            consumedChars,
+            hasOverflow: true,
+          };
         }
 
         ctx.fillText(line, rect.x + padding, y);
+        renderedChars += line.length;
+
         y += lineHeight;
         line = "";
       }
@@ -83,10 +104,17 @@ export function renderTextBox(
         }
 
         if (y + lineHeight > rect.y + rect.height) {
-          return;
+          return {
+            renderedChars,
+            consumedChars,
+            hasOverflow: true,
+          };
         }
 
         ctx.fillText(chunk, rect.x + padding, y);
+
+        renderedChars += chunk.length;
+        consumedChars += chunk.length;
 
         y += lineHeight;
         word = word.substring(chunk.length);
@@ -96,26 +124,54 @@ export function renderTextBox(
 
       if (ctx.measureText(testLine).width > maxWidth) {
         if (y + lineHeight > rect.y + rect.height) {
-          return;
+          return {
+            renderedChars,
+            consumedChars,
+            hasOverflow: true,
+          };
         }
 
         ctx.fillText(line, rect.x + padding, y);
+        renderedChars += line.length;
 
         y += lineHeight;
         line = word;
       } else {
         line = testLine;
       }
+
+      consumedChars += word.length;
+
+      // Leerzeichen im Originaltext mitzählen
+      if (w < words.length - 1) {
+        consumedChars += 1;
+      }
     }
 
     if (line.length > 0) {
       if (y + lineHeight > rect.y + rect.height) {
-        return;
+        return {
+          renderedChars,
+          consumedChars,
+          hasOverflow: true,
+        };
       }
 
       ctx.fillText(line, rect.x + padding, y);
+      renderedChars += line.length;
 
       y += lineHeight;
     }
+
+    // Newline im Originaltext mitzählen
+    if (p < paragraphs.length - 1) {
+      consumedChars += 1;
+    }
   }
+
+  return {
+    renderedChars,
+    consumedChars,
+    hasOverflow: false,
+  };
 }

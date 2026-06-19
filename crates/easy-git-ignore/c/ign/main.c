@@ -27,6 +27,7 @@ int help()
            GREEN "git-tagp" END "   to create a tag and push it\n"
            GREEN "git-tags" END "   to save all tags into a txt File\n"
            GREEN "viewb   " END "   to view the selected branch for every git repository in the directory\n"
+           GREEN "unpush  " END "   to check for unpushed changes on every branch in the repository\n"
         );
     return 0;
 }

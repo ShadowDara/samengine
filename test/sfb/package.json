@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/bun": "^1.3.14",
     "esbuild": "^0.28.0",
     "samengine": "^1.9.0",
     "typescript": "^6.0.3"

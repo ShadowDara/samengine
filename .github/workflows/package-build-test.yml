@@ -1,0 +1,45 @@
+name: Build Packages Test
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-packages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Build all packages
+        run: |
+          set -e
+
+          for dir in packages/*; do
+            if [ -d "$dir" ]; then
+              echo "Building $dir"
+
+              if [ -f "$dir/package.json" ]; then
+                (
+                  cd "$dir"
+
+                  if bun run | grep -q "^ build"; then
+                    bun run build
+                  else
+                    echo "No build script in $dir"
+                    exit 1
+                  fi
+                )
+              fi
+            fi
+          done

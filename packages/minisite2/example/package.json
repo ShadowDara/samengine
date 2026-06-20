@@ -1,0 +1,12 @@
+{
+  "name": "my-minisite",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "minisite build"
+  },
+  "dependencies": {
+    "minisite": "file:../.",
+    "typescript": "^6.0.3"
+  }
+}

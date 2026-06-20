@@ -1,0 +1,4 @@
+node_modules
+dist-bin
+/example/.minisite-tmp
+/example/dist

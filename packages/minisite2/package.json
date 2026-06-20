@@ -1,0 +1,35 @@
+{
+  "name": "minisite",
+  "version": "0.1.0",
+  "description": "Minimalist static site generator. TSX → one HTML file.",
+  "type": "module",
+  "bin": {
+    "minisite": "./dist-bin/cli/index.js"
+  },
+  "scripts": {
+    "build:self": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build:self"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "files": [
+    "dist-bin"
+  ],
+  "keywords": [
+    "static-site-generator",
+    "tsx",
+    "hash-router"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^26.0.0"
+  },
+  "exports": {
+    ".": "./dist-bin/index.js",
+    "./jsx-runtime": "./dist-bin/jsx-runtime/index.js",
+    "./renderer": "./dist-bin/renderer/index.js",
+    "./router": "./dist-bin/router/index.js",
+    "./components/link": "./dist-bin/components/link.js"
+  }
+}

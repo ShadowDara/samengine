@@ -18,8 +18,8 @@ export default function Home() {
         </h1>
 
         <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mb-8">
-          a Webgameframework written in Typescript for Webgames which export in a single HTML File.{" "}
-          <i>(and 3D Games in the Future)</i>
+          a webgame framework written in Typescript for webgames which export in a single HTML file.{" "}
+          <i>(and 3D Games in the future)</i>
         </p>
 
         {/* Buttons */}
@@ -88,7 +88,7 @@ export default function Home() {
           {[
             {
               title: "High Performance",
-              desc: "samengine has no Runtime, this means, every unused Feature will NOT be in the export!"
+              desc: "samengine has no Runtime, this means, every unused feature will NOT be in the export!"
             },
             // {
             //   title: "Modular aufgebaut",
@@ -100,7 +100,7 @@ export default function Home() {
             // },
             {
               title: "Build",
-              desc: "samengine has its own buildtool to make the build workflow a lot easier!"
+              desc: "samengine has its own build tool to make the build workflow a lot easier!"
             },
           ].map((f, i) => (
             <div
@@ -125,7 +125,7 @@ export default function Home() {
         </h2>
 
         <p className="text-gray-400 mb-8 text-sm sm:text-base">
-          Start new with samengine and create a new high efficient webgame!
+          Start new with samengine and create a new highly efficient webgame!
         </p>
 
         <Link href="/start">

@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-import Prism from "prismjs";
-import "prismjs/themes/prism-tomorrow.css";
-import "prismjs/components/prism-markup";
-import "prismjs/components/prism-css";
-import "prismjs/components/prism-javascript";
+// import Prism from "prismjs";
+// import "prismjs/themes/prism-tomorrow.css";
+// import "prismjs/components/prism-markup";
+// import "prismjs/components/prism-css";
+// import "prismjs/components/prism-javascript";
 
 import Editor from "@monaco-editor/react";
 

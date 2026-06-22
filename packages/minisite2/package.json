@@ -7,10 +7,11 @@
     "minisite": "./dist-bin/cli/index.js"
   },
   "scripts": {
-    "build:self": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build:self"
   },
   "devDependencies": {
+    "@types/html-minifier-terser": "^7.0.2",
     "typescript": "^5.4.0"
   },
   "files": [
@@ -23,7 +24,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@types/node": "^26.0.0"
+    "@types/node": "^26.0.0",
+    "html-minifier-terser": "^7.2.0"
   },
   "exports": {
     ".": "./dist-bin/index.js",

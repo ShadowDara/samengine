@@ -20,4 +20,9 @@ bun i
 bun run build
 cd ../..
 
+cd packages/minisite2
+bun i
+bun run build
+cd ../..
+
 echo Finished!

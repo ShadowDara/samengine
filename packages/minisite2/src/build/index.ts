@@ -4,6 +4,7 @@ import { execSync } from "child_process";
 import { ROUTER_SCRIPT } from "../router/index.js";
 import { pathToFileURL } from "url";
 import { renderToString } from "minisite/renderer";
+import { minify } from "html-minifier-terser";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -84,7 +85,18 @@ export async function build(cwd: string) {
     console.log("Loading:", compiled);
     console.log("URL:", pathToFileURL(compiled).href);
 
-    const html = renderToString(Page({}));
+    // Compressing with Terser
+    const html = await minify(
+      renderToString(Page({})),
+      {
+        collapseWhitespace: true,
+        removeComments: true,
+        removeAttributeQuotes: true,
+        minifyCSS: true,
+        minifyJS: true,
+      }
+    );
+
     routes[route] = html;
     console.log(`  ✓ ${route}`);
   }
@@ -108,7 +120,18 @@ export async function build(cwd: string) {
 </body>
 </html>`;
 
-  fs.writeFileSync(path.join(distDir, "index.html"), output, "utf-8");
+  const compressedOutput = await minify(
+    output,
+    {
+      collapseWhitespace: true,
+      removeComments: true,
+      removeAttributeQuotes: true,
+      minifyCSS: true,
+      minifyJS: true,
+    }
+  );
+
+  fs.writeFileSync(path.join(distDir, "index.html"), compressedOutput, "utf-8");
 
   // 5. Cleanup
   // fs.rmSync(tmpDir, { recursive: true, force: true });

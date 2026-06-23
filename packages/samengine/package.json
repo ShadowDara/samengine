@@ -23,7 +23,9 @@
     "./physics": "./dist/physics/index.js",
     "./samegui": "./dist/samegui/index.js",
     "./storage": "./dist/storage/index.js",
-    "./text": "./dist/text/index.js"
+    "./text": "./dist/text/index.js",
+    "./config": "./dist/config/index.js",
+    "./nonbrowser": "./dist/nonbrowser/index.js"
   },
   "keywords": [
     "game",
@@ -32,16 +34,28 @@
   "author": "Shadowdara",
   "license": "MIT",
   "devDependencies": {
-    "chalk": "^5.6.2",
     "@types/node": "^25.6.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "@types/html-minifier-terser": "^7.0.2",
+    "@types/ws": "^8.18.1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/shadowdara/samengine"
+    "url": "https://github.com/shadowdara/samengine",
+    "directory": "packages/samengine"
   },
   "bugs": {
     "url": "https://github.com/shadowdara/samengine/issues"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "esbuild": "^0.28.0",
+    "html-minifier-terser": "^7.2.0",
+    "mime": "^4.1.0",
+    "ws": "^8.20.0"
+  },
+  "bin": {
+    "samengine": "dist/nonbrowser/internal/cli/main.js"
+  }
 }

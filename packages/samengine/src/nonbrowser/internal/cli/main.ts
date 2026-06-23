@@ -19,14 +19,14 @@ import { watch, watchFile } from "fs";
 import path from "path";
 import { WebSocket, WebSocketServer } from "ws";
 
-import { createProject } from "./new.js";
-import { copyFolder, flog, getContentType, scanResourcesAsDataURIs, filterResourcesByUsage } from "../buildhelper.js";
+import { createProject } from "./../new.js";
+import { copyFolder, flog, getContentType, scanResourcesAsDataURIs, filterResourcesByUsage } from "./../buildhelper.js";
 import { GetDefaultHTML, GetSingleFileHTML } from "../exporthtml.js";
-import { loadUserConfig } from "./config.js";
-import { compressHTML } from "../utils/utils.js";
-import { parseArgs } from "./argparser.js";
-import { buildconfig } from "../buildconfig.js";
-import { getPackageVersion } from "../getversion.js";
+import { loadUserConfig } from "./../config.js";
+import { compressHTML } from "../../index.js";
+import { parseArgs } from "../../index.js"
+import { buildconfig } from "../../../config/index.js";
+import { getPackageVersion } from "../../index.js"
 
 const version = getPackageVersion("samengine");
 

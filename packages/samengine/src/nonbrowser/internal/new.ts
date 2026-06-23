@@ -2,7 +2,7 @@ import path from "path";
 import { writeFile, mkdir } from "fs/promises";
 import chalk from 'chalk';
 
-import { flog } from "../buildhelper.js";
+import { flog } from "./buildhelper.js";
 
 // ================= NEW PROJECT =================
 /**

@@ -9,9 +9,9 @@
  * - `GetSingleFileHTML` embeds the bundled JavaScript and optional resource
  *   Data URIs directly into one HTML document.
  */
-import type { buildconfig } from "./buildconfig.js";
-import { parseMarkdown } from "samengine/utils";
-import { getPackageVersion } from "./getversion.js";
+import type { buildconfig } from "../../config/buildconfig.js";
+import { parseMarkdown } from "../../utils/index.js";
+import { getPackageVersion } from "../getversion.js";
 
 const version = getPackageVersion("samengine");
 

@@ -5,10 +5,21 @@ import { ROUTER_SCRIPT } from "../router/index.js";
 import { pathToFileURL } from "url";
 import { renderToString } from "minisite/renderer";
 import { minify } from "html-minifier-terser";
+import { transform } from "lightningcss";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+function compressCss(css: string, file: string): string {
+  const result = transform({
+    code: Buffer.from(css),
+    filename: file.replace(/\.(tsx|ts|jsx|js)$/, ".css"),
+    minify: true,
+  });
+
+  return result.code.toString();
+}
 
 function walk(dir: string, base = dir): string[] {
   if (!fs.existsSync(dir)) return [];
@@ -28,6 +39,14 @@ function fileToRoute(file: string, pagesDir: string): string {
 
   const route = "/" + parts.join("/");
   return route === "" ? "/" : route;
+}
+
+function loadCss(file: string): string {
+  const cssPath = file.replace(/\.(tsx|ts|jsx|js)$/, ".css");
+  if (fs.existsSync(cssPath)) {
+    return fs.readFileSync(cssPath, "utf-8");
+  }
+  return "";
 }
 
 // ---------------------------------------------------------------------------
@@ -65,6 +84,9 @@ export async function build(cwd: string) {
   for (const file of pageFiles) {
     const route = fileToRoute(file, pagesDir);
 
+    const rawCss = loadCss(file);
+    const css = compressCss(rawCss, file);
+
     // Relative path inside tmpDir
     const rel = path.relative(cwd, file);
     const compiled = path.join(tmpDir, rel.replace(/\.(tsx|ts)$/, ".js"));
@@ -97,7 +119,18 @@ export async function build(cwd: string) {
       }
     );
 
-    routes[route] = html;
+    let finalHtml = html;
+
+    if (finalHtml.includes("</head>")) {
+      finalHtml = finalHtml.replace(
+        "</head>",
+        `<style>${css}</style></head>`
+      );
+    } else {
+      finalHtml = `<style>${css}</style>` + finalHtml;
+    }
+
+    routes[route] = finalHtml;
     console.log(`  ✓ ${route}`);
   }
 

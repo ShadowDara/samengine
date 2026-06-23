@@ -5,6 +5,8 @@ import esbuild from "esbuild";
 import { render } from "./runtime";
 
 async function build() {
+  // console.log("Run build");
+
   fs.mkdirSync("dist", { recursive: true });
 
   const ssrFile = path.resolve("dist/ssr.mjs");
@@ -13,14 +15,19 @@ async function build() {
     bundle: true,
     outfile: ssrFile,
     format: "esm",
-    platform: "node",
+    platform: "browser",
     jsx: "transform",
     jsxFactory: "jsx",
     jsxFragment: "Fragment",
   });
 
+  // console.log("After esbuild");
+
   const { default: App } = await import(pathToFileURL(ssrFile).href);
+  console.log("App imported");
+
   const app = App();
+  console.log("App rendered");
 
   const html = await minifyHtml(`
 <!doctype html>
@@ -44,7 +51,7 @@ async function build() {
 
   fs.writeFileSync("dist/index.html", html);
   fs.rmSync("dist/app.js", { force: true });
-  fs.rmSync(ssrFile, { force: true });
+  // fs.rmSync(ssrFile, { force: true });
 
   console.log("built dist/index.html");
 }

@@ -1,24 +1,13 @@
-const input = document.querySelector("#markdown-input");
-const preview = document.querySelector("#markdown-preview");
+const routes = {
+  "/": "<div><h2>Home</h2><p>Startseite</p></div>",
+  "/about": "<div><h2>About</h2><p>Über uns</p></div>",
+};
 
-function escapeHtml(value) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
+function renderRoute() {
+  const path = location.hash.slice(1) || "/";
+  document.getElementById("router-view").innerHTML =
+    routes[path] || "<h1>404</h1>";
 }
 
-function parseMarkdownLive(markdown) {
-  return escapeHtml(markdown)
-    .replace(/^## (.*)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.*)$/gm, "<h1>$1</h1>")
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\n{2,}/g, "</p><p>")
-    .replace(/\n/g, "<br>");
-}
-
-function updatePreview() {
-  preview.innerHTML = "<p>" + parseMarkdownLive(input.value) + "</p>";
-}
-
-input.addEventListener("input", updatePreview);
+window.addEventListener("hashchange", renderRoute);
+renderRoute();

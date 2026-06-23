@@ -1,21 +1,18 @@
-import { jsx, setInnerHTML, setScript } from "../runtime";
-import { parseMarkdown } from "samengine/utils";
-import { loadRaw } from "./../file-loader";
-
-const initialMarkdown = `# Hallo
-
-Schreib hier **Markdown**.`;
-
-const source = await loadRaw("./game/helper.ts");
+import { loadRaw } from "../file-loader";
+import { jsx, setScript } from "../runtime";
 
 function App() {
+  let source = await loadRaw("./helper");
+
   return (
     <div class="app">
-      <h1>Live Markdown Editor</h1>
-      <textarea id="markdown-input">{initialMarkdown}</textarea>
-      <div id="markdown-preview">
-        {setInnerHTML(parseMarkdown(initialMarkdown))}
-      </div>
+      <nav>
+        <a href="#/">Home</a>
+        <a href="#/about">About</a>
+      </nav>
+
+      <div id="router-view"></div>
+
       {setScript(source)}
     </div>
   );

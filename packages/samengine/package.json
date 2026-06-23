@@ -20,7 +20,8 @@
     "./utils/csv": "./dist/utils/csv/index.js",
     "./build": "./dist/build/index.js",
     "./physics": "./dist/physics/index.js",
-    "./samegui": "./dist/samegui/index.js"
+    "./samegui": "./dist/samegui/index.js",
+    "./site/sfb/hashrouter": "./dist/site/sfb/hashrouter/index.js"
   },
   "keywords": [
     "game",

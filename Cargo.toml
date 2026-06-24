@@ -1,0 +1,12 @@
+# Cargo.toml im Repo-Root
+
+[workspace]
+members = [
+  "crates/seg"
+]
+resolver = "2"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"

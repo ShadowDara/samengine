@@ -65,6 +65,7 @@ jobs:
 
       # 🔥 IMPORTANT: rebuild locally so cargo-npm sees correct target layout
       - name: Build Linux (for npm packaging context)
+        working-directory: crates/seg
         run: |
           cargo build --release --target x86_64-unknown-linux-gnu
 

@@ -1,5 +1,9 @@
 # Samengine 🎮
 
+[![Build Packages Test](https://github.com/ShadowDara/samengine/actions/workflows/package-build-test.yml/badge.svg)](https://github.com/ShadowDara/samengine/actions/workflows/package-build-test.yml)
+[![Tauri Release (Webtools Desktop)](https://github.com/ShadowDara/samengine/actions/workflows/tauri-release.yml/badge.svg)](https://github.com/ShadowDara/samengine/actions/workflows/tauri-release.yml)
+[![Release Samtool](https://github.com/ShadowDara/samengine/actions/workflows/release-samtool.yml/badge.svg)](https://github.com/ShadowDara/samengine/actions/workflows/release-samtool.yml)
+
 A lightweight, TypeScript-first web game engine framework for building
 2D games *and maybe 3D Games in the Future*.
 
@@ -330,6 +334,19 @@ import { compressHTML } from "samengine/nonbrowser";
 Learn more about samengine on
 [GitHub](https://github.com/ShadowDara/samengine) or
 [NPM](https://www.npmjs.com/package/samengine).
+
+
+## Project Templates
+
+Project Templates can be found [here](https://github.com/ShadowDara/samengine-project-templates)
+
+## Webtools
+
+- releases are made on tags which are starting with `webtools-v*`
+
+## IGN
+
+Git ignore Adder Infos are [here](crates/easy-git-ignore/README.md)
 
 
 <!--

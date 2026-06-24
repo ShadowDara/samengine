@@ -1,6 +1,6 @@
 [package]
 name = "samtool"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2024"
 authors = ["Shadowdara"]
 readme = "README.md"
@@ -53,7 +53,7 @@ targets = [
 
   # Linux glibc
   "x86_64-unknown-linux-gnu",
-  "aarch64-unknown-linux-gnu",
+  # "aarch64-unknown-linux-gnu",
 
   # macOS
   "x86_64-apple-darwin",

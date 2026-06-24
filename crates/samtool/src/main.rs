@@ -5,9 +5,7 @@ use samfileparser::{parse, run_task, validate_all, RuntimeState};
 use win_utf8_rs::enable_utf8;
 
 mod linksaver;
-mod tags;
 mod sx;
-mod newproject;
 mod help;
 mod birthdaytool;
 
@@ -139,16 +137,6 @@ fn main() {
             linksaver::execute(sndarg);
         }
 
-        // Tags
-        "-t" | "--tag" => {
-            if args.len() >= 3 {
-                let sndarg = &args[2];
-                tags::add_tag(sndarg);
-            }
-
-            eprintln!("Missing Argument after --tag!");
-        }
-
         // SX
         "-x" | "--sx" => {
             let mut cmd = "";
@@ -162,11 +150,6 @@ fn main() {
             } else {
                 println!("Command {} does not exist!", red(cmd))
             }
-        }
-
-        // New samengine Project
-        "-n" | "--new" => {
-            todo!("Create new samengine project");
         }
 
         // Birthday Tool

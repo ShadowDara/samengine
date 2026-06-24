@@ -5,12 +5,11 @@ use samfileparser::{parse, run_task, validate_all, RuntimeState};
 use win_utf8_rs::enable_utf8;
 
 mod linksaver;
-mod sx;
 mod help;
 mod birthdaytool;
 
 use crate::help::help;
-use ::sx::{load_commands, command_exists, execute_command};
+// use ::sx::{load_commands, command_exists, execute_command};
 
 const PROGNAME: &str = "samtool";
 
@@ -137,20 +136,20 @@ fn main() {
             linksaver::execute(sndarg);
         }
 
-        // SX
-        "-x" | "--sx" => {
-            let mut cmd = "";
-            if args.len() >= 3 {
-                cmd = &args[2];
-            }
+        // // SX
+        // "-x" | "--sx" => {
+        //     let mut cmd = "";
+        //     if args.len() >= 3 {
+        //         cmd = &args[2];
+        //     }
 
-            load_commands();
-            if (command_exists(cmd)) {
-                execute_command(cmd, "");
-            } else {
-                println!("Command {} does not exist!", red(cmd))
-            }
-        }
+        //     load_commands();
+        //     if (command_exists(cmd)) {
+        //         execute_command(cmd, "");
+        //     } else {
+        //         println!("Command {} does not exist!", red(cmd))
+        //     }
+        // }
 
         // Birthday Tool
         "-b" | "--birthday" => {

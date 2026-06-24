@@ -28,8 +28,8 @@ jobs:
             aarch64-apple-darwin
             x86_64-pc-windows-msvc
 
-      - name: Install Cross
-        uses: taiki-e/setup-cross-action@v1
+      - name: Install cross
+        run: cargo install cross
 
       - name: Install cargo-npm
         run: cargo install cargo-npm

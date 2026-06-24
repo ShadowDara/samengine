@@ -8,12 +8,36 @@ on:
 permissions:
   contents: read
 
-jobs:
-  publish-npm:
-    runs-on: ubuntu-latest
+env:
+  CARGO_TERM_COLOR: always
 
-    env:
-      CARGO_TERM_COLOR: always
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact: linux-x64
+
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            artifact: linux-arm64
+
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: windows-x64
+
+          - os: macos-13
+            target: x86_64-apple-darwin
+            artifact: macos-x64
+
+          - os: macos-14
+            target: aarch64-apple-darwin
+            artifact: macos-arm64
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
@@ -21,67 +45,45 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: |
-            x86_64-unknown-linux-gnu
-            aarch64-unknown-linux-gnu
-            x86_64-apple-darwin
-            aarch64-apple-darwin
-            x86_64-pc-windows-msvc
+          targets: ${{ matrix.target }}
 
-      - name: Install cross
-        run: cargo install cross
+      - name: Build
+        working-directory: crates/samtool
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Upload Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: crates/samtool/target/${{ matrix.target }}/release/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Install cargo-npm
         run: cargo install cargo-npm
 
-      - name: Build Linux x64
-        run: |
-          cd crates/samtool
-          cross build \
-            -p samtool \
-            --release \
-            --target x86_64-unknown-linux-gnu
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
 
-      - name: Build Linux ARM64
-        run: |
-          cd crates/samtool
-          cross build \
-            -p samtool \
-            --release \
-            --target aarch64-unknown-linux-gnu
-
-      - name: Build macOS x64
-        run: |
-          cd crates/samtool
-          cross build \
-            -p samtool \
-            --release \
-            --target x86_64-apple-darwin
-
-      - name: Build macOS ARM64
-        run: |
-          cd crates/samtool
-          cross build \
-            -p samtool \
-            --release \
-            --target aarch64-apple-darwin
-
-      - name: Build Windows x64
-        run: |
-          cd crates/samtool
-          cross build \
-            -p samtool \
-            --release \
-            --target x86_64-pc-windows-msvc
+      - name: Show Artifacts
+        run: find artifacts
 
       - name: Generate npm packages
-        run: |
-          cd crates/samtool
-          cargo npm generate
+        working-directory: crates/samtool
+        run: cargo npm generate
 
       - name: Publish npm packages
-        run: |
-          cd crates/samtool
-          cargo npm publish
+        working-directory: crates/samtool
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: cargo npm publish

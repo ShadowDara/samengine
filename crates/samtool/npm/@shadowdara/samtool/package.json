@@ -1,6 +1,6 @@
 {
   "name": "@shadowdara/samtool",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "bin": {
     "samtool": "bin/samtool.js"
   },
@@ -8,13 +8,11 @@
     "node": ">=14"
   },
   "optionalDependencies": {
-    "@shadowdara/samtool-darwin-arm64": "0.1.5",
-    "@shadowdara/samtool-darwin-x64": "0.1.5",
-    "@shadowdara/samtool-linux-arm64": "0.1.5",
-    "@shadowdara/samtool-linux-arm64-musl": "0.1.5",
-    "@shadowdara/samtool-linux-x64": "0.1.5",
-    "@shadowdara/samtool-linux-x64-musl": "0.1.5",
-    "@shadowdara/samtool-win32-x64": "0.1.5"
+    "@shadowdara/samtool-darwin-arm64": "0.1.6",
+    "@shadowdara/samtool-darwin-x64": "0.1.6",
+    "@shadowdara/samtool-linux-arm64": "0.1.6",
+    "@shadowdara/samtool-linux-x64": "0.1.6",
+    "@shadowdara/samtool-win32-x64": "0.1.6"
   },
   "description": "the fast cli tool for samengine",
   "keywords": [

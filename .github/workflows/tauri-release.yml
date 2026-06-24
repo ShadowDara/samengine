@@ -1,4 +1,4 @@
-name: Tauri Release
+name: Tauri Release (Webtools Desktop)
 
 on:
   push:

@@ -33,12 +33,7 @@ jobs:
                 (
                   cd "$dir"
 
-                  if bun run | grep -q "^ build"; then
-                    bun run build
-                  else
-                    echo "No build script in $dir"
-                    exit 1
-                  fi
+                  bun run build
                 )
               fi
             fi

@@ -3,7 +3,7 @@ name: Release Seg
 on:
   push:
     tags:
-      - "samtool-v*"
+      - "seg-v*"
 
 permissions:
   contents: read
@@ -19,23 +19,15 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            artifact: linux-x64
-
-          # - os: ubuntu-latest
-          #   target: aarch64-unknown-linux-gnu
-          #   artifact: linux-arm64
 
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            artifact: windows-x64
 
-          - os: macos-latest
+          - os: macos-15
             target: x86_64-apple-darwin
-            artifact: macos-x64
 
           - os: macos-latest
             target: aarch64-apple-darwin
-            artifact: macos-arm64
 
     runs-on: ${{ matrix.os }}
 
@@ -51,11 +43,12 @@ jobs:
         working-directory: crates/seg
         run: cargo build --release --target ${{ matrix.target }}
 
-      - name: Upload Binary
+      # optional: upload only for debugging (not required)
+      - name: Upload binary (debug)
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
-          path: crates/seg/target/${{ matrix.target }}/release/
+          path: crates/seg/target/${{ matrix.target }}/release/seg*
 
   publish:
     needs: build
@@ -70,13 +63,10 @@ jobs:
       - name: Install cargo-npm
         run: cargo install cargo-npm
 
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Show Artifacts
-        run: find artifacts
+      # 🔥 IMPORTANT: rebuild locally so cargo-npm sees correct target layout
+      - name: Build Linux (for npm packaging context)
+        run: |
+          cargo build --release --target x86_64-unknown-linux-gnu
 
       - name: Generate npm packages
         working-directory: crates/seg

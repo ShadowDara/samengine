@@ -37,7 +37,7 @@
     "gamelib"
   ],
   "author": "Shadowdara",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/html-minifier-terser": "^7.0.2",

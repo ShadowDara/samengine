@@ -1,5 +1,13 @@
 # samtool
 
+The fast CLI Tool for samengine
+
+## for Rust Users
+
+```sh
+cargo install samtool
+```
+
 ## Build all targets
 
 Install

@@ -61,7 +61,7 @@ targets = [
 
   # Windows
   "x86_64-pc-windows-msvc",
-  "x86_64-pc-windows-gnu"
+  # "x86_64-pc-windows-gnu"
 ]
 
 # Output directory. Defaults to "npm". Can only be set at the workspace

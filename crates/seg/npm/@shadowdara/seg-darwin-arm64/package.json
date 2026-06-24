@@ -1,18 +1,15 @@
 {
-  "name": "@shadowdara/samtool-linux-x64-musl",
-  "version": "0.1.6",
+  "name": "@shadowdara/seg-darwin-arm64",
+  "version": "0.1.7",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shadowdara/samengine.git"
   },
   "os": [
-    "linux"
+    "darwin"
   ],
   "cpu": [
-    "x64"
-  ],
-  "libc": [
-    "musl"
+    "arm64"
   ]
 }

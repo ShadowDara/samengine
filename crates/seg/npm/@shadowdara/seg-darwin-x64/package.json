@@ -1,5 +1,5 @@
 {
-  "name": "@shadowdara/samtool-win32-x64",
+  "name": "@shadowdara/seg-darwin-x64",
   "version": "0.1.7",
   "license": "Apache-2.0",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "git+https://github.com/shadowdara/samengine.git"
   },
   "os": [
-    "win32"
+    "darwin"
   ],
   "cpu": [
     "x64"

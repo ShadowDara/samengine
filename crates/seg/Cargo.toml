@@ -1,5 +1,5 @@
 [package]
-name = "samtool"
+name = "seg"
 version = "0.1.7"
 edition = "2024"
 authors = ["Shadowdara"]
@@ -34,15 +34,15 @@ incremental = false
 
 [package.metadata.npm]
 # Main package name. Defaults to the crate name.
-name = "@shadowdara/samtool"
+name = "seg"
 
 # Platform package name prefix. Defaults to "{name}-". It is recommended to
 # use a scoped prefix (e.g. "@myorg/my-tool-") as publishing many packages
 # at once can trigger npm spam detection.
-prefix = "@shadowdara/samtool-"
+prefix = "@shadowdara/seg-"
 
 # Binaries to include. Defaults to all [[bin]] targets in the crate.
-bins = ["samtool"]
+bins = ["seg"]
 
 # Target triples to generate packages for. When unset, falls back to
 # build.target in .cargo/config.toml.

@@ -4,6 +4,13 @@ use crate::PROGNAME;
 
 // Help Message
 pub fn help() {
+    let help2 = r#"CLI Help
+  -h, --help        Show Help
+  --init            create a new samfile
+  --linksaver, -l   run linksaver
+  --birthday, -b    run the birthday tool
+"#;
+
     println!(r#"{}
 ███████╗ █████╗ ███╗   ███╗███████╗███╗   ██╗ ██████╗ ██╗███╗   ██╗███████╗
 ██╔════╝██╔══██╗████╗ ████║██╔════╝████╗  ██║██╔════╝ ██║████╗  ██║██╔════╝
@@ -35,8 +42,6 @@ pub fn help() {
     or {}-l{} instead of linksaver
     check {}https://samengine.vercel.app/docs/linksaver{} for more Infos
 
-{}:
-    Run {} or {} and then a Tag which should be added to the Git Repository
-    and pushed to Github.
-"#, RED, END, GREEN, END, YELLOW, PROGNAME, END, YELLOW, END, BLUE, END, PURPLE, END, GREEN, END, YELLOW, PROGNAME, END, PURPLE, END, BLUE, END, green("Tags"), purple("-t"), purple("--tag"));
+{}
+"#, RED, END, GREEN, END, YELLOW, PROGNAME, END, YELLOW, END, BLUE, END, PURPLE, END, GREEN, END, YELLOW, PROGNAME, END, PURPLE, END, BLUE, END, help2);
 }

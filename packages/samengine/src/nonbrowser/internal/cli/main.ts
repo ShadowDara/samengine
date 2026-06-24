@@ -19,16 +19,32 @@ import { watch, watchFile } from "fs";
 import path from "path";
 import { WebSocket, WebSocketServer } from "ws";
 
-import { createProject } from "./../new.js";
 import { copyFolder, flog, getContentType, scanResourcesAsDataURIs, filterResourcesByUsage } from "./../buildhelper.js";
-import { GetDefaultHTML, GetSingleFileHTML } from "../exporthtml.js";
+import { GetDefaultHTML, GetSingleFileHTML, getVersion } from "../exporthtml.js";
 import { loadUserConfig } from "./../config.js";
 import { compressHTML } from "../../index.js";
-import { parseArgs } from "../../index.js"
+import { parseArgs } from "../argparser.js";
 import { buildconfig } from "../../../config/index.js";
-import { getPackageVersion } from "../../index.js"
+import { getPackageVersion } from "../../index.js";
+import { run as runCreateProject } from "../projcreator/main.js"; 
 
-const version = getPackageVersion("samengine");
+// ================= HELP ============
+/**
+ * Function to print Help
+ */
+
+function showHelp() {
+    console.log(
+`CLI Tool for samengine
+
+Usage:
+  -r, --release
+  n <project>
+  --new-empty
+  -single-file   to generate the Export into one file
+`);
+}
+
 
 // ================= BUILD =================
 /**
@@ -73,7 +89,7 @@ function createBuilder(config: buildconfig, isRelease: boolean) {
                 if (isRelease) html = await compressHTML(html);
                 
                 // Add comment at the beginning after minification
-                const htmlComment = `<!-- Game made with samengine v${version} - https://github.com/Shadowdara/samengine ${config.gameauthor} (Game Author) -->\n`;
+                const htmlComment = `<!-- Game made with samengine v${getVersion()} - https://github.com/Shadowdara/samengine ${config.gameauthor} (Game Author) -->\n`;
                 html = htmlComment + html;
                 
                 await writeFile(`./${config.outdir}/index.html`, html);
@@ -88,13 +104,13 @@ function createBuilder(config: buildconfig, isRelease: boolean) {
                 if (isRelease) html = await compressHTML(html);
                 
                 // Add HTML comment at the beginning after minification
-                const htmlComment = `<!-- Game made with samengine v${version} - https://www.npmjs.com/samengine ${config.gameauthor} (Game Author) -->\n`;
+                const htmlComment = `<!-- Game made with samengine v${getVersion()} - https://www.npmjs.com/samengine ${config.gameauthor} (Game Author) -->\n`;
                 html = htmlComment + html;
                 
                 await writeFile(`./${config.outdir}/index.html`, html);
                 
                 // Add JS comment at the beginning of JS files
-                const jsComment = `// Game made with samengine v${version} - https://www.npmjs.com/samengine by ${config.gameauthor} (Game Author)\n`;
+                const jsComment = `// Game made with samengine v${getVersion()} - https://www.npmjs.com/samengine by ${config.gameauthor} (Game Author)\n`;
                 const jsPath = path.join(".", config.outdir, `${config.entryname.replace(/\.[^.]*$/, "")}.js`);
                 let jsContent = await readFile(jsPath, "utf-8");
                 jsContent = jsComment + jsContent;
@@ -207,7 +223,12 @@ async function main() {
     const args = parseArgs();
 
     if (args.newProject) {
-        await createProject(args.newProject, args.empty);
+        await runCreateProject();
+        process.exit(0);
+    }
+
+    if (args.help) {
+        showHelp()
         process.exit(0);
     }
 

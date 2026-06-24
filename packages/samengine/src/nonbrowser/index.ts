@@ -9,6 +9,4 @@ export { compressHTML } from "./utils.js";
 
 export { getPackageVersion } from "./getversion.js"
 
-export { type CLIArgs, parseArgs } from "./argparser.js";
-
 export { getTemplateZipUrl } from "./ghresolver.js";

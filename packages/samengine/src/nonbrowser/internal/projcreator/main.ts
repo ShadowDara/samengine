@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import inquirer from "inquirer";
 import path from "path";
 import fs from "fs-extra";
@@ -8,7 +6,7 @@ import { downloadAndExtract, flattenGitHubZip } from "./downloadZip.js";
 const USERNAME = "Shadowdara";
 const REPO = "samengine-project-templates";
 
-async function run() {
+export async function run() {
     const answers = await inquirer.prompt([
         {
             name: "projectName",
@@ -108,5 +106,3 @@ async function run() {
     console.log("✅ Done!");
     console.log(`👉 cd ${answers.projectName} && npm install`);
 }
-
-run();

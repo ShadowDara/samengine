@@ -1,6 +1,6 @@
 [package]
-name = "seg"
-version = "0.1.7"
+name = "samtool"
+version = "0.1.8"
 edition = "2024"
 authors = ["Shadowdara"]
 readme = "README.md"
@@ -21,6 +21,10 @@ chrono = { version = "0.4", features = ["serde"] }
 
 [target.'cfg(windows)'.dependencies]
 win-utf8-rs = "0.2.1"
+
+[[bin]]
+name = "seg"
+path = "src/main.rs"
 
 [profile.release]
 opt-level = 3       # 0 -> no optimizing, 3 -> max speed

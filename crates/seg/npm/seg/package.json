@@ -1,6 +1,6 @@
 {
   "name": "seg",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "the fast cli tool for samengine",
   "keywords": [
     "samengine",
@@ -19,9 +19,9 @@
     "node": ">=14"
   },
   "optionalDependencies": {
-    "@shadowdara/seg-darwin-arm64": "0.1.7",
-    "@shadowdara/seg-darwin-x64": "0.1.7",
-    "@shadowdara/seg-linux-x64": "0.1.7",
-    "@shadowdara/seg-win32-x64": "0.1.7"
+    "@shadowdara/seg-darwin-arm64": "0.1.8",
+    "@shadowdara/seg-darwin-x64": "0.1.8",
+    "@shadowdara/seg-linux-x64": "0.1.8",
+    "@shadowdara/seg-win32-x64": "0.1.8"
   }
 }

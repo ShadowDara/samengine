@@ -3,5 +3,5 @@
 -- Comment
 
 build:
-    echo Hello
+    run echo Hello
     

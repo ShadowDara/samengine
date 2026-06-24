@@ -182,11 +182,11 @@ pub fn validate_all(tasks: &Tasks) {
 fn parse_line(line: &str) -> Option<Command> {
     let line = line.trim();
 
-    if line.starts_with("cd ") {
+    if line.starts_with("cd ") || line.starts_with("CD ") {
         return Some(Command::Cd(line[3..].to_string()));
     }
 
-    if line.starts_with("run ") {
+    if line.starts_with("run ") || line.starts_with("RUN ") {
         let cmd = line[4..].trim();
 
         if cmd.is_empty() {
@@ -196,7 +196,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::Run(cmd.to_string()));
     }
 
-    if line.starts_with("env ") {
+    if line.starts_with("env ") || line.starts_with("ENV ") {
         // env KEY=VALUE
         let rest = &line[4..];
         let parts: Vec<&str> = rest.split('=').collect();
@@ -355,7 +355,7 @@ pub fn run_task(
         run_task(tasks, dep, visited, &mut local_state);
     }
 
-    println!("\n==> running task: {}\n", name);
+    println!("\n==> {}running task{}: {}\n", GREEN, END, name);
 
     // 2. run commands
     for cmd in &task.commands {

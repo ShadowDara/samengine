@@ -5,14 +5,11 @@ use samfileparser::{parse, run_task, validate_all, RuntimeState};
 use win_utf8_rs::enable_utf8;
 
 mod linksaver;
-mod tags;
-mod sx;
-mod newproject;
 mod help;
 mod birthdaytool;
 
 use crate::help::help;
-use ::sx::{load_commands, command_exists, execute_command};
+// use ::sx::{load_commands, command_exists, execute_command};
 
 const PROGNAME: &str = "samtool";
 
@@ -139,35 +136,20 @@ fn main() {
             linksaver::execute(sndarg);
         }
 
-        // Tags
-        "-t" | "--tag" => {
-            if args.len() >= 3 {
-                let sndarg = &args[2];
-                tags::add_tag(sndarg);
-            }
+        // // SX
+        // "-x" | "--sx" => {
+        //     let mut cmd = "";
+        //     if args.len() >= 3 {
+        //         cmd = &args[2];
+        //     }
 
-            eprintln!("Missing Argument after --tag!");
-        }
-
-        // SX
-        "-x" | "--sx" => {
-            let mut cmd = "";
-            if args.len() >= 3 {
-                cmd = &args[2];
-            }
-
-            load_commands();
-            if (command_exists(cmd)) {
-                execute_command(cmd, "");
-            } else {
-                println!("Command {} does not exist!", red(cmd))
-            }
-        }
-
-        // New samengine Project
-        "-n" | "--new" => {
-            todo!("Create new samengine project");
-        }
+        //     load_commands();
+        //     if (command_exists(cmd)) {
+        //         execute_command(cmd, "");
+        //     } else {
+        //         println!("Command {} does not exist!", red(cmd))
+        //     }
+        // }
 
         // Birthday Tool
         "-b" | "--birthday" => {

@@ -1,0 +1,78 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "samtool-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+
+    env:
+      CARGO_TERM_COLOR: always
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: |
+            x86_64-unknown-linux-gnu
+            aarch64-unknown-linux-gnu
+            x86_64-apple-darwin
+            aarch64-apple-darwin
+            x86_64-pc-windows-msvc
+
+      - name: Install Cross
+        uses: taiki-e/setup-cross-action@v1
+
+      - name: Install cargo-npm
+        run: cargo install cargo-npm
+
+      - name: Build Linux x64
+        run: |
+          cross build \
+            -p samtool \
+            --release \
+            --target x86_64-unknown-linux-gnu
+
+      - name: Build Linux ARM64
+        run: |
+          cross build \
+            -p samtool \
+            --release \
+            --target aarch64-unknown-linux-gnu
+
+      - name: Build macOS x64
+        run: |
+          cross build \
+            -p samtool \
+            --release \
+            --target x86_64-apple-darwin
+
+      - name: Build macOS ARM64
+        run: |
+          cross build \
+            -p samtool \
+            --release \
+            --target aarch64-apple-darwin
+
+      - name: Build Windows x64
+        run: |
+          cross build \
+            -p samtool \
+            --release \
+            --target x86_64-pc-windows-msvc
+
+      - name: Generate npm packages
+        run: cargo npm generate
+
+      - name: Publish npm packages
+        run: cargo npm publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

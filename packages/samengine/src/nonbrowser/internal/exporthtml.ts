@@ -9,11 +9,18 @@
  * - `GetSingleFileHTML` embeds the bundled JavaScript and optional resource
  *   Data URIs directly into one HTML document.
  */
-import type { buildconfig } from "./buildconfig.js";
-import { parseMarkdown } from "samengine/utils";
-import { getPackageVersion } from "./getversion.js";
+import type { buildconfig } from "../../config/buildconfig.js";
+import { parseMarkdown } from "../../utils/index.js";
+import { getPackageVersion } from "../getversion.js";
 
-const version = getPackageVersion("samengine");
+/**
+ * Function to get the samengine Version
+ * 
+ * @deprecated WARN Function should not be used outside samengine. Use getPackageVersion instead!
+ */
+export function getVersion(): string {
+    return getPackageVersion("samengine");
+}
 
 /** Builds the start screen shown before the game code runs. */
 function getStartScreen(config: buildconfig): string {
@@ -523,7 +530,7 @@ function getSettingsButtonJSrem(config: buildconfig): string {
  * show the start screen, unlock audio, and remove temporary UI first.
  */
 export function GetSingleFileHTML(config: buildconfig, bundledJsContent: string, resourcesMap: Record<string, string> = {}): string {
-    let frameworkVersion = version;
+    let frameworkVersion = getVersion();
 
     // Embed resource lookup helpers for games that need assets in single-file builds.
     const resourceLoaderScript = `window.__resources = ${JSON.stringify(resourcesMap)};
@@ -617,7 +624,7 @@ document.getElementById("mdnotes").remove();
  * bundle is loaded with a dynamic import only after the start button is clicked.
  */
 export function GetDefaultHTML(config: buildconfig, releasemode: boolean): string {
-    let frameworkVersion = version;
+    let frameworkVersion = getVersion();
 
     const defaulthtml: string = `<!DOCTYPE html>
 <html>

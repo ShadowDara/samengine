@@ -1,6 +1,6 @@
 [package]
 name = "samtool"
-version = "0.1.7"
+version = "0.1.8"
 edition = "2024"
 authors = ["Shadowdara"]
 readme = "README.md"
@@ -22,6 +22,10 @@ chrono = { version = "0.4", features = ["serde"] }
 [target.'cfg(windows)'.dependencies]
 win-utf8-rs = "0.2.1"
 
+[[bin]]
+name = "seg"
+path = "src/main.rs"
+
 [profile.release]
 opt-level = 3       # 0 -> no optimizing, 3 -> max speed
 lto = "fat"         # oder "thin" für schnelleren Build
@@ -34,15 +38,15 @@ incremental = false
 
 [package.metadata.npm]
 # Main package name. Defaults to the crate name.
-name = "@shadowdara/samtool"
+name = "seg"
 
 # Platform package name prefix. Defaults to "{name}-". It is recommended to
 # use a scoped prefix (e.g. "@myorg/my-tool-") as publishing many packages
 # at once can trigger npm spam detection.
-prefix = "@shadowdara/samtool-"
+prefix = "@shadowdara/seg-"
 
 # Binaries to include. Defaults to all [[bin]] targets in the crate.
-bins = ["samtool"]
+bins = ["seg"]
 
 # Target triples to generate packages for. When unset, falls back to
 # build.target in .cargo/config.toml.

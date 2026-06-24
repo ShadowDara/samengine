@@ -3,14 +3,14 @@
 
 const PLATFORMS = {
   darwin: {
-    arm64: '@shadowdara/samtool-darwin-arm64/samtool',
-    x64: '@shadowdara/samtool-darwin-x64/samtool',
+    arm64: '@shadowdara/seg-darwin-arm64/seg',
+    x64: '@shadowdara/seg-darwin-x64/seg',
   },
   linux: {
-    x64: '@shadowdara/samtool-linux-x64/samtool',
+    x64: '@shadowdara/seg-linux-x64/seg',
   },
   win32: {
-    x64: '@shadowdara/samtool-win32-x64/samtool.exe',
+    x64: '@shadowdara/seg-win32-x64/seg.exe',
   },
 }
 

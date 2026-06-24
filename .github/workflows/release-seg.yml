@@ -1,4 +1,4 @@
-name: Release Samtool
+name: Release Seg
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
             target: x86_64-pc-windows-msvc
             artifact: windows-x64
 
-          - os: macos-13
+          - os: macos-latest
             target: x86_64-apple-darwin
             artifact: macos-x64
 
@@ -48,14 +48,14 @@ jobs:
           targets: ${{ matrix.target }}
 
       - name: Build
-        working-directory: crates/samtool
+        working-directory: crates/seg
         run: cargo build --release --target ${{ matrix.target }}
 
       - name: Upload Binary
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
-          path: crates/samtool/target/${{ matrix.target }}/release/
+          path: crates/seg/target/${{ matrix.target }}/release/
 
   publish:
     needs: build
@@ -79,11 +79,11 @@ jobs:
         run: find artifacts
 
       - name: Generate npm packages
-        working-directory: crates/samtool
+        working-directory: crates/seg
         run: cargo npm generate
 
       - name: Publish npm packages
-        working-directory: crates/samtool
+        working-directory: crates/seg
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: cargo npm publish

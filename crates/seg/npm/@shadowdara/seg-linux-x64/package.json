@@ -1,15 +1,18 @@
 {
-  "name": "@shadowdara/samtool-win32-x64",
-  "version": "0.1.7",
+  "name": "@shadowdara/seg-linux-x64",
+  "version": "0.1.8",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shadowdara/samengine.git"
   },
   "os": [
-    "win32"
+    "linux"
   ],
   "cpu": [
     "x64"
+  ],
+  "libc": [
+    "glibc"
   ]
 }

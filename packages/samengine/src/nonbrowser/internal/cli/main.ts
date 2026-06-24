@@ -25,7 +25,6 @@ import { loadUserConfig } from "./../config.js";
 import { compressHTML } from "../../index.js";
 import { parseArgs } from "../argparser.js";
 import { buildconfig } from "../../../config/index.js";
-import { getPackageVersion } from "../../index.js";
 import { run as runCreateProject } from "../projcreator/main.js"; 
 
 // ================= HELP ============

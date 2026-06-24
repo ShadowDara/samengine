@@ -45,10 +45,13 @@ function showHelp() {
 CLI Tool for samengine
 
 Usage:
-  -r, --release
-  n <project>
-  --new-empty
-  -single-file   to generate the Export into one file
+  -r, --release         build the project in Release Mode
+  create                create a new project
+  help                  Show this menu
+
+More: samfile
+use with @shadowdara/samtool
+Install: npm i @shadowdara/samtool
 `);
 }
 

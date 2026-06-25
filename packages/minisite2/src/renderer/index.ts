@@ -1,9 +1,19 @@
 import { VNode, Fragment } from "../jsx-runtime/index.js";
 
-const VOID_ELEMENTS = new Set([
-    "area", "base", "br", "col", "embed", "hr", "img", "input",
-    "link", "meta", "param", "source", "track", "wbr",
-]);
+const VOID = new Set(["img","input","br","hr","meta","link"]);
+
+let eventId = 0;
+
+export type RouteOutput = {
+  html: string;
+  events: Array<{
+    id: number;
+    type: string;
+    handler: string;
+  }>;
+};
+
+const events = new Map<number, Record<string, Function>>();
 
 const ATTR_MAP: Record<string, string> = {
     className: "class",
@@ -11,16 +21,40 @@ const ATTR_MAP: Record<string, string> = {
 };
 
 function renderAttrs(props: Record<string, unknown>): string {
-    return Object.entries(props)
-        .filter(([key]) => key !== "children")
-        .map(([key, val]) => {
-            const attr = ATTR_MAP[key] ?? key;
-            if (val === true) return attr;
-            if (val === false || val == null) return "";
-            return `${attr}="${String(val).replace(/"/g, "&quot;")}"`;
-        })
-        .filter(Boolean)
-        .join(" ");
+    const attrs: string[] = [];
+
+    for (const [key, val] of Object.entries(props)) {
+
+        if (key === "children") continue;
+
+        if (key.startsWith("on") && typeof val === "function") {
+            const id = ++eventId;
+
+            events.set(id, {
+                [key.slice(2).toLowerCase()]: val,
+            });
+
+            attrs.push(`data-ms-event="${id}"`);
+            continue;
+        }
+
+        const attr = ATTR_MAP[key] ?? key;
+
+        if (val === true) {
+            attrs.push(attr);
+            continue;
+        }
+
+        if (val === false || val == null) {
+            continue;
+        }
+
+        attrs.push(
+            `${attr}="${String(val).replace(/"/g, "&quot;")}"`
+        );
+    }
+
+    return attrs.join(" ");
 }
 
 function escapeHtml(str: string): string {
@@ -30,35 +64,70 @@ function escapeHtml(str: string): string {
         .replace(/>/g, "&gt;");
 }
 
-export function renderToString(node: unknown): string {
-    if (node == null || node === false || node === true) return "";
-    if (typeof node === "string") return escapeHtml(node);
-    if (typeof node === "number") return String(node);
-    if (Array.isArray(node)) return node.map(renderToString).join("");
+export function getEvents() {
+    return events;
+}
 
-    const vnode = node as VNode;
+export function renderToString(node: any, events: RouteOutput["events"] = []): string {
+  if (node == null || node === false) return "";
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(n => renderToString(n, events)).join("");
 
-    // Fragment
-    if (vnode.tag === Fragment) {
-        return vnode.children.map(renderToString).join("");
+  const vnode = node as VNode;
+
+  if (typeof vnode.tag === "function") {
+    return renderToString(vnode.tag(vnode.props), events);
+  }
+
+  if (vnode.tag === Fragment) {
+    return renderToString(vnode.children, events);
+  }
+
+  const tag = vnode.tag as string;
+
+  const props = vnode.props ?? {};
+  const attrs: string[] = [];
+
+  const myId = ++eventId;
+
+  // EVENT SYSTEM
+  if (props["data-ms"]) {
+    const [type, handler] = String(props["data-ms"]).split(":");
+
+    events.push({
+      id: myId,
+      type,
+      handler,
+    });
+
+    attrs.push(`data-ms-id="${myId}"`);
+  }
+
+  for (const [k, v] of Object.entries(props)) {
+    if (k === "children" || k === "data-ms") continue;
+
+    if (typeof v === "function") continue;
+
+    const attr = k === "className" ? "class" : k;
+
+    if (v === true) {
+      attrs.push(attr);
+      continue;
     }
 
-    // Component
-    if (typeof vnode.tag === "function") {
-        const props = { ...vnode.props, children: vnode.children };
-        const result = (vnode.tag as Function)(props);
-        return renderToString(result);
+    if (v != null && v !== false) {
+      attrs.push(`${attr}="${String(v)}"`);
     }
+  }
 
-    // HTML element
-    const tag = vnode.tag as string;
-    const attrs = renderAttrs(vnode.props);
-    const attrStr = attrs ? ` ${attrs}` : "";
+  const attrStr = attrs.length ? " " + attrs.join(" ") : "";
 
-    if (VOID_ELEMENTS.has(tag)) {
-        return `<${tag}${attrStr}>`;
-    }
+  const children = renderToString(vnode.children, events);
 
-    const children = vnode.children.map(renderToString).join("");
-    return `<${tag}${attrStr}>${children}</${tag}>`;
+  if (VOID.has(tag)) {
+    return `<${tag}${attrStr}>`;
+  }
+
+  return `<${tag}${attrStr}>${children}</${tag}>`;
 }

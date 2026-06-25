@@ -6,6 +6,27 @@ import { pathToFileURL } from "url";
 import { renderToString } from "minisite/renderer";
 import { minify } from "html-minifier-terser";
 import { transform } from "lightningcss";
+import { build as esbuild } from "esbuild";
+import { readFile } from "fs/promises";
+
+const inlineCssPlugin = {
+  name: "inline-css",
+  setup(build: any) {
+    build.onResolve({ filter: /\.css$/ }, (args: any) => ({
+      path: path.resolve(args.resolveDir, args.path),
+      namespace: "css-inline",
+    }));
+
+    build.onLoad({ filter: /.*/, namespace: "css-inline" }, async (args: any) => {
+      const css = await readFile(args.path, "utf8");
+
+      return {
+        loader: "text",
+        contents: compressCss(css, args.path),
+      };
+    });
+  },
+};
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -72,24 +93,53 @@ export async function build(cwd: string) {
   // 2. Compile TSX → JS into tmpDir
   fs.mkdirSync(tmpDir, { recursive: true });
 
-  const tsconfig = path.join(cwd, "tsconfig.json");
-  execSync(
-    `npx tsc --project "${tsconfig}" --outDir "${tmpDir}" --noEmit false`,
-    { stdio: "inherit", cwd },
-  );
+  for (const file of pageFiles) {
+    const rel = path.relative(cwd, file);
+
+    const outfile = path.join(
+      tmpDir,
+      rel.replace(/\.(tsx|ts|jsx|js)$/, ".js"),
+    );
+
+    await esbuild({
+      entryPoints: [file],
+      outfile,
+
+      bundle: true,
+      platform: "node",
+      format: "esm",
+      target: "esnext",
+
+      jsx: "automatic",
+      jsxImportSource: "minisite",
+
+      packages: "external",
+
+      sourcemap: false,
+      minify: false,
+      write: true,
+
+      plugins: [inlineCssPlugin],
+    });
+  }
 
   // 3. Execute each page and render to HTML
-  const routes: Record<string, string> = {};
+  type Route = {
+    html: string;
+    events: any[];
+  };
+
+  const routes: Record<string, Route> = {};
 
   for (const file of pageFiles) {
     const route = fileToRoute(file, pagesDir);
 
-    const rawCss = loadCss(file);
-    const css = compressCss(rawCss, file);
-
     // Relative path inside tmpDir
     const rel = path.relative(cwd, file);
-    const compiled = path.join(tmpDir, rel.replace(/\.(tsx|ts)$/, ".js"));
+    const compiled = path.join(
+      tmpDir,
+      rel.replace(/\.(tsx|ts|jsx|js)$/, ".js")
+    );
 
     // Dynamic import (Node ESM)
     const mod = await import(pathToFileURL(compiled).href);
@@ -100,37 +150,17 @@ export async function build(cwd: string) {
       continue;
     }
 
-    // const rendererPath = path.join(tmpDir, "../renderer/index.js");
-
-    // const { renderToString } = await import(pathToFileURL(rendererPath).href);
-
     console.log("Loading:", compiled);
     console.log("URL:", pathToFileURL(compiled).href);
 
-    // Compressing with Terser
-    const html = await minify(
-      renderToString(Page({})),
-      {
-        collapseWhitespace: true,
-        removeComments: true,
-        removeAttributeQuotes: true,
-        minifyCSS: true,
-        minifyJS: true,
-      }
-    );
+    const events: any[] = [];
+    const html = renderToString(Page({}), events);
 
-    let finalHtml = html;
+    routes[route] = {
+      html,
+      events,
+    };
 
-    if (finalHtml.includes("</head>")) {
-      finalHtml = finalHtml.replace(
-        "</head>",
-        `<style>${css}</style></head>`
-      );
-    } else {
-      finalHtml = `<style>${css}</style>` + finalHtml;
-    }
-
-    routes[route] = finalHtml;
     console.log(`  ✓ ${route}`);
   }
 

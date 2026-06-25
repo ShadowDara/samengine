@@ -11,6 +11,8 @@ export function Header() {
         <Link to="/about">About</Link>
         {" · "}
         <Link to="/blog">Blog</Link>
+        {" · "}
+        <Link to="/markdown">Markdown</Link>
       </nav>
     </header>
   );

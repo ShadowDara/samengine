@@ -1,15 +1,13 @@
 export interface VNode {
-  tag: string | symbol | Function;
-  props: Record<string, unknown>;
-  children: unknown[];
+  tag: string | Function;
+  props: Record<string, any>;
+  children: any[];
 }
 
-export function Fragment(props: any) {
-  return props.children;
-}
+export const Fragment = "Fragment";
 
 export function h(
-  tag: string | symbol | Function,
+  tag: string | Function,
   props: Record<string, unknown> | null,
   ...children: unknown[]
 ): VNode {

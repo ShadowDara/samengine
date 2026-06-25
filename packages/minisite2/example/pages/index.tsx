@@ -1,6 +1,7 @@
 import { h, Fragment } from "minisite/jsx-runtime";
 import { Header } from "../components/Header.js";
 // import styles from "./home.css?inline";
+import "./index.css";
 
 export default function Home() {
   return (

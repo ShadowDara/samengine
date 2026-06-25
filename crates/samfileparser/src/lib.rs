@@ -51,12 +51,18 @@
 //! run_task(&tasks, "test", &mut visited, &mut state);
 //! ```
 
+use fluaterm::{END, GREEN};
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 
 /// A single executable instruction inside a [`Task`].
 ///
 /// Commands are created by [`parse`] from indented Samfile lines.
+///
+/// Dependencies execute in an isolated RuntimeState clone.
+///
+/// Changes made by dependency tasks (such as `cd` or `env`) do not
+/// propagate back to the dependent task.
 pub enum Command {
     /// Change the current runtime directory.
     ///
@@ -70,6 +76,10 @@ pub enum Command {
 
     /// Set an environment variable as `KEY=VALUE`.
     Env(String, String),
+
+    RunWin(String),
+    RunMac(String),
+    RunLin(String),
 }
 
 type Tasks = HashMap<String, Task>;
@@ -85,7 +95,6 @@ pub struct Task {
     /// Commands belonging to this task.
     pub commands: Vec<Command>,
 }
-
 
 enum VisitState {
     NotVisited,
@@ -126,7 +135,7 @@ fn detect_cycles(
 
             let cycle = &stack[cycle_start..];
 
-            panic!("samfile Cycle detected: {:?}", cycle);
+            panic!("Cycle detected: {:?}", cycle);
         }
 
         VisitState::Visited => return,
@@ -138,8 +147,7 @@ fn detect_cycles(
     state.insert(name.to_string(), VisitState::Visiting);
     stack.push(name.to_string());
 
-    let task = tasks.get(name)
-        .expect("task not found");
+    let task = tasks.get(name).expect("task not found");
 
     // Check Unknow dependencies
     for dep in &task.deps {
@@ -155,7 +163,6 @@ fn detect_cycles(
     stack.pop();
     state.insert(name.to_string(), VisitState::Visited);
 }
-
 
 /// Validate task dependencies.
 ///
@@ -177,7 +184,6 @@ pub fn validate_all(tasks: &Tasks) {
     }
 }
 
-
 // Function to parse a Line
 fn parse_line(line: &str) -> Option<Command> {
     let line = line.trim();
@@ -196,39 +202,64 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::Run(cmd.to_string()));
     }
 
+    if line.starts_with("runwin ") || line.starts_with("RUNWIN ") {
+        let cmd = line[7..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty runwin command");
+        }
+
+        return Some(Command::RunWin(cmd.to_string()));
+    }
+
+    if line.starts_with("runmac ") || line.starts_with("RUNMAC ") {
+        let cmd = line[7..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty runmac command");
+        }
+
+        return Some(Command::RunMac(cmd.to_string()));
+    }
+
+    if line.starts_with("runlin ") || line.starts_with("RUNLIN ") {
+        let cmd = line[7..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty runlin command");
+        }
+
+        return Some(Command::RunLin(cmd.to_string()));
+    }
+
     if line.starts_with("env ") || line.starts_with("ENV ") {
         // env KEY=VALUE
         let rest = &line[4..];
-        let parts: Vec<&str> = rest.split('=').collect();
-        if parts.len() == 2 {
-            return Some(Command::Env(
-                parts[0].to_string(),
-                parts[1].to_string(),
-            ));
+        if let Some((key, value)) = rest.split_once('=') {
+            return Some(Command::Env(key.trim().to_string(), value.to_string()));
         }
     }
 
     None
 }
 
-
 // Function to parse the Header of a Task
 fn parse_task_header(line: &str) -> (String, Vec<String>) {
-    let parts: Vec<&str> = line.split(':').collect();
-    let name = parts[0].trim().to_string();
+    let (name, deps_part) = line.split_once(':').expect("invalid task header");
 
-    let deps = if parts.len() > 1 {
-        parts[1]
-            .split_whitespace()
-            .map(|s| s.to_string())
-            .collect()
-    } else {
-        vec![]
-    };
+    let name = name.trim();
 
-    (name, deps)
+    if name.is_empty() {
+        panic!("Task name cannot be empty");
+    }
+
+    let deps = deps_part
+        .split_whitespace()
+        .map(|s| s.to_string())
+        .collect();
+
+    (name.trim().to_string(), deps)
 }
-
 
 /// Parse Samfile content into tasks.
 ///
@@ -247,7 +278,7 @@ pub fn parse(content: &str) -> Tasks {
 
     for line in content.lines() {
         let line = line.trim_end();
-        
+
         let trimmed = line.trim();
 
         // ignore empty lines
@@ -256,10 +287,7 @@ pub fn parse(content: &str) -> Tasks {
         }
 
         // ignore comments
-        if trimmed.starts_with('#')
-            || trimmed.starts_with("//")
-            || trimmed.starts_with("--")
-        {
+        if trimmed.starts_with('#') || trimmed.starts_with("//") || trimmed.starts_with("--") {
             continue;
         }
 
@@ -267,23 +295,26 @@ pub fn parse(content: &str) -> Tasks {
         if !line.starts_with(' ') && line.contains(':') {
             let (name, deps) = parse_task_header(line);
 
-            tasks.insert(name.clone(), Task {
-                deps,
-                commands: vec![],
-            });
+            if tasks.contains_key(&name) {
+                panic!("Duplicate task '{}'", name);
+            }
+
+            tasks.insert(
+                name.clone(),
+                Task {
+                    deps,
+                    commands: vec![],
+                },
+            );
 
             current = Some(name);
         }
-
         // command
         else if line.starts_with(' ') {
             if let Some(task_name) = &current {
                 match parse_line(line) {
                     Some(cmd) => {
-                        tasks.get_mut(task_name)
-                            .unwrap()
-                            .commands
-                            .push(cmd);
+                        tasks.get_mut(task_name).unwrap().commands.push(cmd);
                     }
 
                     None => {
@@ -292,12 +323,32 @@ pub fn parse(content: &str) -> Tasks {
                     }
                 }
             }
+        } else {
+            eprintln!("warning: line outside of task: {}", line);
         }
     }
 
     tasks
 }
 
+fn run_command(command: &str, state: &RuntimeState) {
+    let mut parts = command.split_whitespace();
+
+    let program = parts.next().unwrap();
+
+    let args: Vec<&str> = parts.collect();
+
+    let status = std::process::Command::new(program)
+        .args(args)
+        .current_dir(&state.cwd)
+        .envs(&state.env)
+        .status()
+        .expect("failed");
+
+    if !status.success() {
+        panic!("task failed");
+    }
+}
 
 /// Run a task and its dependencies.
 ///
@@ -314,6 +365,10 @@ pub fn parse(content: &str) -> Tasks {
 /// - a `cd` command points to a path that does not exist
 /// - a `run` command cannot be started
 /// - a process exits with a non-success status
+///
+/// The current runner clones this state before executing dependencies.
+/// Dependency modifications are isolated and discarded when the dependency
+/// finishes.
 pub fn run_task(
     tasks: &Tasks,
     name: &str,
@@ -323,8 +378,6 @@ pub fn run_task(
     if visited.contains(name) {
         return;
     }
-
-    visited.insert(name.to_string());
 
     let task = match tasks.get(name) {
         Some(t) => t,
@@ -344,6 +397,8 @@ pub fn run_task(
             return;
         }
     };
+
+    visited.insert(name.to_string());
 
     let mut local_state = RuntimeState {
         cwd: state.cwd.clone(),
@@ -378,24 +433,28 @@ pub fn run_task(
             }
 
             Command::Env(k, v) => {
-                unsafe {
-                    std::env::set_var(k, v);
-                }
+                state.env.insert(k.clone(), v.clone());
             }
 
             Command::Run(c) => {
-                let mut parts = c.split_whitespace();
-                let program = parts.next().unwrap();
-                let args: Vec<&str> = parts.collect();
+                run_command(c, state);
+            }
 
-                let status = std::process::Command::new(program)
-                    .args(args)
-                    .current_dir(&state.cwd)   // 🔥 WICHTIG
-                    .status()
-                    .expect("failed");
+            Command::RunWin(c) => {
+                if cfg!(target_os = "windows") {
+                    run_command(c, state);
+                }
+            }
 
-                if !status.success() {
-                    panic!("task failed");
+            Command::RunMac(c) => {
+                if cfg!(target_os = "macos") {
+                    run_command(c, state);
+                }
+            }
+
+            Command::RunLin(c) => {
+                if cfg!(target_os = "linux") {
+                    run_command(c, state);
                 }
             }
         }

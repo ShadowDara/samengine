@@ -5,7 +5,7 @@
     {
       "name": "portfolio-starter-kit",
       "link": "https://portfolio-blog-starter.vercel.app/",
-      "description": "",
+      "description": "a simple starterkit to make a portfolio with a blog",
       "license": "MIT?",
       "author": "Vercel.com",
       "licenselink": "https://mit-license.org/",

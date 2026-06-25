@@ -15,6 +15,9 @@ export interface CLIArgs {
 
     /** Show a Help Message */
     help: boolean;
+
+    /** Parse markdown */
+    parseMD: boolean;
 }
 
 /**
@@ -25,7 +28,7 @@ export interface CLIArgs {
  */
 export function parseArgs(): CLIArgs {
     const args = process.argv.slice(2);
-    const options: CLIArgs = { release: false, singlefile: false, newProject: false, empty: false, help: false };
+    const options: CLIArgs = { release: false, singlefile: false, newProject: false, empty: false, help: false, parseMD: false };
 
     for (let i = 0; i < args.length; i++) {
         const arg = args[i];
@@ -46,6 +49,9 @@ export function parseArgs(): CLIArgs {
             case "-h":
             case "--help":
                 options.help = true;
+                break;
+            case "markdown":
+                options.parseMD = true;
                 break;
             default:
                 console.warn(`⚠️ Unknown Argument: ${arg}`);

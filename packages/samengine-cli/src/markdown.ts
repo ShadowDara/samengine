@@ -102,31 +102,33 @@ function renderInline(text: string, opts: ParseOptions): string {
         });
     }
 
-    // Links  [text](url "title")
-    text = text.replace(
-        /\[([^\]]+)\]\(([^)]+?)(?:\s+"([^"]*)")?\)/g,
-        (_, linkText, url, title) => {
-            const t = title ? ` title="${escapeHtml(title)}"` : "";
-            const ext =
-                opts.externalLinks && isExternalUrl(url)
-                    ? ' target="_blank" rel="noopener noreferrer"'
-                    : "";
-            return `<a href="${url}"${t}${ext}>${linkText}</a>`;
-        }
-    );
-    // Code-Spans (höchste Priorität, vor allem anderen)
-    text = text.replace(/`{2}([^`]+)`{2}|`([^`\n]+)`/g, (_, a, b) => {
-        return `<code>${escapeHtml(a ?? b)}</code>`;
-    });
-
-    // Bilder  ![alt](url "title")
+    // Bilder VOR Links (sonst wird ![...](url) als !+Link gematcht)
     text = text.replace(
         /!\[([^\]]*)\]\(([^)]+?)(?:\s+"([^"]*)")?\)/g,
         (_, alt, url, title) => {
             const t = title ? ` title="${escapeHtml(title)}"` : "";
-            return `<img src="${url}" alt="${escapeHtml(alt)}"${t}>`;
+            const idx = htmlPlaceholders.push(`<img src="${url}" alt="${escapeHtml(alt)}"${t}>`) - 1;
+            return `@@HTML${idx}@@`;   // als Platzhalter sichern!
         }
     );
+
+    // Links ebenfalls sofort als Platzhalter sichern
+    text = text.replace(
+        /\[([^\]]+)\]\(([^)]+?)(?:\s+"([^"]*)")?\)/g,
+        (_, linkText, url, title) => {
+            const t = title ? ` title="${escapeHtml(title)}"` : "";
+            const ext = opts.externalLinks && isExternalUrl(url)
+                ? ' target="_blank" rel="noopener noreferrer"'
+                : "";
+            const idx = htmlPlaceholders.push(`<a href="${url}"${t}${ext}>${linkText}</a>`) - 1;
+            return `@@HTML${idx}@@`;
+        }
+    );
+
+    // Code-Spans (höchste Priorität, vor allem anderen)
+    text = text.replace(/`{2}([^`]+)`{2}|`([^`\n]+)`/g, (_, a, b) => {
+        return `<code>${escapeHtml(a ?? b)}</code>`;
+    });
 
     // Autolinks  <https://…>
     text = text.replace(/<(https?:\/\/[^\s>]+)>/g, (_, url) => {

@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MiniSite</title>
 
 <style>
@@ -20,10 +21,8 @@ const app = document.getElementById("app");
 function normalizeRoute(route) {
     route = route.trim();
 
-    // entfernt führende /
     route = route.replace(/^\/+/, "");
 
-    // fallback auf index
     if (
         route === "" ||
         route === "/" ||

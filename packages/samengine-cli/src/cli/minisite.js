@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { parseMarkdown, exportCompressedMarkdownCSS } from "../index.js";
 
-const TEMPLATE_HTML = `<!doctype html><html lang="de"><head><meta charset="UTF-8"><title>MiniSite</title><style>__CSS__{}</style></head><body><main id="app" class="md-body"></main><script> const pages = __PAGES__; const app = document.getElementById("app"); function normalizeRoute(route) { route = route.trim(); route = route.replace(/^\/+/, ""); if ( route === "" || route === "/" || route === "index" ) { return "index"; } return route; } function render() { let route = location.hash.slice(1); route = normalizeRoute(route); const html = pages[route] ?? pages["404"] ?? \`<h1>404</h1><a href="#">Home</a>\`; app.innerHTML = html; } window.addEventListener("hashchange", render); window.addEventListener("DOMContentLoaded", render); </script></body></html>
+const TEMPLATE_HTML = `<!doctype html><html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>MiniSite</title><style>__CSS__{}</style></head><body><main id="app" class="md-body"></main><script> const pages = __PAGES__; const app = document.getElementById("app"); function normalizeRoute(route) { route = route.trim(); route = route.replace(/^\/+/, ""); if ( route === "" || route === "/" || route === "index" ) { return "index"; } return route; } function render() { let route = location.hash.slice(1); route = normalizeRoute(route); const html = pages[route] ?? pages["404"] ?? \`<h1>404</h1><a href="#">Home</a>\`; app.innerHTML = html; } window.addEventListener("hashchange", render); window.addEventListener("DOMContentLoaded", render); </script></body></html>
 `;
 
 export function newProj() {

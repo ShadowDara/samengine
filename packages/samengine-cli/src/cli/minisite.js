@@ -1,6 +1,6 @@
-const fs = require("fs");
-const path = require("path");
-const { parseMarkdown, exportCompressedMarkdownCSS } = require("samengine/utils");
+import fs from "fs";
+import path from "path";
+import { parseMarkdown, exportCompressedMarkdownCSS } from "../index.js";
 
 export function main() {
     const pages = {};
@@ -49,5 +49,3 @@ export function main() {
 
     console.log("compiled", Object.keys(pages).length, "pages");
 }
-
-main();

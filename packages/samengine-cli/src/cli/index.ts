@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { parseMarkdown } from "..";
+import { parseMarkdown } from "../index.js";
 import fs from "fs/promises";
 import path from "path";
 
@@ -21,8 +21,7 @@ async function convertMarkdown() {
 }
 
 function help() {
-    console.log(`
-samengine-cli
+    console.log(`samengine-cli
 
 This package provides a cli tool for samengine:
 - markdown
@@ -38,8 +37,9 @@ and some usable functions:
 
 // Main funciton
 async function main() {
-    if (process.argv.length > 3) {
+    if (process.argv.length < 3) {
         help();
+        process.exit(1);
     }
 
     if (process.argv[2] == "markdown") {

@@ -241,11 +241,6 @@ async function main() {
         process.exit(0);
     }
 
-    if (args.parseMD) {
-        await convertMarkdown();
-        process.exit(0);
-    }
-
     const config = await loadUserConfig();
     let builder = createBuilder(config, args.release);
 

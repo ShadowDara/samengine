@@ -20,7 +20,28 @@ async function convertMarkdown() {
     }
 }
 
+function help() {
+    console.log(`
+samengine-cli
+
+This package provides a cli tool for samengine:
+- markdown
+- buildinfos
+- minisite
+
+and some usable functions:
+- a markdown parser
+- a csv parser
+- a jsonc parser
+`);
+}
+
+// Main funciton
 async function main() {
+    if (process.argv.length > 3) {
+        help();
+    }
+
     if (process.argv[2] == "markdown") {
         await convertMarkdown();
     }

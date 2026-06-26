@@ -3,7 +3,8 @@ export type { ParseOptions as MarkdownParseOptions } from "./markdown.js";
 export {
   parse as parseMarkdown,
   parseToDocument as parseMarkdownToDocument,
-  exportcss as exportMarkdownCSS
+  exportcss as exportMarkdownCSS,
+  exportCompressedCSS as exportCompressedMarkdownCSS
 } from "./markdown.js";
 
 // JSON5 Parser

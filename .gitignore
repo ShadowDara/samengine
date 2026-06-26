@@ -16,3 +16,5 @@ dist2/
 /.samengine/tags.txt
 /crates/seg/target
 /minisite-md/index.html
+
+.npmrc

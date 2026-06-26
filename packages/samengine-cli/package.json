@@ -11,16 +11,13 @@
     "./csv": "./dist/csv/index.js"
   },
   "bin": {
-    "sam-cli-buildinfos": "dist/cli/buildinfos.js"
+    "sam-cli": "dist/cli/index.js"
   },
   "author": "Shadowdara",
   "type": "module",
   "devDependencies": {
     "@types/node": "^25.5.2",
     "typescript": "^6.0.2"
-  },
-  "dependencies": {
-    "chalk": "^5.6.2"
   },
   "license": "MIT",
   "repository": {

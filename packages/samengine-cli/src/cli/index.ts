@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 
 import { main as buildinfos} from "./buildinfos.js";
-import { main as minisite } from "./minisite.js";
+import { main as minisite, newProj } from "./minisite.js";
 
 async function convertMarkdown() {
     // const args = process.argv.slice(2); // alles nach node + script
@@ -51,6 +51,11 @@ async function main() {
     }
 
     if (process.argv[2] == "minisite") {
+        // New minisite proj
+        if (process.argv.length >= 4 && process.argv[3] == "new") {
+            newProj();
+        }
+
         minisite();
     }
 }

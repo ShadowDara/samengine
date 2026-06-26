@@ -15,3 +15,4 @@ dist2/
 /crates/easy-git-ignore/target/
 /.samengine/tags.txt
 /crates/seg/target
+/minisite-md/index.html

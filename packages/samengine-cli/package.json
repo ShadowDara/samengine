@@ -1,14 +1,17 @@
 {
   "name": "samengine-cli",
-  "version": "1.7.0",
-  "description": "CLI which help with samengine",
+  "version": "2.0.0",
+  "description": "CLI Tools and other useful helper for samengine",
   "scripts": {
     "build": "tsc",
     "pack": "node ../../scripts/clean.js && npm run build && npm pack && git push --follow-tags"
   },
+  "exports": {
+    ".": "./dist/index.js",
+    "./csv": "./dist/csv/index.js"
+  },
   "bin": {
-    "samengine-cli-linksaver": "dist/linksaver.js",
-    "samengine-cli-buildinfos": "dist/buildinfos.js"
+    "sam-cli-buildinfos": "dist/cli/buildinfos.js"
   },
   "author": "Shadowdara",
   "type": "module",
@@ -23,7 +26,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/shadowdara/samengine",
-    "directory": "samengine-cli"
+    "directory": "packages/samengine-cli"
   },
   "bugs": {
     "url": "https://github.com/shadowdara/samengine/issues"

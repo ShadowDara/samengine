@@ -6,7 +6,6 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from "fs";
 import { join } from "path";
 import os from "os";
-import chalk from 'chalk';
 import { mkdir } from "fs/promises";
 
 const CONFIG_FILE = ".samengine/buildinfos.json";
@@ -114,8 +113,7 @@ async function setup() {
 
 // Help
 function help() {
-    console.log(`
-${chalk.green("Buildinfos CLI by webgameengine")}
+    console.log(`Buildinfos CLI by webgameengine
 
 Commands:
     setup   Create config file
@@ -125,8 +123,8 @@ Commands:
 }
 
 // Main
-function main() {
-    const args = process.argv.slice(2);
+export function main() {
+    const args = process.argv.slice(3);
 
     try {
         if (args[0] === "setup") {
@@ -153,6 +151,3 @@ function main() {
         process.exit(1);
     }
 }
-
-// Start the Cli Tool
-main();

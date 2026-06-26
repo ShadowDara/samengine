@@ -1,0 +1,14 @@
+{
+  "name": "minisite-md",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx sam-cli minisite"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "samengine-cli": "2.0.0"
+  }
+}

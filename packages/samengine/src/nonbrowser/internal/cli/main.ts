@@ -25,9 +25,7 @@ import { loadUserConfig } from "./../config.js";
 import { compressHTML } from "../../index.js";
 import { parseArgs } from "./argparser.js";
 import { buildconfig } from "../../../config/index.js";
-import { run as runCreateProject } from "../projcreator/main.js"; 
-import fs from "fs/promises";
-import { parseMarkdown } from "../../../utils/index.js";
+import { run as runCreateProject } from "../projcreator/main.js";
 
 // ================= HELP ============
 /**
@@ -56,20 +54,6 @@ use with @shadowdara/samtool
 Install: npm i @shadowdara/samtool
 `);
 }
-
-async function convertMarkdown() {
-    // const args = process.argv.slice(2); // alles nach node + script
-    // falls du wirklich "nach dem 2. Argument" meinst:
-    const args = process.argv.slice(3);
-
-    for (const arg of args) {
-        const content = await fs.readFile(arg, "utf-8");
-        const html = parseMarkdown(content);
-        const filePath = path.join(arg + ".html");
-        await fs.writeFile(filePath, html, "utf-8");
-    }
-}
-
 
 // ================= BUILD =================
 /**
@@ -254,11 +238,6 @@ async function main() {
 
     if (args.help) {
         showHelp()
-        process.exit(0);
-    }
-
-    if (args.parseMD) {
-        await convertMarkdown();
         process.exit(0);
     }
 

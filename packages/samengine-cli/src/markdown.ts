@@ -803,6 +803,10 @@ export function exportcss(): string {
     return defaultCss;
 }
 
+export function exportCompressedCSS(): string {
+    return `:root{--md-font:system-ui,sans-serif;--md-mono:"Fira Code","Cascadia Code",Consolas,monospace;--md-max-width:800px;--md-line-height:1.7;--md-color:#1a1a2e;--md-bg:#fff;--md-code-bg:#f4f4f8;--md-border:#d1d5db;--md-accent:#3b5bdb;--md-blockquote:#6b7280}*,::before,::after{box-sizing:border-box}body{margin:0;background:var(--md-bg);color:var(--md-color)}.md-body{font-family:var(--md-font);line-height:var(--md-line-height);max-width:var(--md-max-width);margin:2rem auto;padding:0 1.5rem}h1,h2,h3,h4,h5,h6{margin:1.6em 0 .4em;line-height:1.25;font-weight:700}h1{font-size:2rem;border-bottom:2px solid var(--md-border);padding-bottom:.3em}h2{font-size:1.5rem;border-bottom:1px solid var(--md-border);padding-bottom:.2em}p{margin:.8em 0}a{color:var(--md-accent)}code{font-family:var(--md-mono);font-size:.875em;background:var(--md-code-bg);padding:.15em .35em;border-radius:4px}pre{background:var(--md-code-bg);border-radius:6px;padding:1em;overflow-x:auto}pre code{background:none;padding:0;font-size:.9em}blockquote{margin:1em 0;padding:.5em 1em;border-left:4px solid var(--md-accent);color:var(--md-blockquote)}table{border-collapse:collapse;width:100%;margin:1em 0}th,td{border:1px solid var(--md-border);padding:.5em .8em}th{background:var(--md-code-bg);font-weight:600}tr:nth-child(even) td{background:#fafafa}ul,ol{padding-left:1.5em;margin:.8em 0}li{margin:.25em 0}hr{border:none;border-top:2px solid var(--md-border);margin:2em 0}img{max-width:100%;height:auto;border-radius:4px}mark{background:#fef08a;padding:.1em .2em;border-radius:2px}input[type="checkbox"]{margin-right:.4em}.footnotes{font-size:.875em;color:var(--md-blockquote)}`;
+}
+
 // ---------------------------------------------------------------------------
 // CLI  (wird ausgeführt wenn die Datei direkt aufgerufen wird)
 // ---------------------------------------------------------------------------

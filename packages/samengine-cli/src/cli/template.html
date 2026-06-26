@@ -42,7 +42,7 @@ function render() {
     const html =
         pages[route] ??
         pages["404"] ??
-        `<h1>404</h1><a href="#">Home</a>`;
+        `<h1>404</h1><p>This Page was not found!</p><p><a href="#">Back Home</a></p><p><a href="javascript:location.hash = '#/' + lastValid">Back to the last Page</a></p>`;
 
     app.innerHTML = html;
 }

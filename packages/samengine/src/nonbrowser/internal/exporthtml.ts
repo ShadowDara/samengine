@@ -10,7 +10,7 @@
  *   Data URIs directly into one HTML document.
  */
 import type { buildconfig } from "../../config/buildconfig.js";
-import { parseMarkdown } from "../../utils/index.js";
+import { parseMarkdown } from "samengine-cli";
 import { getPackageVersion } from "../getversion.js";
 
 /**

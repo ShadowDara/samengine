@@ -31,3 +31,5 @@ index.ts
 *.tgz
 
 test
+
+.npmrc

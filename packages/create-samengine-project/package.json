@@ -1,0 +1,35 @@
+{
+  "name": "create-samengine-project",
+  "version": "1.0.0",
+  "description": "the project creator for samengine",
+  "scripts": {
+    "build": "tsc",
+    "pack": "node ../../scripts/clean.js && npm run build && npm pack && git push --follow-tags"
+  },
+  "bin": {
+    "create-samengine-project": "dist/main.js"
+  },
+  "author": "Shadowdara",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^25.5.2",
+    "typescript": "^6.0.2",
+    "@types/fs-extra": "^11.0.4",
+    "@types/unzipper": "^0.10.11"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shadowdara/samengine",
+    "directory": "packages/create-samengine-project"
+  },
+  "bugs": {
+    "url": "https://github.com/shadowdara/samengine/issues"
+  },
+  "dependencies": {
+    "fs-extra": "^11.3.5",
+    "inquirer": "^14.0.2",
+    "node-fetch": "^3.3.2",
+    "unzipper": "^0.12.5"
+  }
+}

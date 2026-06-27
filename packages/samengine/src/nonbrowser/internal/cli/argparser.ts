@@ -10,9 +10,6 @@ export interface CLIArgs {
     /** Project name passed to `--new` or `--new-empty`; otherwise `null`. */
     newProject: boolean;
 
-    /** True when `--new-empty` should create an empty starter instead of the example game. */
-    empty: boolean;
-
     /** Show a Help Message */
     help: boolean;
 }
@@ -25,7 +22,7 @@ export interface CLIArgs {
  */
 export function parseArgs(): CLIArgs {
     const args = process.argv.slice(2);
-    const options: CLIArgs = { release: false, singlefile: false, newProject: false, empty: false, help: false };
+    const options: CLIArgs = { release: false, singlefile: false, newProject: false, help: false };
 
     for (let i = 0; i < args.length; i++) {
         const arg = args[i];

@@ -25,7 +25,6 @@ import { loadUserConfig } from "./../config.js";
 import { compressHTML } from "../../index.js";
 import { parseArgs } from "./argparser.js";
 import { buildconfig } from "../../../config/index.js";
-import { run as runCreateProject } from "../projcreator/main.js";
 
 // ================= HELP ============
 /**
@@ -232,7 +231,11 @@ async function main() {
     const args = parseArgs();
 
     if (args.newProject) {
-        await runCreateProject();
+        console.log(`to create a new project run:
+
+npx create-samengine-project
+
+and then select your template!`);
         process.exit(0);
     }
 

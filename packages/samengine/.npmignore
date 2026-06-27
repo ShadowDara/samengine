@@ -33,3 +33,5 @@ index.ts
 test
 
 .npmrc
+
+bun.lock

@@ -1272,7 +1272,7 @@ pub fn parse(content: &str) -> Tasks {
         }
 
         // task header
-        if !line.starts_with(' ') && line.contains(':') {
+        if !line.starts_with(char::is_whitespace) && line.contains(':') {
             let (name, deps) = parse_task_header(line);
 
             if tasks.contains_key(&name) {
@@ -1828,9 +1828,10 @@ mod tests {
     #[test]
     fn parse_basic_task() {
         let input = r#"
-        build:
-            run echo hello
-        "#;
+
+build:
+    run echo hello
+"#;
 
         let tasks = parse(input);
         assert!(tasks.contains_key("build"));
@@ -1840,9 +1841,9 @@ mod tests {
     #[test]
     fn parse_dependencies() {
         let input = r#"
-        a:
-        b: a
-        "#;
+a:
+b: a
+"#;
 
         let tasks = parse(input);
         assert_eq!(tasks["b"].deps, vec!["a"]);
@@ -1851,9 +1852,9 @@ mod tests {
     #[test]
     fn detect_cycle() {
         let input = r#"
-        a: b
-        b: a
-        "#;
+a: b
+b: a
+"#;
 
         let tasks = parse(input);
 
@@ -1864,9 +1865,9 @@ mod tests {
     #[test]
     fn parse_env() {
         let input = r#"
-        t:
-            env KEY=value
-        "#;
+t:
+    env KEY=value
+"#;
 
         let tasks = parse(input);
         match tasks["t"].commands[0] {
@@ -1881,9 +1882,9 @@ mod tests {
     #[test]
     fn parse_rm() {
         let input = r#"
-        t:
-            rm test.txt
-        "#;
+t:
+    rm test.txt
+"#;
 
         let tasks = parse(input);
         match &tasks["t"].commands[0] {
@@ -1895,9 +1896,9 @@ mod tests {
     #[test]
     fn run_task_basic() {
         let input = r#"
-        a:
-            echo hello
-        "#;
+a:
+    echo hello
+"#;
 
         let tasks = parse(input);
         validate_all(&tasks);
@@ -1911,12 +1912,12 @@ mod tests {
     #[test]
     fn run_task_with_dependency() {
         let input = r#"
-        a:
-            echo A
+a:
+    echo A
 
-        b: a
-            echo B
-        "#;
+b: a
+    echo B
+"#;
 
         let tasks = parse(input);
         validate_all(&tasks);
@@ -1930,10 +1931,10 @@ mod tests {
     #[test]
     fn case_insensitive_parser() {
         let input = r#"
-        t:
-            ENV KEY=value
-            RuN echo hello
-        "#;
+t:
+    ENV KEY=value
+    RuN echo hello
+"#;
 
         let tasks = parse(input);
         assert!(matches!(tasks["t"].commands[0], Command::Env(_, _)));

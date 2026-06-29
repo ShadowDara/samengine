@@ -635,7 +635,7 @@ fn sleep_for(time: &str) {
     std::thread::sleep(duration);
 }
 
-fn run_shell(command: &str, state: &RuntimeState, conf: &RunConfig) {
+fn run_shell(command: &str, state: &RuntimeState, conf: &RunConfig, cmd: &CommandWithMeta) {
     let status = if cfg!(target_os = "windows") {
         std::process::Command::new("cmd")
             .args(["/C", command])
@@ -653,14 +653,14 @@ fn run_shell(command: &str, state: &RuntimeState, conf: &RunConfig) {
     };
 
     if !status.success() {
-        handle_failure("shell command failed", conf);
+        handle_failure("shell command failed", conf, cmd);
     }
 }
 
-fn handle_failure(msg: &str, conf: &RunConfig) {
+fn handle_failure(msg: &str, conf: &RunConfig, cmd: &CommandWithMeta) {
     match conf.errorMode {
         ErrorMode::FailFast => {
-            panic!("{}", msg);
+            panic!("Error in line {}\n\"{}\"\n{}", cmd.line, cmd.linstr, msg);
         }
         ErrorMode::Continue => {
             eprintln!("error (ignored): {}", msg);
@@ -1547,7 +1547,7 @@ pub fn parse(content: &str) -> Tasks {
     tasks
 }
 
-fn run_command(command: &str, state: &RuntimeState, conf: &RunConfig) {
+fn run_command(command: &str, state: &RuntimeState, conf: &RunConfig, cmd: &CommandWithMeta) {
     let mut parts = command.split_whitespace();
 
     let program = parts.next().unwrap();
@@ -1562,7 +1562,7 @@ fn run_command(command: &str, state: &RuntimeState, conf: &RunConfig) {
         .expect("failed");
 
     if !status.success() {
-        handle_failure("task failed", conf);
+        handle_failure("task failed", conf, cmd);
     }
 }
 
@@ -1736,24 +1736,24 @@ pub fn run_task(
 
             // RUN
             Command::Run(c) => {
-                run_command(&c, state, conf);
+                run_command(&c, state, conf, cmd);
             }
 
             Command::RunWin(c) => {
                 if cfg!(target_os = "windows") {
-                    run_command(&c, state, conf);
+                    run_command(&c, state, conf, cmd);
                 }
             }
 
             Command::RunMac(c) => {
                 if cfg!(target_os = "macos") {
-                    run_command(&c, state, conf);
+                    run_command(&c, state, conf, cmd);
                 }
             }
 
             Command::RunLin(c) => {
                 if cfg!(target_os = "linux") {
-                    run_command(&c, state, conf);
+                    run_command(&c, state, conf, cmd);
                 }
             }
 
@@ -1896,25 +1896,25 @@ pub fn run_task(
             }
 
             // SHELL
-            Command::Shell(cmd) => {
-                run_shell(&cmd, state, conf);
+            Command::Shell(cmde) => {
+                run_shell(&cmde, state, conf, cmd);
             }
 
-            Command::ShellWin(cmd) => {
+            Command::ShellWin(cmde) => {
                 if cfg!(target_os = "windows") {
-                    run_shell(&cmd, state, conf);
+                    run_shell(&cmde, state, conf, cmd);
                 }
             }
 
-            Command::ShellMac(cmd) => {
+            Command::ShellMac(cmde) => {
                 if cfg!(target_os = "macos") {
-                    run_shell(&cmd, state, conf);
+                    run_shell(&cmde, state, conf, cmd);
                 }
             }
 
-            Command::ShellLin(cmd) => {
+            Command::ShellLin(cmde) => {
                 if cfg!(target_os = "linux") {
-                    run_shell(&cmd, state, conf);
+                    run_shell(&cmde, state, conf, cmd);
                 }
             }
 

@@ -1,0 +1,454 @@
+#!/usr/bin/env node
+// Shebang
+
+/* 
+ * MIT License Shadowdara 2025
+ * Create MD Index
+ * Dieses Skript liest eine Markdown-Datei ein und erstellt automatisch
+ * ein Inhaltsverzeichnis (Index) basierend auf allen gefundenen Überschriften.
+ * 
+ */
+
+// Import von Node.js-Modulen
+import fs, { copyFileSync } from 'fs';
+import path from 'path';
+
+// Import Local Functions
+import { mdindex_help } from './helper';
+import { update_index } from './write';
+import { checklastcharacter } from './check';
+
+// Const for the Index Recognition
+const index_start = "<!--$$MD_INDEX_START$$-->";
+const index_end = "<!--$$MD_INDEX_END$$-->";
+
+export const index_create = "<!--$$MD_INDEX$$-->";
+
+// Testmodus – aktiviert zusätzliche Konsolenausgaben
+let test_mode = false;
+
+// If true the programm closes if there was no index found in
+// in one of the Markdown files
+let strict_mode = true;
+
+// Interface zur Beschreibung der Position, an der der Index erstellt oder aktualisiert wird
+export interface IndexPosition {
+    type: 'create' | 'update'; // Gibt an, ob der Index neu erstellt oder aktualisiert wird
+    line_start?: number;       // Startzeile für Update
+    line_end?: number;         // Endzeile für Update
+    line?: number;             // Zeile für Erstellung
+}
+
+// Interface für gefundene Überschriften im Markdown
+export interface Heading_Index {
+    level: number;            // Ebene der Überschrift (1–6)
+    title: string;            // Text der Überschrift
+    line: number;             // Zeilennummer im Dokument (1-basiert)
+}
+
+// Fehlercode-Wörterbuch für Debugging oder zukünftige Erweiterung
+const error = {
+    1: "Line 150 - add the Error!",
+    2: "eww"
+}
+
+
+function strip_code_blocks(content: string): string {
+    return content
+        // entfernt ```...``` (inkl. Sprache)
+        .replace(/```[\s\S]*?```/g, '')
+        // optional: entfernt auch ~~~ code blocks
+        .replace(/~~~[\s\S]*?~~~/g, '');
+}
+
+// ------------------------------------------------------------
+// Funktion: read_and_index
+// ------------------------------------------------------------
+// Liest den Markdown-Inhalt und gibt ein Array aller Überschriften zurück.
+// Unterstützt sowohl Markdown-Syntax (# ...) als auch HTML-Überschriften (<h1>...</h1>).
+function read_and_index(content: string): Heading_Index[] {
+    const lines = content.split('\n');
+    const index: Heading_Index[] = [];
+
+    let inCodeBlock = false;
+    let inPreBlock = false;
+    let inHtmlComment = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // --- Blockstatus ändern ----------------------------------
+
+        // HTML-Kommentare
+        if (line.includes("<!--")) inHtmlComment = true;
+        if (line.includes("-->")) {
+            inHtmlComment = false;
+            continue; // Nicht verarbeiten
+        }
+
+        // <pre>...</pre> Block
+        if (line.includes("<pre")) inPreBlock = true;
+        if (line.includes("</pre>")) {
+            inPreBlock = false;
+            continue;
+        }
+
+        // Codeblöcke ```, ``````, etc.
+        if (line.match(/^`{3,}$/)) {
+            inCodeBlock = !inCodeBlock;
+            continue;
+        }
+
+        // Wenn in einem Block → keine Erkennung durchführen
+        if (inCodeBlock || inPreBlock || inHtmlComment) {
+            continue;
+        }
+
+        // --- Markdown-Überschriften erkennen ------------------------
+        const match = line.match(/^(#{1,6})\s+(.*)/);
+
+        if (match) {
+            const level = match[1].length;
+            const title = match[2].trim();
+            index.push({ level, title, line: i + 1 });
+            continue;
+        }
+
+        // --- HTML-Überschriften erkennen ----------------------------
+        const match_html = line.match(/<h([1-6])>(.*?)<\/h\1>/);
+
+        if (match_html) {
+            const level = parseInt(match_html[1], 10);
+            const title = match_html[2].trim();
+            index.push({ level, title, line: i + 1 });
+        }
+    }
+
+    return index;
+}
+
+
+// Du brauchst eine saubere Slug-Generierung:
+function slugify(text: string): string {
+    return text
+        .toLowerCase()
+        .trim()
+        // Umlaute ersetzen
+        .replace(/ä/g, 'ae')
+        .replace(/ö/g, 'oe')
+        .replace(/ü/g, 'ue')
+        .replace(/ß/g, 'ss')
+        // Sonderzeichen entfernen
+        .replace(/[^a-z0-9\s-]/g, '')
+        // Whitespaces zu -
+        .replace(/\s+/g, '-')
+        // Mehrere - zusammenfassen
+        .replace(/-+/g, '-');
+}
+
+const slugCount: Record<string, number> = {};
+
+function uniqueSlug(slug: string): string {
+    if (!slugCount[slug]) {
+        slugCount[slug] = 0;
+        return slug;
+    }
+    slugCount[slug]++;
+    return `${slug}-${slugCount[slug]}`;
+}
+
+
+// ------------------------------------------------------------
+// Funktion: write_index
+// ------------------------------------------------------------
+// Schreibt den erstellten Index in die Markdown-Datei.
+// Je nach Typ (create/update) wird er entweder neu eingefügt oder ersetzt.
+function write_index(file_path: string, index: Heading_Index[], index_position: IndexPosition, content: String, ignore_h1: boolean, no_timestamp: boolean): void {
+    const lines = content.split('\n');
+
+    // Den eigentlichen Indextext aus den Überschriften aufbauen
+    const index_lines = index
+    .filter(item => {
+        if (ignore_h1 && item.level === 1) return false;
+        return true;
+    })
+    .map(item => {
+        const base = slugify(item.title);
+        const finalSlug = uniqueSlug(base);
+
+        return `${'  '.repeat((item.level - 1))}- [${item.title}](#${finalSlug})`;
+    });
+
+    // Updating the Index
+    if (index_position.type === 'update') {
+        update_index(index_position, file_path, lines, ignore_h1, no_timestamp);
+
+        // Return because update_index() although calles this function
+        return;
+    }
+
+    // Creating the Index
+    else if ((index_position.type === 'create') && (index_position.line != null)) {
+        // Print Info
+        console.log("Creating new Index for File: " + file_path);
+
+        // Get the current Date
+        const now = new Date();
+
+        // Message which gets added before the Index when creating an Index
+        const top = index_start + `
+<!-- 
+    Index by Automatic MD Index
+    a simple Tool to Index your Markdown files like this
+
+    More Infos:
+    https://github.com/ShadowDara/automatic-md-index
+
+    DO NOT REMOVE THIS CREDIT !!!
+${!no_timestamp ? `\n\tLast Update Time of the Index: ${now.toISOString()}` : ""}
+-->
+
+` + "## Index";
+
+        // Message which gets added after the Creation of an Index
+        const bottom = "<!-- Index by Automatic MD Index -->\n" + index_end;
+
+        // Wenn ein Platzhalter für den Index gefunden wurde, dort einfügen
+        lines.splice(index_position.line, 1, top);
+        // Platzhalterzeile ersetzen
+
+        // Danach alle Indexzeilen direkt darunter einfügen
+        for (const i in index_lines) {
+            lines.splice(index_position.line + Number(i) + 1, 0, index_lines[i]);
+            // console.log(index_lines[i]);
+        }
+
+        // Nach der letzten Index-Zeile noch 'bottom' hinzufügen
+        const last_index_line = index_position.line + index_lines.length;
+        lines.splice(last_index_line + 1, 0, bottom);
+    }
+
+    // Änderungen wieder in die Datei schreiben
+    fs.writeFileSync(file_path, lines.join('\n'), 'utf-8');
+}
+
+
+// ------------------------------------------------------------
+// Funktion: lookup_index
+// ------------------------------------------------------------
+// Durchsucht den Inhalt der Markdown-Datei nach speziellen Kommentaren,
+// die den Index definieren:
+// <!--$$MD_INDEX$$-->  → Index soll hier erstellt werden
+// <!--$$MD_INDEX_START$$--> und <!--$$MD_INDEX_END$$--> → Bereich für Update
+// Gibt ein IndexPosition-Objekt oder null zurück.
+function lookup_index(content: string): IndexPosition | null {
+    // Split the file for it's lines
+    const lines = content.split('\n');
+
+    debug_message("");
+    debug_message("Looking for Index");
+
+    let start = 0;
+    let end = 0;
+
+    // For Schleife um das ganze file durchzugehen
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Prüfen, ob bereits ein Index vorhanden ist (für Update)
+        const match = line.match(/<!--\$\$((MD_INDEX_START))\$\$-->/);
+
+        // Looking for the begin of the Index
+        if (match) {
+            // The Line Number where the Index is located
+            start = i + 1;
+            continue;
+        }
+
+        // Prüfen ob INDEX_END da ist
+        const match_end = line.match(/<!--\$\$((MD_INDEX_END))\$\$-->/);
+
+        // Looking for the Index End
+        if (match_end) {
+            const end = i + 1;
+            const position: IndexPosition = {
+                type: 'update',
+                line_start: start,
+                line_end: end
+            };
+            return position;
+        }
+
+        // Prüfen, ob ein Platzhalter für Erstellung existiert
+        const match_create = line.match(/<!--\$\$((MD_INDEX))\$\$-->/);
+
+        if (match_create) {
+            debug_message("\nIndex Create Found!");
+            const position: IndexPosition = {
+                type: 'create',
+                line: i
+            };
+            return position;
+        }
+    }
+
+    // Kein End for MD Index gefunden
+    if(start != 0 && end == 0) {
+        console.error('No index End specifier found');
+        // Strict Mode
+        if (strict_mode) {
+            process.exit(1);
+        }
+        return null;
+    }
+
+    // Kein Index-Platzhalter gefunden
+    console.error('No index found');
+    // Strict Mode
+    if (strict_mode) {
+            process.exit(1);
+        }
+    return null;
+}
+
+
+// ------------------------------------------------------------
+// Hauptfunktion: create
+// ------------------------------------------------------------
+// Führt den gesamten Ablauf für eine Datei aus:
+// 1. Datei lesen
+// 2. Position für Index finden
+// 3. Überschriften einlesen
+// 4. Index schreiben
+function create(file_path: string, ignore_h1: boolean, no_timestamp: boolean) {
+    // Reset für jede Datei
+    for (const key in slugCount) delete slugCount[key];
+
+    let content = fs.readFileSync(file_path, 'utf-8');
+
+    // 🔥 Codeblöcke vorher entfernen
+    content = strip_code_blocks(content);
+
+    // Get the Index Position
+    const index_position = lookup_index(content);
+
+    debug_message("\nafter Look Index\n");
+
+    // // Print the Indexpostion Interface which contains
+    // // the type of the work for the index and the Line for the Index
+    // console.log(index_position);
+
+    if (index_position === null) {
+        console.error("No Index created for File: " + file_path);
+        // Strict Mode
+        if (strict_mode) {
+            process.exit(1);
+        }
+        return;
+    } else {
+        const index = read_and_index(content);
+        if (index_position !== null) {
+            const content = fs.readFileSync(file_path, 'utf-8');
+            write_index(file_path, index, index_position, content, ignore_h1, no_timestamp);
+        } else {
+            console.error(error[1]);
+        }
+
+        console.log(`Index created for File: ${file_path}`);
+    }
+}
+
+
+// ------------------------------------------------------------
+// Hilfsfunktion: debug_message()
+// ------------------------------------------------------------
+// Gibt Debug-Nachrichten nur aus, wenn test_mode aktiv ist.
+function debug_message(msg: string): void {
+    if (test_mode) {
+        console.log(msg);
+    }
+}
+
+
+// ------------------------------------------------------------
+// CLI-Teil (wird nur ausgeführt, wenn Datei direkt gestartet wird)
+// ------------------------------------------------------------
+if (path.resolve(__filename) === path.resolve(process.argv[1])) {
+    // Ermöglicht den Testmodus (--test) und das automatische Durchsuchen
+    // eines Ordners nach .md-Dateien
+
+    let filearr: string[] = [];
+
+    // Ignore the First Heading
+    let ignore_h1 = false;
+
+    let no_timestamp = false;
+
+
+    const args = process.argv.slice(2);
+    let execution_path = process.cwd(); // aktuelles Arbeitsverzeichnis
+
+    for (const arg of args) {
+        // Printing help bei --help arg
+        if (arg === '--help') {
+            mdindex_help();
+            process.exit(0);
+        }
+
+        // Ignore the First Heading
+        if (arg === '--no-h1') {
+            console.log("Heading 1 will be ignored!");
+            ignore_h1 = true;
+        }
+
+        // Dont print the Time
+        if (arg === '--no-timestamp') {
+            no_timestamp = true;
+        }
+
+        // Strict Mode
+        if (arg === '--no-strict') {
+            strict_mode = false;
+        }
+
+        // // Wenn "--test" übergeben wurde, Testmodus aktivieren
+        // if (arg === '--test') {
+        //     test_mode = true;
+        //     debug_message("Starting: Testmode");
+        //     debug_message("Using: Testpath\n");
+        //     // Testverzeichnis definieren
+        //     execution_path = path.join(process.cwd(), "test", "markdown_output");
+        // }
+        // Read the file
+        if (arg.startsWith("--files=")) {
+            const files = arg.slice(8);
+            filearr = files.split(",");
+        }
+    }
+
+    // Printing the Execution Path into the Terminal
+    debug_message(execution_path);
+
+    if (filearr.length === 0) {
+        console.warn("No files provied!!\nRun with --help for more Infos.");
+        process.exit(1);
+    }
+
+    // Für jede Datei den Index erstellen
+    for (const file of filearr) {
+        // Printing the Current File
+        debug_message(file);
+        create(file, ignore_h1, no_timestamp);
+    }
+}
+
+
+// ------------------------------------------------------------
+// Exporte der Funktionen
+// ------------------------------------------------------------
+export {
+    create,
+    read_and_index,
+    write_index,
+    lookup_index
+};

@@ -4,3 +4,5 @@ tsconfig.json
 .npmrc
 
 bun.lock
+
+dist/cli/*.d.ts

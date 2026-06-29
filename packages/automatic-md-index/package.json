@@ -1,0 +1,58 @@
+{
+  "name": "automatic-md-index",
+  "version": "1.3.7",
+  "description": "Automatically generate a table of contents from headings in Markdown files.",
+  "author": "Shadowdara",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shadowdara/samengine",
+    "directory": "packages/automatic-md-index"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "md-index": "dist/index.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "help": "npm run dev -- -- --help",
+    "build": "tsc",
+    "updaterm": "npm run dev -- -- --files=README.md",
+    "start": "node ./dist/index.js",
+    "dev": "npm run build && npm run start",
+    "test": "echo Running Tests && node test/index.js && npm run build && npm run test-start",
+    "test-nd": "echo Running Tests Without Debug Information! && npm run build && node dist/index.js",
+    "test-start": "node dist/index.js --no-h1 --files=test/markdown_output/datei1.md,test/markdown_output/datei2.md,test/markdown_output/datei3.md",
+    "test-files": "node test/index.js",
+    "bdev": "bun x tsc --noEmit && bun run src/index.ts",
+    "btest": "bun x tsc --noEmit && bun run test/index.js && bun run src/index.ts --test"
+  },
+  "keywords": [
+    "markdown",
+    "index",
+    "automatic",
+    "headings",
+    "table of contents",
+    "toc",
+    "markdown index",
+    "markdown headings",
+    "markdown toc",
+    "markdown table of contents",
+    "markdown toc generator",
+    "markdown table of contents generator",
+    "markdown index generator"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.15.18",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "undici-types": "^7.9.0"
+  }
+}

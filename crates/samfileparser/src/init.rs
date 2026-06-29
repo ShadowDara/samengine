@@ -7,8 +7,67 @@ use crate::validate_all;
 use crate::parse;
 use crate::RuntimeState;
 
+/// Defines how execution errors are handled during task execution.
+///
+/// This controls whether the runner stops immediately, continues execution,
+/// or suppresses error output entirely when a command fails.
+pub enum ErrorMode {
+    /// Stop execution immediately when an error occurs.
+    ///
+    /// This behaves like a strict mode: any failing command will abort the
+    /// entire task execution with a panic.
+    FailFast,
+
+    /// Continue execution after an error.
+    ///
+    /// Errors are printed, but execution continues with the next command
+    /// or task.
+    Continue,
+
+    /// Suppress error output entirely.
+    ///
+    /// Failures are ignored silently and do not produce any output.
+    Silent,
+}
+
+/// Configuration options for executing a Samfile task.
+///
+/// This struct controls global execution behavior such as debugging output
+/// and how errors are handled during runtime.
+pub struct RunConfig {
+    /// Enables debug output during task execution.
+    ///
+    /// When enabled, the runner may print additional internal information
+    /// such as executed commands and state changes.
+    pub debug: bool,
+
+    /// Controls how command and task failures are handled.
+    ///
+    /// Determines whether execution stops immediately, continues with
+    /// warnings, or suppresses error output entirely.
+    pub errorMode: ErrorMode,
+}
+
+// Helper functions
+
+fn has_gitignore(dir: &str) -> bool {
+    Path::new(dir).join(".gitignore").exists()
+}
+
+fn read_gitignore(dir: &str) -> Option<String> {
+    let path = std::path::Path::new(dir).join(".gitignore");
+
+    fs::read_to_string(path).ok()
+}
+
+fn is_samfile_ignored(gitignore_content: &str) -> bool {
+    gitignore_content
+        .lines()
+        .any(|line| line.trim() == "samfile")
+}
+
 // Run sth from the samfile
-pub fn run_sam_file(command: &str) {
+pub fn run_sam_file(command: &str, conf: RunConfig) {
     let mut state = RuntimeState {
         cwd: std::env::current_dir().unwrap(),
         env: HashMap::new(),
@@ -31,23 +90,7 @@ pub fn run_sam_file(command: &str) {
     let mut visited = std::collections::HashSet::new();
 
     // Execute the Task
-    run_task(&tasks, command, &mut visited, &mut state);
-}
-
-fn has_gitignore(dir: &str) -> bool {
-    Path::new(dir).join(".gitignore").exists()
-}
-
-fn read_gitignore(dir: &str) -> Option<String> {
-    let path = std::path::Path::new(dir).join(".gitignore");
-
-    fs::read_to_string(path).ok()
-}
-
-fn is_samfile_ignored(gitignore_content: &str) -> bool {
-    gitignore_content
-        .lines()
-        .any(|line| line.trim() == "samfile")
+    run_task(&tasks, command, &mut visited, &mut state, &conf);
 }
 
 // Create new samfile

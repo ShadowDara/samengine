@@ -30,6 +30,9 @@
 //! ```no_run
 //! use samfileparser::{parse, run_task, validate_all, RuntimeState};
 //! use std::collections::{HashMap, HashSet};
+//! 
+//! use samfileparser::init::RunConfig;
+//! use samfileparser::init::ErrorMode;
 //!
 //! let content = r#"
 //! build:
@@ -47,17 +50,24 @@
 //!     env: HashMap::new(),
 //! };
 //! let mut visited = HashSet::new();
+//! 
+//! let conf = RunConfig {
+//!     debug: false,
+//!     errorMode: ErrorMode::FailFast
+//! };
 //!
-//! run_task(&tasks, "test", &mut visited, &mut state);
+//! run_task(&tasks, "test", &mut visited, &mut state, &conf);
 //! ```
 
 // some more usable functions
 pub mod init;
 
-use fluaterm::{END, GREEN};
+use fluaterm::{END, GREEN, RED, YELLOW};
 use fs_extra::{dir, file};
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
+
+use crate::init::{ErrorMode, RunConfig};
 
 /// A single executable instruction inside a [`Task`].
 ///
@@ -254,6 +264,55 @@ pub enum Command {
     /// Print text on Linux only.
     EchoLin(String),
 
+    /// Generic warning message.
+    ///
+    /// Indicates a non-fatal issue that does not stop execution.
+    /// Typically used when something unexpected or suboptimal occurs,
+    /// but the program can continue safely.
+    Warn(String),
+
+    /// Windows-specific warning message.
+    ///
+    /// Only relevant when running on Windows. Ignored on other platforms.
+    /// Used for platform-specific issues or behavior differences.
+    WarnWin(String),
+
+    /// macOS-specific warning message.
+    ///
+    /// Only relevant when running on macOS. Ignored on other platforms.
+    /// Used for platform-specific issues or behavior differences.
+    WarnMac(String),
+
+    /// Linux-specific warning message.
+    ///
+    /// Only relevant when running on Linux. Ignored on other platforms.
+    /// Used for platform-specific issues or behavior differences.
+    WarnLin(String),
+
+    /// Generic error message.
+    ///
+    /// Indicates a fatal or blocking issue that prevents successful execution
+    /// of a task or operation.
+    Error(String),
+
+    /// Windows-specific error message.
+    ///
+    /// Only relevant when running on Windows. Ignored on other platforms.
+    /// Represents a platform-specific failure condition.
+    ErrorWin(String),
+
+    /// macOS-specific error message.
+    ///
+    /// Only relevant when running on macOS. Ignored on other platforms.
+    /// Represents a platform-specific failure condition.
+    ErrorMac(String),
+
+    /// Linux-specific error message.
+    ///
+    /// Only relevant when running on Linux. Ignored on other platforms.
+    /// Represents a platform-specific failure condition.
+    ErrorLin(String),
+
     /// Create an empty file or update its timestamp.
     ///
     /// If the file does not exist, it will be created.
@@ -420,6 +479,14 @@ pub struct RuntimeState {
 //
 //
 
+fn warn(s: &str) {
+    println!("{}{}{}", YELLOW, s, END)
+}
+
+fn error(s: &str) {
+    println!("{}{}{}", RED, s, END)
+}
+
 fn prompt() {
     use std::io::{self, Write};
 
@@ -552,7 +619,7 @@ fn sleep_for(time: &str) {
     std::thread::sleep(duration);
 }
 
-fn run_shell(command: &str, state: &RuntimeState) {
+fn run_shell(command: &str, state: &RuntimeState, conf: &RunConfig) {
     let status = if cfg!(target_os = "windows") {
         std::process::Command::new("cmd")
             .args(["/C", command])
@@ -570,7 +637,21 @@ fn run_shell(command: &str, state: &RuntimeState) {
     };
 
     if !status.success() {
-        panic!("shell command failed");
+        handle_failure("shell command failed", conf);
+    }
+}
+
+fn handle_failure(msg: &str, conf: &RunConfig) {
+    match conf.errorMode {
+        ErrorMode::FailFast => {
+            panic!("{}", msg);
+        }
+        ErrorMode::Continue => {
+            eprintln!("error (ignored): {}", msg);
+        }
+        ErrorMode::Silent => {
+            // komplett still
+        }
     }
 }
 
@@ -1113,6 +1194,88 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::EchoLin(cmd.to_string()));
     }
 
+    // WARN
+    if lower.starts_with("warn ") {
+        let cmd = line[5..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty warn command");
+        }
+
+        return Some(Command::Warn(cmd.to_string()));
+    }
+
+    if lower.starts_with("warnwin ") {
+        let cmd = line[8..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty warnwin command");
+        }
+
+        return Some(Command::WarnWin(cmd.to_string()));
+    }
+
+    if lower.starts_with("warnmac ") {
+        let cmd = line[8..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty warnmac command");
+        }
+
+        return Some(Command::WarnMac(cmd.to_string()));
+    }
+
+    if lower.starts_with("warnlin ") {
+        let cmd = line[8..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty warnlin command");
+        }
+
+        return Some(Command::WarnLin(cmd.to_string()));
+    }
+
+    // ERROR
+    if lower.starts_with("error ") {
+        let cmd = line[6..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty error command");
+        }
+
+        return Some(Command::Error(cmd.to_string()));
+    }
+
+    if lower.starts_with("errorwin ") {
+        let cmd = line[9..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty errorwin command");
+        }
+
+        return Some(Command::ErrorWin(cmd.to_string()));
+    }
+
+    if lower.starts_with("errormac ") {
+        let cmd = line[9..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty errormac command");
+        }
+
+        return Some(Command::ErrorMac(cmd.to_string()));
+    }
+
+    if lower.starts_with("errorlin ") {
+        let cmd = line[9..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty errorlin command");
+        }
+
+        return Some(Command::ErrorLin(cmd.to_string()));
+    }
+
     // TOUCH
     if lower.starts_with("touch ") {
         return Some(Command::Touch(line[6..].trim().to_string()));
@@ -1311,7 +1474,7 @@ pub fn parse(content: &str) -> Tasks {
     tasks
 }
 
-fn run_command(command: &str, state: &RuntimeState) {
+fn run_command(command: &str, state: &RuntimeState, conf: &RunConfig) {
     let mut parts = command.split_whitespace();
 
     let program = parts.next().unwrap();
@@ -1326,7 +1489,7 @@ fn run_command(command: &str, state: &RuntimeState) {
         .expect("failed");
 
     if !status.success() {
-        panic!("task failed");
+        handle_failure("task failed", conf);
     }
 }
 
@@ -1354,6 +1517,7 @@ pub fn run_task(
     name: &str,
     visited: &mut HashSet<String>,
     state: &mut RuntimeState,
+    conf: &RunConfig
 ) {
     if visited.contains(name) {
         return;
@@ -1387,7 +1551,7 @@ pub fn run_task(
 
     // 1. run dependencies first
     for dep in &task.deps {
-        run_task(tasks, dep, visited, &mut local_state);
+        run_task(tasks, dep, visited, &mut local_state, conf);
     }
 
     println!("\n==> {}running task{}: {}\n", GREEN, END, name);
@@ -1495,47 +1659,47 @@ pub fn run_task(
 
             // RUN
             Command::Run(c) => {
-                run_command(c, state);
+                run_command(c, state, conf);
             }
 
             Command::RunWin(c) => {
                 if cfg!(target_os = "windows") {
-                    run_command(c, state);
+                    run_command(c, state, conf);
                 }
             }
 
             Command::RunMac(c) => {
                 if cfg!(target_os = "macos") {
-                    run_command(c, state);
+                    run_command(c, state, conf);
                 }
             }
 
             Command::RunLin(c) => {
                 if cfg!(target_os = "linux") {
-                    run_command(c, state);
+                    run_command(c, state, conf);
                 }
             }
 
             // TASK
             Command::Task(name) => {
-                run_task(tasks, name, visited, state);
+                run_task(tasks, name, visited, state, conf);
             }
 
             Command::TaskWin(name) => {
                 if cfg!(target_os = "windows") {
-                    run_task(tasks, name, visited, state);
+                    run_task(tasks, name, visited, state, conf);
                 }
             }
 
             Command::TaskMac(name) => {
                 if cfg!(target_os = "macos") {
-                    run_task(tasks, name, visited, state);
+                    run_task(tasks, name, visited, state, conf);
                 }
             }
 
             Command::TaskLin(name) => {
                 if cfg!(target_os = "linux") {
-                    run_task(tasks, name, visited, state);
+                    run_task(tasks, name, visited, state, conf);
                 }
             }
 
@@ -1656,27 +1820,28 @@ pub fn run_task(
 
             // SHELL
             Command::Shell(cmd) => {
-                run_shell(cmd, state);
+                run_shell(cmd, state, conf);
             }
 
             Command::ShellWin(cmd) => {
                 if cfg!(target_os = "windows") {
-                    run_shell(cmd, state);
+                    run_shell(cmd, state, conf);
                 }
             }
 
             Command::ShellMac(cmd) => {
                 if cfg!(target_os = "macos") {
-                    run_shell(cmd, state);
+                    run_shell(cmd, state, conf);
                 }
             }
 
             Command::ShellLin(cmd) => {
                 if cfg!(target_os = "linux") {
-                    run_shell(cmd, state);
+                    run_shell(cmd, state, conf);
                 }
             }
 
+            // ECHO
             Command::Echo(cmd) => {
                 println!("{}", cmd);
             }
@@ -1696,6 +1861,52 @@ pub fn run_task(
             Command::EchoLin(cmd) => {
                 if cfg!(target_os = "linux") {
                     println!("{}", cmd);
+                }
+            }
+
+            // WARN
+            Command::Warn(cmd) => {
+                warn(cmd);
+            }
+
+            Command::WarnWin(cmd) => {
+                if cfg!(target_os = "windows") {
+                    warn(cmd);
+                }
+            }
+
+            Command::WarnMac(cmd) => {
+                if cfg!(target_os = "macos") {
+                    warn(cmd);
+                }
+            }
+
+            Command::WarnLin(cmd) => {
+                if cfg!(target_os = "linux") {
+                    warn(cmd);
+                }
+            }
+
+            // ERROR
+            Command::Error(cmd) => {
+                error(cmd);
+            }
+
+            Command::ErrorWin(cmd) => {
+                if cfg!(target_os = "windows") {
+                    error(cmd);
+                }
+            }
+
+            Command::ErrorMac(cmd) => {
+                if cfg!(target_os = "macos") {
+                    error(cmd);
+                }
+            }
+
+            Command::ErrorLin(cmd) => {
+                if cfg!(target_os = "linux") {
+                    error(cmd);
                 }
             }
 
@@ -1803,6 +2014,8 @@ pub fn run_task(
                     prompt()
                 }
             }
+
+            // _ => todo!()
         }
     }
 }
@@ -1818,11 +2031,22 @@ mod tests {
     use super::*;
     use std::collections::{HashMap, HashSet};
 
+    use crate::init::RunConfig;
+    use crate::init::ErrorMode;
+
     fn make_state() -> RuntimeState {
         RuntimeState {
             cwd: std::env::current_dir().unwrap(),
             env: HashMap::new(),
         }
+    }
+
+    fn make_conf() -> RunConfig {
+        let conf = RunConfig{
+            debug: false,
+            errorMode: ErrorMode::FailFast
+        };
+        return conf;
     }
 
     #[test]
@@ -1906,7 +2130,7 @@ a:
         let mut state = make_state();
         let mut visited = HashSet::new();
 
-        run_task(&tasks, "a", &mut visited, &mut state);
+        run_task(&tasks, "a", &mut visited, &mut state, &make_conf());
     }
 
     #[test]
@@ -1925,7 +2149,7 @@ b: a
         let mut state = make_state();
         let mut visited = HashSet::new();
 
-        run_task(&tasks, "b", &mut visited, &mut state);
+        run_task(&tasks, "b", &mut visited, &mut state, &make_conf());
     }
 
     #[test]

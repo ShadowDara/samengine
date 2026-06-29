@@ -44,7 +44,7 @@ Empty lines are ignored. Comments can start with `#`, `//`, or `--`.
 
 ## Commands
 
-There a lot for more commands in this version! Go to [docs.rs](https://docs.rs/samfileparser/0.1.4/samfileparser/) to see more infos!
+There a lot for more commands in this version! Go to [docs.rs](https://docs.rs/samfileparser/latest/samfileparser/) to see more infos!
 
 ### `run`
 

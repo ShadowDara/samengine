@@ -51,13 +51,21 @@
 //! run_task(&tasks, "test", &mut visited, &mut state);
 //! ```
 
+// some more usable functions
+pub mod init;
+
 use fluaterm::{END, GREEN};
+use fs_extra::{dir, file};
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 
 /// A single executable instruction inside a [`Task`].
 ///
 /// Commands are created by [`parse`] from indented Samfile lines.
+///
+/// Every command also has optional platform-specific variants (`*Win`,
+/// `*Mac`, `*Lin`) that are only executed when running on the matching
+/// operating system.
 ///
 /// Dependencies execute in an isolated RuntimeState clone.
 ///
@@ -69,19 +77,185 @@ pub enum Command {
     /// Relative paths are resolved against the current runtime directory.
     Cd(String),
 
-    /// Run a program with whitespace-separated arguments.
+    /// Change the current runtime directory on Windows only.
     ///
-    /// For example, `run cargo test` becomes `Run("cargo test")`.
-    Run(String),
+    /// This command is ignored on other operating systems.
+    CdWin(String),
+
+    /// Change the current runtime directory on macOS only.
+    ///
+    /// This command is ignored on other operating systems.
+    CdMac(String),
+
+    /// Change the current runtime directory on Linux only.
+    ///
+    /// This command is ignored on other operating systems.
+    CdLin(String),
 
     /// Set an environment variable as `KEY=VALUE`.
+    ///
+    /// The value is stored in the current [`RuntimeState`] and passed to all
+    /// following child processes started by [`Command::Run`] or
+    /// [`Command::Shell`].
     Env(String, String),
 
+    /// Set an environment variable on Windows only.
+    EnvWin(String, String),
+
+    /// Set an environment variable on MacOS only.
+    EnvMac(String, String),
+
+    /// Set an environment variable on Linux only.
+    EnvLin(String, String),
+
+    /// Run a program with whitespace-separated arguments.
+    ///
+    /// For example:
+    ///
+    /// ```text
+    /// run cargo test
+    /// ```
+    ///
+    /// becomes
+    ///
+    /// ```text
+    /// cargo test
+    /// ```
+    ///
+    /// executed in the current runtime directory.
+    Run(String),
+
+    /// Run a program on Windows only.
     RunWin(String),
+
+    /// Run a program on macOS only.
     RunMac(String),
+
+    /// Run a program on Linux only.
     RunLin(String),
+
+    /// Execute another task.
+    ///
+    /// The referenced task and all of its dependencies are executed before
+    /// execution continues with the current task.
+    Task(String),
+
+    /// Execute another task on Windows only.
+    TaskWin(String),
+
+    /// Execute another task on macOS only.
+    TaskMac(String),
+
+    /// Execute another task on Linux only.
+    TaskLin(String),
+
+    /// Remove a file or directory.
+    ///
+    /// Directories are removed recursively.
+    ///
+    /// Missing paths are ignored.
+    Rm(String),
+
+    /// Remove a file or directory on Windows only.
+    RmWin(String),
+
+    /// Remove a file or directory on macOS only.
+    RmMac(String),
+
+    /// Remove a file or directory on Linux only.
+    RmLin(String),
+
+    /// Create a directory and all missing parent directories.
+    ///
+    /// Equivalent to `mkdir -p`.
+    Mkdir(String),
+
+    /// Create a directory on Windows only.
+    MkdirWin(String),
+
+    /// Create a directory on macOS only.
+    MkdirMac(String),
+
+    /// Create a directory on Linux only.
+    MkdirLin(String),
+
+    /// Copy a file or directory.
+    ///
+    /// Directories are copied recursively.
+    Cp(String, String),
+
+    /// Copy a file or directory on Windows only.
+    CpWin(String, String),
+
+    /// Copy a file or directory on macOS only.
+    CpMac(String, String),
+
+    /// Copy a file or directory on Linux only.
+    CpLin(String, String),
+
+    /// Move or rename a file or directory.
+    Mv(String, String),
+
+    /// Move or rename a file or directory on Windows only.
+    MvWin(String, String),
+
+    /// Move or rename a file or directory on macOS only.
+    MvMac(String, String),
+
+    /// Move or rename a file or directory on Linux only.
+    MvLin(String, String),
+
+    /// Pause execution for a period of time.
+    ///
+    /// Supported formats include:
+    ///
+    /// - `5`
+    /// - `5s`
+    /// - `250ms`
+    /// - `2m`
+    Sleep(String),
+
+    /// Pause execution on Windows only.
+    SleepWin(String),
+
+    /// Pause execution on macOS only.
+    SleepMac(String),
+
+    /// Pause execution on Linux only.
+    SleepLin(String),
+
+    /// Execute a command through the system shell.
+    ///
+    /// On Unix systems this uses `sh -c`.
+    ///
+    /// On Windows this uses `cmd /C`.
+    Shell(String),
+
+    /// Execute a shell command on Windows only.
+    ShellWin(String),
+
+    /// Execute a shell command on macOS only.
+    ShellMac(String),
+
+    /// Execute a shell command on Linux only.
+    ShellLin(String),
+
+    /// Print text followed by a newline.
+    ///
+    /// Unlike [`Command::Run`], this does not start an external process.
+    Echo(String),
+
+    /// Print text on Windows only.
+    EchoWin(String),
+
+    /// Print text on macOS only.
+    EchoMac(String),
+
+    /// Print text on Linux only.
+    EchoLin(String),
 }
 
+/// HashMap of every Task
 type Tasks = HashMap<String, Task>;
 
 /// A named task with dependencies and commands.
@@ -116,6 +290,112 @@ pub struct RuntimeState {
     /// commands also set variables on the process environment.
     pub env: HashMap<String, String>,
 }
+
+fn make_dir(path: &str, state: &RuntimeState) {
+    let path = if PathBuf::from(path).is_absolute() {
+        PathBuf::from(path)
+    } else {
+        state.cwd.join(path)
+    };
+
+    std::fs::create_dir_all(&path).unwrap_or_else(|e| panic!("mkdir '{}': {}", path.display(), e));
+}
+
+fn copy_path(src: &str, dst: &str, state: &RuntimeState) {
+    let src = state.cwd.join(src);
+    let dst = state.cwd.join(dst);
+
+    if src.is_dir() {
+        let mut options = dir::CopyOptions::new();
+        options.copy_inside = true;
+        options.overwrite = true;
+
+        dir::copy(src, dst, &options).unwrap();
+    } else {
+        let mut options = file::CopyOptions::new();
+        options.overwrite = true;
+
+        file::copy(src, dst, &options).unwrap();
+    }
+}
+
+fn move_path(src: &str, dst: &str, state: &RuntimeState) {
+    let src = if PathBuf::from(src).is_absolute() {
+        PathBuf::from(src)
+    } else {
+        state.cwd.join(src)
+    };
+
+    let dst = if PathBuf::from(dst).is_absolute() {
+        PathBuf::from(dst)
+    } else {
+        state.cwd.join(dst)
+    };
+
+    std::fs::rename(src, dst).expect("move failed");
+}
+
+fn remove_path(path: &str, state: &RuntimeState) {
+    let target = if PathBuf::from(path).is_absolute() {
+        PathBuf::from(path)
+    } else {
+        state.cwd.join(path)
+    };
+
+    if !target.exists() {
+        return;
+    }
+
+    if target.is_dir() {
+        std::fs::remove_dir_all(&target)
+            .unwrap_or_else(|e| panic!("failed to remove directory '{}': {}", target.display(), e));
+    } else {
+        std::fs::remove_file(&target)
+            .unwrap_or_else(|e| panic!("failed to remove file '{}': {}", target.display(), e));
+    }
+}
+
+fn sleep_for(time: &str) {
+    let duration = if let Some(ms) = time.strip_suffix("ms") {
+        std::time::Duration::from_millis(ms.parse().expect("invalid duration"))
+    } else if let Some(sec) = time.strip_suffix('s') {
+        std::time::Duration::from_secs(sec.parse().expect("invalid duration"))
+    } else if let Some(min) = time.strip_suffix('m') {
+        std::time::Duration::from_secs(min.parse::<u64>().expect("invalid duration") * 60)
+    } else {
+        std::time::Duration::from_secs(time.parse().expect("invalid duration"))
+    };
+
+    std::thread::sleep(duration);
+}
+
+fn run_shell(command: &str, state: &RuntimeState) {
+    let status = if cfg!(target_os = "windows") {
+        std::process::Command::new("cmd")
+            .args(["/C", command])
+            .current_dir(&state.cwd)
+            .envs(&state.env)
+            .status()
+            .expect("failed to start shell")
+    } else {
+        std::process::Command::new("sh")
+            .args(["-c", command])
+            .current_dir(&state.cwd)
+            .envs(&state.env)
+            .status()
+            .expect("failed to start shell")
+    };
+
+    if !status.success() {
+        panic!("shell command failed");
+    }
+}
+
+//
+//
+// Helper functions ^^^^
+//
+//
 
 fn detect_cycles(
     tasks: &Tasks,
@@ -188,10 +468,24 @@ pub fn validate_all(tasks: &Tasks) {
 fn parse_line(line: &str) -> Option<Command> {
     let line = line.trim();
 
+    // CD
     if line.starts_with("cd ") || line.starts_with("CD ") {
         return Some(Command::Cd(line[3..].to_string()));
     }
 
+    if line.starts_with("cdwin ") || line.starts_with("CDWIN ") {
+        return Some(Command::CdWin(line[6..].to_string()));
+    }
+
+    if line.starts_with("cdmac ") || line.starts_with("CDMAC ") {
+        return Some(Command::CdMac(line[6..].to_string()));
+    }
+
+    if line.starts_with("cdlin ") || line.starts_with("CDLIN ") {
+        return Some(Command::CdLin(line[6..].to_string()));
+    }
+
+    // RUN
     if line.starts_with("run ") || line.starts_with("RUN ") {
         let cmd = line[4..].trim();
 
@@ -232,12 +526,405 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::RunLin(cmd.to_string()));
     }
 
+    // ENV
     if line.starts_with("env ") || line.starts_with("ENV ") {
         // env KEY=VALUE
         let rest = &line[4..];
         if let Some((key, value)) = rest.split_once('=') {
             return Some(Command::Env(key.trim().to_string(), value.to_string()));
         }
+    }
+
+    if line.starts_with("envwin ") || line.starts_with("ENVWIN ") {
+        // env KEY=VALUE
+        let rest = &line[7..];
+        if let Some((key, value)) = rest.split_once('=') {
+            return Some(Command::EnvWin(key.trim().to_string(), value.to_string()));
+        }
+    }
+
+    if line.starts_with("envmac ") || line.starts_with("ENVMAC ") {
+        // env KEY=VALUE
+        let rest = &line[7..];
+        if let Some((key, value)) = rest.split_once('=') {
+            return Some(Command::EnvMac(key.trim().to_string(), value.to_string()));
+        }
+    }
+
+    if line.starts_with("envlin ") || line.starts_with("ENVLIN ") {
+        // env KEY=VALUE
+        let rest = &line[7..];
+        if let Some((key, value)) = rest.split_once('=') {
+            return Some(Command::EnvLin(key.trim().to_string(), value.to_string()));
+        }
+    }
+
+    // TASK
+    if line.starts_with("task ") || line.starts_with("TASK ") {
+        let name = line[5..].trim();
+
+        if name.is_empty() {
+            panic!("Invalid empty task command");
+        }
+
+        return Some(Command::Task(name.to_string()));
+    }
+
+    if line.starts_with("taskwin ") || line.starts_with("TASKWIN ") {
+        let name = line[8..].trim();
+
+        if name.is_empty() {
+            panic!("Invalid empty taskwin command");
+        }
+
+        return Some(Command::TaskWin(name.to_string()));
+    }
+
+    if line.starts_with("taskmac ") || line.starts_with("TASKMAC ") {
+        let name = line[8..].trim();
+
+        if name.is_empty() {
+            panic!("Invalid empty taskmac command");
+        }
+
+        return Some(Command::TaskMac(name.to_string()));
+    }
+
+    if line.starts_with("tasklin ") || line.starts_with("TASKLIN ") {
+        let name = line[8..].trim();
+
+        if name.is_empty() {
+            panic!("Invalid empty tasklin command");
+        }
+
+        return Some(Command::TaskLin(name.to_string()));
+    }
+
+    // RM
+    if line.starts_with("rm ") || line.starts_with("RM ") {
+        let path = line[3..].trim();
+
+        if path.is_empty() {
+            panic!("Invalid empty rm command");
+        }
+
+        return Some(Command::Rm(path.to_string()));
+    }
+
+    if line.starts_with("rmwin ") || line.starts_with("RMWIN ") {
+        let path = line[6..].trim();
+
+        if path.is_empty() {
+            panic!("Invalid empty rmwin command");
+        }
+
+        return Some(Command::RmWin(path.to_string()));
+    }
+
+    if line.starts_with("rmmac ") || line.starts_with("RMMAC ") {
+        let path = line[6..].trim();
+
+        if path.is_empty() {
+            panic!("Invalid empty rmmac command");
+        }
+
+        return Some(Command::RmMac(path.to_string()));
+    }
+
+    if line.starts_with("rmlin ") || line.starts_with("RMLIN ") {
+        let path = line[6..].trim();
+
+        if path.is_empty() {
+            panic!("Invalid empty rmlin command");
+        }
+
+        return Some(Command::RmLin(path.to_string()));
+    }
+
+    // MKDIR
+    if line.starts_with("mkdir ") || line.starts_with("MKDIR ") {
+        let path = line[6..].trim();
+
+        if path.is_empty() {
+            panic!("Invalid empty mkdir command");
+        }
+
+        return Some(Command::Mkdir(path.to_string()));
+    }
+
+    if line.starts_with("mkdirwin ") || line.starts_with("MKDIRWIN ") {
+        let path = line[9..].trim();
+
+        if path.is_empty() {
+            panic!("Invalid empty mkdirwin command");
+        }
+
+        return Some(Command::MkdirWin(path.to_string()));
+    }
+
+    if line.starts_with("mkdirmac ") || line.starts_with("MKDIRMAC ") {
+        let path = line[9..].trim();
+
+        if path.is_empty() {
+            panic!("Invalid empty mkdirmac command");
+        }
+
+        return Some(Command::MkdirMac(path.to_string()));
+    }
+
+    if line.starts_with("mkdirlin ") || line.starts_with("MKDIRLIN ") {
+        let path = line[9..].trim();
+
+        if path.is_empty() {
+            panic!("Invalid empty mkdirlin command");
+        }
+
+        return Some(Command::MkdirLin(path.to_string()));
+    }
+
+    // CP
+    if line.starts_with("cp ") || line.starts_with("CP ") {
+        let rest = line[3..].trim();
+
+        let mut parts = rest.split_whitespace();
+
+        let src = parts.next().expect("missing source");
+        let dst = parts.next().expect("missing destination");
+
+        if parts.next().is_some() {
+            panic!("cp expects exactly SOURCE DEST");
+        }
+
+        return Some(Command::Cp(src.to_string(), dst.to_string()));
+    }
+
+    if line.starts_with("cpwin ") || line.starts_with("CPWIN ") {
+        let rest = line[6..].trim();
+
+        let mut parts = rest.split_whitespace();
+
+        let src = parts.next().expect("missing source");
+        let dst = parts.next().expect("missing destination");
+
+        if parts.next().is_some() {
+            panic!("cpwin expects exactly SOURCE DEST");
+        }
+
+        return Some(Command::CpWin(src.to_string(), dst.to_string()));
+    }
+
+    if line.starts_with("cpmac ") || line.starts_with("CPMAC ") {
+        let rest = line[6..].trim();
+
+        let mut parts = rest.split_whitespace();
+
+        let src = parts.next().expect("missing source");
+        let dst = parts.next().expect("missing destination");
+
+        if parts.next().is_some() {
+            panic!("cpmac expects exactly SOURCE DEST");
+        }
+
+        return Some(Command::CpMac(src.to_string(), dst.to_string()));
+    }
+
+    if line.starts_with("cplin ") || line.starts_with("CPLIN ") {
+        let rest = line[6..].trim();
+
+        let mut parts = rest.split_whitespace();
+
+        let src = parts.next().expect("missing source");
+        let dst = parts.next().expect("missing destination");
+
+        if parts.next().is_some() {
+            panic!("cplin expects exactly SOURCE DEST");
+        }
+
+        return Some(Command::CpLin(src.to_string(), dst.to_string()));
+    }
+
+    // MV
+    if line.starts_with("mv ") || line.starts_with("MV ") {
+        let rest = line[3..].trim();
+
+        let mut parts = rest.split_whitespace();
+
+        let src = parts.next().expect("missing source");
+        let dst = parts.next().expect("missing destination");
+
+        if parts.next().is_some() {
+            panic!("mv expects exactly SOURCE DEST");
+        }
+
+        return Some(Command::Mv(src.to_string(), dst.to_string()));
+    }
+
+    if line.starts_with("mvwin ") || line.starts_with("MVWIN ") {
+        let rest = line[6..].trim();
+
+        let mut parts = rest.split_whitespace();
+
+        let src = parts.next().expect("missing source");
+        let dst = parts.next().expect("missing destination");
+
+        if parts.next().is_some() {
+            panic!("mvwin expects exactly SOURCE DEST");
+        }
+
+        return Some(Command::MvWin(src.to_string(), dst.to_string()));
+    }
+
+    if line.starts_with("mvmac ") || line.starts_with("MVMAC ") {
+        let rest = line[6..].trim();
+
+        let mut parts = rest.split_whitespace();
+
+        let src = parts.next().expect("missing source");
+        let dst = parts.next().expect("missing destination");
+
+        if parts.next().is_some() {
+            panic!("mvmac expects exactly SOURCE DEST");
+        }
+
+        return Some(Command::MvMac(src.to_string(), dst.to_string()));
+    }
+
+    if line.starts_with("mvlin ") || line.starts_with("MVLIN ") {
+        let rest = line[6..].trim();
+
+        let mut parts = rest.split_whitespace();
+
+        let src = parts.next().expect("missing source");
+        let dst = parts.next().expect("missing destination");
+
+        if parts.next().is_some() {
+            panic!("mvlin expects exactly SOURCE DEST");
+        }
+
+        return Some(Command::MvLin(src.to_string(), dst.to_string()));
+    }
+
+    // SLEEP
+    if line.starts_with("sleep ") || line.starts_with("SLEEP ") {
+        let time = line[6..].trim();
+
+        if time.is_empty() {
+            panic!("Invalid empty sleep command");
+        }
+
+        return Some(Command::Sleep(time.to_string()));
+    }
+
+    if line.starts_with("sleepwin ") || line.starts_with("SLEEPWIN ") {
+        let time = line[9..].trim();
+
+        if time.is_empty() {
+            panic!("Invalid empty sleepwin command");
+        }
+
+        return Some(Command::SleepWin(time.to_string()));
+    }
+
+    if line.starts_with("sleepmac ") || line.starts_with("SLEEPMAC ") {
+        let time = line[9..].trim();
+
+        if time.is_empty() {
+            panic!("Invalid empty sleepmac command");
+        }
+
+        return Some(Command::SleepMac(time.to_string()));
+    }
+
+    if line.starts_with("sleeplin ") || line.starts_with("SLEEPLIN ") {
+        let time = line[9..].trim();
+
+        if time.is_empty() {
+            panic!("Invalid empty sleeplin command");
+        }
+
+        return Some(Command::SleepLin(time.to_string()));
+    }
+
+    // SHELL
+    if line.starts_with("shell ") || line.starts_with("SHELL ") {
+        let cmd = line[6..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty shell command");
+        }
+
+        return Some(Command::Shell(cmd.to_string()));
+    }
+
+    if line.starts_with("shellwin ") || line.starts_with("SHELLWIN ") {
+        let cmd = line[9..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty shellwin command");
+        }
+
+        return Some(Command::ShellWin(cmd.to_string()));
+    }
+
+    if line.starts_with("shellmac ") || line.starts_with("SHELLMAC ") {
+        let cmd = line[9..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty shellmac command");
+        }
+
+        return Some(Command::ShellMac(cmd.to_string()));
+    }
+
+    if line.starts_with("shelllin ") || line.starts_with("SHELLLIN ") {
+        let cmd = line[9..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty shelllin command");
+        }
+
+        return Some(Command::ShellLin(cmd.to_string()));
+    }
+
+    // ECHO
+    if line.starts_with("echo ") || line.starts_with("ECHO ") {
+        let cmd = line[5..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty echo command");
+        }
+
+        return Some(Command::Echo(cmd.to_string()));
+    }
+
+    if line.starts_with("echowin ") || line.starts_with("ECHOWIN ") {
+        let cmd = line[8..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty echowin command");
+        }
+
+        return Some(Command::EchoWin(cmd.to_string()));
+    }
+
+    if line.starts_with("echomac ") || line.starts_with("ECHOMAC ") {
+        let cmd = line[8..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty echomac command");
+        }
+
+        return Some(Command::EchoMac(cmd.to_string()));
+    }
+
+    if line.starts_with("echolin ") || line.starts_with("ECHOLIN ") {
+        let cmd = line[8..].trim();
+
+        if cmd.is_empty() {
+            panic!("Invalid empty echolin command");
+        }
+
+        return Some(Command::EchoLin(cmd.to_string()));
     }
 
     None
@@ -415,6 +1102,7 @@ pub fn run_task(
     // 2. run commands
     for cmd in &task.commands {
         match cmd {
+            // CD
             Command::Cd(path) => {
                 let new_path = if PathBuf::from(path).is_absolute() {
                     PathBuf::from(path)
@@ -432,10 +1120,87 @@ pub fn run_task(
                 };
             }
 
+            Command::CdWin(path) => {
+                if cfg!(target_os = "windows") {
+                    let new_path = if PathBuf::from(path).is_absolute() {
+                        PathBuf::from(path)
+                    } else {
+                        state.cwd.join(path)
+                    };
+
+                    println!("> cd {}", new_path.display());
+
+                    state.cwd = match new_path.canonicalize() {
+                        Ok(p) => p,
+                        Err(_) => {
+                            panic!("cd failed: path does not exist: {}", new_path.display());
+                        }
+                    };
+                }
+            }
+
+            Command::CdMac(path) => {
+                if cfg!(target_os = "macos") {
+                    let new_path = if PathBuf::from(path).is_absolute() {
+                        PathBuf::from(path)
+                    } else {
+                        state.cwd.join(path)
+                    };
+
+                    println!("> cd {}", new_path.display());
+
+                    state.cwd = match new_path.canonicalize() {
+                        Ok(p) => p,
+                        Err(_) => {
+                            panic!("cd failed: path does not exist: {}", new_path.display());
+                        }
+                    };
+                }
+            }
+
+            Command::CdLin(path) => {
+                if cfg!(target_os = "linux") {
+                    let new_path = if PathBuf::from(path).is_absolute() {
+                        PathBuf::from(path)
+                    } else {
+                        state.cwd.join(path)
+                    };
+
+                    println!("> cd {}", new_path.display());
+
+                    state.cwd = match new_path.canonicalize() {
+                        Ok(p) => p,
+                        Err(_) => {
+                            panic!("cd failed: path does not exist: {}", new_path.display());
+                        }
+                    };
+                }
+            }
+
+            // ENV
             Command::Env(k, v) => {
                 state.env.insert(k.clone(), v.clone());
             }
 
+            Command::EnvWin(k, v) => {
+                if cfg!(target_os = "windows") {
+                    state.env.insert(k.clone(), v.clone());
+                }
+            }
+
+            Command::EnvMac(k, v) => {
+                if cfg!(target_os = "macos") {
+                    state.env.insert(k.clone(), v.clone());
+                }
+            }
+
+            Command::EnvLin(k, v) => {
+                if cfg!(target_os = "linux") {
+                    state.env.insert(k.clone(), v.clone());
+                }
+            }
+
+            // RUN
             Command::Run(c) => {
                 run_command(c, state);
             }
@@ -455,6 +1220,189 @@ pub fn run_task(
             Command::RunLin(c) => {
                 if cfg!(target_os = "linux") {
                     run_command(c, state);
+                }
+            }
+
+            // TASK
+            Command::Task(name) => {
+                run_task(tasks, name, visited, state);
+            }
+
+            Command::TaskWin(name) => {
+                if cfg!(target_os = "windows") {
+                    run_task(tasks, name, visited, state);
+                }
+            }
+
+            Command::TaskMac(name) => {
+                if cfg!(target_os = "macos") {
+                    run_task(tasks, name, visited, state);
+                }
+            }
+
+            Command::TaskLin(name) => {
+                if cfg!(target_os = "linux") {
+                    run_task(tasks, name, visited, state);
+                }
+            }
+
+            // RM
+            Command::Rm(path) => {
+                remove_path(path, state);
+            }
+
+            Command::RmWin(path) => {
+                if cfg!(target_os = "windows") {
+                    remove_path(path, state);
+                }
+            }
+
+            Command::RmMac(path) => {
+                if cfg!(target_os = "macos") {
+                    remove_path(path, state);
+                }
+            }
+
+            Command::RmLin(path) => {
+                if cfg!(target_os = "linux") {
+                    remove_path(path, state);
+                }
+            }
+
+            // MKDIR
+            Command::Mkdir(path) => {
+                make_dir(path, state);
+            }
+
+            Command::MkdirWin(path) => {
+                if cfg!(target_os = "windows") {
+                    make_dir(path, state);
+                }
+            }
+
+            Command::MkdirMac(path) => {
+                if cfg!(target_os = "macos") {
+                    make_dir(path, state);
+                }
+            }
+
+            Command::MkdirLin(path) => {
+                if cfg!(target_os = "linux") {
+                    make_dir(path, state);
+                }
+            }
+
+            // CP
+            Command::Cp(src, dst) => {
+                copy_path(src, dst, state);
+            }
+
+            Command::CpWin(src, dst) => {
+                if cfg!(target_os = "windows") {
+                    copy_path(src, dst, state);
+                }
+            }
+
+            Command::CpMac(src, dst) => {
+                if cfg!(target_os = "macos") {
+                    copy_path(src, dst, state);
+                }
+            }
+
+            Command::CpLin(src, dst) => {
+                if cfg!(target_os = "linux") {
+                    copy_path(src, dst, state);
+                }
+            }
+
+            // MV
+            Command::Mv(src, dst) => {
+                move_path(src, dst, state);
+            }
+
+            Command::MvWin(src, dst) => {
+                if cfg!(target_os = "windows") {
+                    move_path(src, dst, state);
+                }
+            }
+
+            Command::MvMac(src, dst) => {
+                if cfg!(target_os = "macos") {
+                    move_path(src, dst, state);
+                }
+            }
+
+            Command::MvLin(src, dst) => {
+                if cfg!(target_os = "linux") {
+                    move_path(src, dst, state);
+                }
+            }
+
+            // SLEEP
+            Command::Sleep(time) => {
+                sleep_for(time);
+            }
+
+            Command::SleepWin(time) => {
+                if cfg!(target_os = "windows") {
+                    sleep_for(time);
+                }
+            }
+
+            Command::SleepMac(time) => {
+                if cfg!(target_os = "macos") {
+                    sleep_for(time);
+                }
+            }
+
+            Command::SleepLin(time) => {
+                if cfg!(target_os = "linux") {
+                    sleep_for(time);
+                }
+            }
+
+            // SHELL
+            Command::Shell(cmd) => {
+                run_shell(cmd, state);
+            }
+
+            Command::ShellWin(cmd) => {
+                if cfg!(target_os = "windows") {
+                    run_shell(cmd, state);
+                }
+            }
+
+            Command::ShellMac(cmd) => {
+                if cfg!(target_os = "macos") {
+                    run_shell(cmd, state);
+                }
+            }
+
+            Command::ShellLin(cmd) => {
+                if cfg!(target_os = "linux") {
+                    run_shell(cmd, state);
+                }
+            }
+
+            Command::Echo(cmd) => {
+                println!("{}", cmd);
+            }
+
+            Command::EchoWin(cmd) => {
+                if cfg!(target_os = "windows") {
+                    println!("{}", cmd);
+                }
+            }
+
+            Command::EchoMac(cmd) => {
+                if cfg!(target_os = "macos") {
+                    println!("{}", cmd);
+                }
+            }
+
+            Command::EchoLin(cmd) => {
+                if cfg!(target_os = "linux") {
+                    println!("{}", cmd);
                 }
             }
         }

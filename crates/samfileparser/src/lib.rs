@@ -253,6 +253,127 @@ pub enum Command {
 
     /// Print text on Linux only.
     EchoLin(String),
+
+    /// Create an empty file or update its timestamp.
+    ///
+    /// If the file does not exist, it will be created.
+    /// If it already exists, its modification time is updated.
+    ///
+    /// This is equivalent to the Unix `touch` command.
+    Touch(String),
+
+    /// Create an empty file or update its timestamp on Windows only.
+    ///
+    /// This command is ignored on other operating systems.
+    TouchWin(String),
+
+    /// Create an empty file or update its timestamp on macOS only.
+    ///
+    /// This command is ignored on other operating systems.
+    TouchMac(String),
+
+    /// Create an empty file or update its timestamp on Linux only.
+    ///
+    /// This command is ignored on other operating systems.
+    TouchLin(String),
+
+    /// Write content to a file.
+    ///
+    /// If the file already exists, it will be overwritten.
+    ///
+    /// If it does not exist, it will be created.
+    Write(String, String),
+
+    /// Write content to a file on Windows only.
+    ///
+    /// This command is ignored on other operating systems.
+    WriteWin(String, String),
+
+    /// Write content to a file on macOS only.
+    ///
+    /// This command is ignored on other operating systems.
+    WriteMac(String, String),
+
+    /// Write content to a file on Linux only.
+    ///
+    /// This command is ignored on other operating systems.
+    WriteLin(String, String),
+
+    /// Append content to a file.
+    ///
+    /// If the file does not exist, it will be created.
+    /// A newline is typically added after the appended content.
+    Append(String, String),
+
+    /// Append content to a file on Windows only.
+    ///
+    /// This command is ignored on other operating systems.
+    AppendWin(String, String),
+
+    /// Append content to a file on macOS only.
+    ///
+    /// This command is ignored on other operating systems.
+    AppendMac(String, String),
+
+    /// Append content to a file on Linux only.
+    ///
+    /// This command is ignored on other operating systems.
+    AppendLin(String, String),
+
+    /// Remove a variable from the runtime environment.
+    ///
+    /// This only affects the current runtime state and child processes
+    /// spawned after this command.
+    UnsetEnv(String),
+
+    /// Remove a variable from the runtime environment on Windows only.
+    ///
+    /// This command is ignored on other operating systems.
+    UnsetEnvWin(String),
+
+    /// Remove a variable from the runtime environment on macOS only.
+    ///
+    /// This command is ignored on other operating systems.
+    UnsetEnvMac(String),
+
+    /// Remove a variable from the runtime environment on Linux only.
+    ///
+    /// This command is ignored on other operating systems.
+    UnsetEnvLin(String),
+
+    /// Wait for user input from standard input.
+    ///
+    /// This pauses execution until the user presses Enter.
+    ///
+    /// Useful for debugging or interactive scripts.
+    Prompt(),
+
+    /// Wait for user input on Windows only.
+    ///
+    /// This command is ignored on other operating systems.
+    PromptWin(),
+
+    /// Wait for user input on macOS only.
+    ///
+    /// This command is ignored on other operating systems.
+    PromptMac(),
+
+    /// Wait for user input on Linux only.
+    ///
+    /// This command is ignored on other operating systems.
+    PromptLin(),
+    //
+    //
+    //
+    // IDEAS
+    // - exists
+    // - printenv
+    // - pwd
+    // - ls
+    // - extract
+    // - downlaod
+    // - clear
+    // - open
 }
 
 /// HashMap of every Task
@@ -289,6 +410,68 @@ pub struct RuntimeState {
     /// The current runner clones this map for dependency execution. `env`
     /// commands also set variables on the process environment.
     pub env: HashMap<String, String>,
+}
+
+//
+//
+//
+//
+// HELPER FUNCTIONS
+//
+//
+
+fn prompt() {
+    use std::io::{self, Write};
+
+    print!("> ");
+    io::stdout().flush().unwrap();
+
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).unwrap();
+}
+
+fn unset_env(key: &str, state: &mut RuntimeState) {
+    state.env.remove(key);
+    unsafe {
+        std::env::remove_var(key);
+    }
+}
+
+fn append_file(path: &str, content: &str, state: &RuntimeState) {
+    let path = state.cwd.join(path);
+
+    use std::fs::OpenOptions;
+
+    let mut file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&path)
+        .expect("append failed");
+
+    use std::io::Write;
+    writeln!(file, "{}", content).unwrap();
+}
+
+fn write_file(path: &str, content: &str, state: &RuntimeState) {
+    let path = state.cwd.join(path);
+
+    std::fs::write(&path, content).unwrap_or_else(|e| panic!("write failed: {}", e));
+}
+
+fn touch(path: &str, state: &RuntimeState) {
+    let path = if PathBuf::from(path).is_absolute() {
+        PathBuf::from(path)
+    } else {
+        state.cwd.join(path)
+    };
+
+    use std::fs::OpenOptions;
+
+    OpenOptions::new()
+        .create(true)
+        .write(true)
+        .open(&path)
+        .expect("touch failed");
 }
 
 fn make_dir(path: &str, state: &RuntimeState) {
@@ -468,25 +651,28 @@ pub fn validate_all(tasks: &Tasks) {
 fn parse_line(line: &str) -> Option<Command> {
     let line = line.trim();
 
+    // normalize for case-insensitive matching
+    let lower = line.to_lowercase();
+
     // CD
-    if line.starts_with("cd ") || line.starts_with("CD ") {
+    if lower.starts_with("cd ") {
         return Some(Command::Cd(line[3..].to_string()));
     }
 
-    if line.starts_with("cdwin ") || line.starts_with("CDWIN ") {
+    if lower.starts_with("cdwin ") {
         return Some(Command::CdWin(line[6..].to_string()));
     }
 
-    if line.starts_with("cdmac ") || line.starts_with("CDMAC ") {
+    if lower.starts_with("cdmac ") {
         return Some(Command::CdMac(line[6..].to_string()));
     }
 
-    if line.starts_with("cdlin ") || line.starts_with("CDLIN ") {
+    if lower.starts_with("cdlin ") {
         return Some(Command::CdLin(line[6..].to_string()));
     }
 
     // RUN
-    if line.starts_with("run ") || line.starts_with("RUN ") {
+    if lower.starts_with("run ") {
         let cmd = line[4..].trim();
 
         if cmd.is_empty() {
@@ -496,7 +682,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::Run(cmd.to_string()));
     }
 
-    if line.starts_with("runwin ") || line.starts_with("RUNWIN ") {
+    if lower.starts_with("runwin ") {
         let cmd = line[7..].trim();
 
         if cmd.is_empty() {
@@ -506,7 +692,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::RunWin(cmd.to_string()));
     }
 
-    if line.starts_with("runmac ") || line.starts_with("RUNMAC ") {
+    if lower.starts_with("runmac ") {
         let cmd = line[7..].trim();
 
         if cmd.is_empty() {
@@ -516,7 +702,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::RunMac(cmd.to_string()));
     }
 
-    if line.starts_with("runlin ") || line.starts_with("RUNLIN ") {
+    if lower.starts_with("runlin ") {
         let cmd = line[7..].trim();
 
         if cmd.is_empty() {
@@ -527,7 +713,7 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     // ENV
-    if line.starts_with("env ") || line.starts_with("ENV ") {
+    if lower.starts_with("env ") {
         // env KEY=VALUE
         let rest = &line[4..];
         if let Some((key, value)) = rest.split_once('=') {
@@ -535,7 +721,7 @@ fn parse_line(line: &str) -> Option<Command> {
         }
     }
 
-    if line.starts_with("envwin ") || line.starts_with("ENVWIN ") {
+    if lower.starts_with("envwin ") {
         // env KEY=VALUE
         let rest = &line[7..];
         if let Some((key, value)) = rest.split_once('=') {
@@ -543,7 +729,7 @@ fn parse_line(line: &str) -> Option<Command> {
         }
     }
 
-    if line.starts_with("envmac ") || line.starts_with("ENVMAC ") {
+    if lower.starts_with("envmac ") {
         // env KEY=VALUE
         let rest = &line[7..];
         if let Some((key, value)) = rest.split_once('=') {
@@ -551,7 +737,7 @@ fn parse_line(line: &str) -> Option<Command> {
         }
     }
 
-    if line.starts_with("envlin ") || line.starts_with("ENVLIN ") {
+    if lower.starts_with("envlin ") {
         // env KEY=VALUE
         let rest = &line[7..];
         if let Some((key, value)) = rest.split_once('=') {
@@ -560,7 +746,7 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     // TASK
-    if line.starts_with("task ") || line.starts_with("TASK ") {
+    if lower.starts_with("task ") {
         let name = line[5..].trim();
 
         if name.is_empty() {
@@ -570,7 +756,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::Task(name.to_string()));
     }
 
-    if line.starts_with("taskwin ") || line.starts_with("TASKWIN ") {
+    if lower.starts_with("taskwin ") {
         let name = line[8..].trim();
 
         if name.is_empty() {
@@ -580,7 +766,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::TaskWin(name.to_string()));
     }
 
-    if line.starts_with("taskmac ") || line.starts_with("TASKMAC ") {
+    if lower.starts_with("taskmac ") {
         let name = line[8..].trim();
 
         if name.is_empty() {
@@ -590,7 +776,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::TaskMac(name.to_string()));
     }
 
-    if line.starts_with("tasklin ") || line.starts_with("TASKLIN ") {
+    if lower.starts_with("tasklin ") {
         let name = line[8..].trim();
 
         if name.is_empty() {
@@ -601,7 +787,7 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     // RM
-    if line.starts_with("rm ") || line.starts_with("RM ") {
+    if lower.starts_with("rm ") {
         let path = line[3..].trim();
 
         if path.is_empty() {
@@ -611,7 +797,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::Rm(path.to_string()));
     }
 
-    if line.starts_with("rmwin ") || line.starts_with("RMWIN ") {
+    if lower.starts_with("rmwin ") {
         let path = line[6..].trim();
 
         if path.is_empty() {
@@ -621,7 +807,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::RmWin(path.to_string()));
     }
 
-    if line.starts_with("rmmac ") || line.starts_with("RMMAC ") {
+    if lower.starts_with("rmmac ") {
         let path = line[6..].trim();
 
         if path.is_empty() {
@@ -631,7 +817,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::RmMac(path.to_string()));
     }
 
-    if line.starts_with("rmlin ") || line.starts_with("RMLIN ") {
+    if lower.starts_with("rmlin ") {
         let path = line[6..].trim();
 
         if path.is_empty() {
@@ -642,7 +828,7 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     // MKDIR
-    if line.starts_with("mkdir ") || line.starts_with("MKDIR ") {
+    if lower.starts_with("mkdir ") {
         let path = line[6..].trim();
 
         if path.is_empty() {
@@ -652,7 +838,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::Mkdir(path.to_string()));
     }
 
-    if line.starts_with("mkdirwin ") || line.starts_with("MKDIRWIN ") {
+    if lower.starts_with("mkdirwin ") {
         let path = line[9..].trim();
 
         if path.is_empty() {
@@ -662,7 +848,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::MkdirWin(path.to_string()));
     }
 
-    if line.starts_with("mkdirmac ") || line.starts_with("MKDIRMAC ") {
+    if lower.starts_with("mkdirmac ") {
         let path = line[9..].trim();
 
         if path.is_empty() {
@@ -672,7 +858,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::MkdirMac(path.to_string()));
     }
 
-    if line.starts_with("mkdirlin ") || line.starts_with("MKDIRLIN ") {
+    if lower.starts_with("mkdirlin ") {
         let path = line[9..].trim();
 
         if path.is_empty() {
@@ -683,7 +869,7 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     // CP
-    if line.starts_with("cp ") || line.starts_with("CP ") {
+    if lower.starts_with("cp ") {
         let rest = line[3..].trim();
 
         let mut parts = rest.split_whitespace();
@@ -698,7 +884,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::Cp(src.to_string(), dst.to_string()));
     }
 
-    if line.starts_with("cpwin ") || line.starts_with("CPWIN ") {
+    if lower.starts_with("cpwin ") {
         let rest = line[6..].trim();
 
         let mut parts = rest.split_whitespace();
@@ -713,7 +899,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::CpWin(src.to_string(), dst.to_string()));
     }
 
-    if line.starts_with("cpmac ") || line.starts_with("CPMAC ") {
+    if lower.starts_with("cpmac ") {
         let rest = line[6..].trim();
 
         let mut parts = rest.split_whitespace();
@@ -728,7 +914,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::CpMac(src.to_string(), dst.to_string()));
     }
 
-    if line.starts_with("cplin ") || line.starts_with("CPLIN ") {
+    if lower.starts_with("cplin ") {
         let rest = line[6..].trim();
 
         let mut parts = rest.split_whitespace();
@@ -744,7 +930,7 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     // MV
-    if line.starts_with("mv ") || line.starts_with("MV ") {
+    if lower.starts_with("mv ") {
         let rest = line[3..].trim();
 
         let mut parts = rest.split_whitespace();
@@ -759,7 +945,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::Mv(src.to_string(), dst.to_string()));
     }
 
-    if line.starts_with("mvwin ") || line.starts_with("MVWIN ") {
+    if lower.starts_with("mvwin ") {
         let rest = line[6..].trim();
 
         let mut parts = rest.split_whitespace();
@@ -774,7 +960,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::MvWin(src.to_string(), dst.to_string()));
     }
 
-    if line.starts_with("mvmac ") || line.starts_with("MVMAC ") {
+    if lower.starts_with("mvmac ") {
         let rest = line[6..].trim();
 
         let mut parts = rest.split_whitespace();
@@ -789,7 +975,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::MvMac(src.to_string(), dst.to_string()));
     }
 
-    if line.starts_with("mvlin ") || line.starts_with("MVLIN ") {
+    if lower.starts_with("mvlin ") {
         let rest = line[6..].trim();
 
         let mut parts = rest.split_whitespace();
@@ -805,7 +991,7 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     // SLEEP
-    if line.starts_with("sleep ") || line.starts_with("SLEEP ") {
+    if lower.starts_with("sleep ") {
         let time = line[6..].trim();
 
         if time.is_empty() {
@@ -815,7 +1001,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::Sleep(time.to_string()));
     }
 
-    if line.starts_with("sleepwin ") || line.starts_with("SLEEPWIN ") {
+    if lower.starts_with("sleepwin ") {
         let time = line[9..].trim();
 
         if time.is_empty() {
@@ -825,7 +1011,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::SleepWin(time.to_string()));
     }
 
-    if line.starts_with("sleepmac ") || line.starts_with("SLEEPMAC ") {
+    if lower.starts_with("sleepmac ") {
         let time = line[9..].trim();
 
         if time.is_empty() {
@@ -835,7 +1021,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::SleepMac(time.to_string()));
     }
 
-    if line.starts_with("sleeplin ") || line.starts_with("SLEEPLIN ") {
+    if lower.starts_with("sleeplin ") {
         let time = line[9..].trim();
 
         if time.is_empty() {
@@ -846,7 +1032,7 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     // SHELL
-    if line.starts_with("shell ") || line.starts_with("SHELL ") {
+    if lower.starts_with("shell ") {
         let cmd = line[6..].trim();
 
         if cmd.is_empty() {
@@ -856,7 +1042,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::Shell(cmd.to_string()));
     }
 
-    if line.starts_with("shellwin ") || line.starts_with("SHELLWIN ") {
+    if lower.starts_with("shellwin ") {
         let cmd = line[9..].trim();
 
         if cmd.is_empty() {
@@ -866,7 +1052,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::ShellWin(cmd.to_string()));
     }
 
-    if line.starts_with("shellmac ") || line.starts_with("SHELLMAC ") {
+    if lower.starts_with("shellmac ") {
         let cmd = line[9..].trim();
 
         if cmd.is_empty() {
@@ -876,7 +1062,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::ShellMac(cmd.to_string()));
     }
 
-    if line.starts_with("shelllin ") || line.starts_with("SHELLLIN ") {
+    if lower.starts_with("shelllin ") {
         let cmd = line[9..].trim();
 
         if cmd.is_empty() {
@@ -887,7 +1073,7 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     // ECHO
-    if line.starts_with("echo ") || line.starts_with("ECHO ") {
+    if lower.starts_with("echo ") {
         let cmd = line[5..].trim();
 
         if cmd.is_empty() {
@@ -897,7 +1083,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::Echo(cmd.to_string()));
     }
 
-    if line.starts_with("echowin ") || line.starts_with("ECHOWIN ") {
+    if lower.starts_with("echowin ") {
         let cmd = line[8..].trim();
 
         if cmd.is_empty() {
@@ -907,7 +1093,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::EchoWin(cmd.to_string()));
     }
 
-    if line.starts_with("echomac ") || line.starts_with("ECHOMAC ") {
+    if lower.starts_with("echomac ") {
         let cmd = line[8..].trim();
 
         if cmd.is_empty() {
@@ -917,7 +1103,7 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::EchoMac(cmd.to_string()));
     }
 
-    if line.starts_with("echolin ") || line.starts_with("ECHOLIN ") {
+    if lower.starts_with("echolin ") {
         let cmd = line[8..].trim();
 
         if cmd.is_empty() {
@@ -925,6 +1111,113 @@ fn parse_line(line: &str) -> Option<Command> {
         }
 
         return Some(Command::EchoLin(cmd.to_string()));
+    }
+
+    // TOUCH
+    if lower.starts_with("touch ") {
+        return Some(Command::Touch(line[6..].trim().to_string()));
+    }
+
+    if lower.starts_with("touchwin ") {
+        return Some(Command::TouchWin(line[9..].trim().to_string()));
+    }
+
+    if lower.starts_with("touchmac ") {
+        return Some(Command::TouchMac(line[9..].trim().to_string()));
+    }
+
+    if lower.starts_with("touchlin ") {
+        return Some(Command::TouchLin(line[9..].trim().to_string()));
+    }
+
+    // WRITE
+    if lower.starts_with("write ") {
+        let rest = line[6..].trim();
+        let (path, content) = rest.split_once(' ').expect("write PATH CONTENT");
+
+        return Some(Command::Write(path.to_string(), content.to_string()));
+    }
+
+    if lower.starts_with("writewin ") {
+        let rest = line[9..].trim();
+        let (path, content) = rest.split_once(' ').expect("writewin PATH CONTENT");
+
+        return Some(Command::WriteWin(path.to_string(), content.to_string()));
+    }
+
+    if lower.starts_with("writemac ") {
+        let rest = line[9..].trim();
+        let (path, content) = rest.split_once(' ').expect("writemac PATH CONTENT");
+
+        return Some(Command::WriteMac(path.to_string(), content.to_string()));
+    }
+
+    if lower.starts_with("writelin ") {
+        let rest = line[9..].trim();
+        let (path, content) = rest.split_once(' ').expect("writelin PATH CONTENT");
+
+        return Some(Command::WriteLin(path.to_string(), content.to_string()));
+    }
+
+    // APPEND
+    if lower.starts_with("append ") {
+        let rest = line[7..].trim();
+        let (path, content) = rest.split_once(' ').expect("append PATH CONTENT");
+
+        return Some(Command::Append(path.to_string(), content.to_string()));
+    }
+
+    if lower.starts_with("appendwin ") {
+        let rest = line[10..].trim();
+        let (path, content) = rest.split_once(' ').expect("appendwin PATH CONTENT");
+
+        return Some(Command::AppendWin(path.to_string(), content.to_string()));
+    }
+
+    if lower.starts_with("appendmac ") {
+        let rest = line[10..].trim();
+        let (path, content) = rest.split_once(' ').expect("appendmac PATH CONTENT");
+
+        return Some(Command::AppendMac(path.to_string(), content.to_string()));
+    }
+
+    if lower.starts_with("appendlin") {
+        let rest = line[10..].trim();
+        let (path, content) = rest.split_once(' ').expect("appendlin PATH CONTENT");
+
+        return Some(Command::AppendLin(path.to_string(), content.to_string()));
+    }
+
+    if lower.starts_with("unsetenv ") {
+        return Some(Command::UnsetEnv(line[9..].trim().to_string()));
+    }
+
+    if lower.starts_with("unsetenvwin ") {
+        return Some(Command::UnsetEnvWin(line[12..].trim().to_string()));
+    }
+
+    if lower.starts_with("unsetenvmac ") {
+        return Some(Command::UnsetEnvMac(line[12..].trim().to_string()));
+    }
+
+    if lower.starts_with("unsetenvlin ") {
+        return Some(Command::UnsetEnvLin(line[12..].trim().to_string()));
+    }
+
+    if lower.starts_with("prompt") {
+        return Some(Command::Prompt());
+    }
+
+    if lower.starts_with("promptwin") {
+        return Some(Command::PromptWin());
+    }
+
+    if lower.starts_with("promptmac") {
+        return Some(Command::PromptMac());
+    }
+
+    if lower.starts_with("promptlin") {
+        return Some(Command::PromptLin());
     }
 
     None
@@ -1405,6 +1698,245 @@ pub fn run_task(
                     println!("{}", cmd);
                 }
             }
+
+            // TOUCH
+            Command::Touch(p) => touch(p, state),
+
+            Command::TouchWin(p) => {
+                if cfg!(target_os = "windows") {
+                    touch(p, state)
+                }
+            }
+
+            Command::TouchMac(p) => {
+                if cfg!(target_os = "macos") {
+                    touch(p, state)
+                }
+            }
+
+            Command::TouchLin(p) => {
+                if cfg!(target_os = "linux") {
+                    touch(p, state)
+                }
+            }
+
+            // WRITE
+            Command::Write(p, c) => write_file(p, c, state),
+
+            Command::WriteWin(p, c) => {
+                if cfg!(target_os = "windows") {
+                    write_file(p, c, state)
+                }
+            }
+
+            Command::WriteMac(p, c) => {
+                if cfg!(target_os = "macos") {
+                    write_file(p, c, state)
+                }
+            }
+
+            Command::WriteLin(p, c) => {
+                if cfg!(target_os = "linux") {
+                    write_file(p, c, state)
+                }
+            }
+
+            // APPEND
+            Command::Append(p, c) => append_file(p, c, state),
+
+            Command::AppendWin(p, c) => {
+                if cfg!(target_os = "windows") {
+                    append_file(p, c, state)
+                }
+            }
+
+            Command::AppendMac(p, c) => {
+                if cfg!(target_os = "macos") {
+                    append_file(p, c, state)
+                }
+            }
+
+            Command::AppendLin(p, c) => {
+                if cfg!(target_os = "linux") {
+                    append_file(p, c, state)
+                }
+            }
+
+            // UNSETENV
+            Command::UnsetEnv(k) => unset_env(k, state),
+
+            Command::UnsetEnvWin(k) => {
+                if cfg!(target_os = "windows") {
+                    unset_env(k, state)
+                }
+            }
+
+            Command::UnsetEnvMac(k) => {
+                if cfg!(target_os = "macos") {
+                    unset_env(k, state)
+                }
+            }
+
+            Command::UnsetEnvLin(k) => {
+                if cfg!(target_os = "linux") {
+                    unset_env(k, state)
+                }
+            }
+
+            // PROMPT
+            Command::Prompt() => prompt(),
+
+            Command::PromptWin() => {
+                if cfg!(target_os = "windows") {
+                    prompt()
+                }
+            }
+
+            Command::PromptMac() => {
+                if cfg!(target_os = "macos") {
+                    prompt()
+                }
+            }
+
+            Command::PromptLin() => {
+                if cfg!(target_os = "linux") {
+                    prompt()
+                }
+            }
         }
+    }
+}
+
+// ======================================
+//
+//  TESTS
+//
+// ======================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::{HashMap, HashSet};
+
+    fn make_state() -> RuntimeState {
+        RuntimeState {
+            cwd: std::env::current_dir().unwrap(),
+            env: HashMap::new(),
+        }
+    }
+
+    #[test]
+    fn parse_basic_task() {
+        let input = r#"
+        build:
+            run echo hello
+        "#;
+
+        let tasks = parse(input);
+        assert!(tasks.contains_key("build"));
+        assert_eq!(tasks["build"].commands.len(), 1);
+    }
+
+    #[test]
+    fn parse_dependencies() {
+        let input = r#"
+        a:
+        b: a
+        "#;
+
+        let tasks = parse(input);
+        assert_eq!(tasks["b"].deps, vec!["a"]);
+    }
+
+    #[test]
+    fn detect_cycle() {
+        let input = r#"
+        a: b
+        b: a
+        "#;
+
+        let tasks = parse(input);
+
+        let result = std::panic::catch_unwind(|| validate_all(&tasks));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn parse_env() {
+        let input = r#"
+        t:
+            env KEY=value
+        "#;
+
+        let tasks = parse(input);
+        match tasks["t"].commands[0] {
+            Command::Env(ref k, ref v) => {
+                assert_eq!(k, "KEY");
+                assert_eq!(v, "value");
+            }
+            _ => panic!("wrong command"),
+        }
+    }
+
+    #[test]
+    fn parse_rm() {
+        let input = r#"
+        t:
+            rm test.txt
+        "#;
+
+        let tasks = parse(input);
+        match &tasks["t"].commands[0] {
+            Command::Rm(p) => assert_eq!(p, "test.txt"),
+            _ => panic!("wrong command"),
+        }
+    }
+
+    #[test]
+    fn run_task_basic() {
+        let input = r#"
+        a:
+            echo hello
+        "#;
+
+        let tasks = parse(input);
+        validate_all(&tasks);
+
+        let mut state = make_state();
+        let mut visited = HashSet::new();
+
+        run_task(&tasks, "a", &mut visited, &mut state);
+    }
+
+    #[test]
+    fn run_task_with_dependency() {
+        let input = r#"
+        a:
+            echo A
+
+        b: a
+            echo B
+        "#;
+
+        let tasks = parse(input);
+        validate_all(&tasks);
+
+        let mut state = make_state();
+        let mut visited = HashSet::new();
+
+        run_task(&tasks, "b", &mut visited, &mut state);
+    }
+
+    #[test]
+    fn case_insensitive_parser() {
+        let input = r#"
+        t:
+            ENV KEY=value
+            RuN echo hello
+        "#;
+
+        let tasks = parse(input);
+        assert!(matches!(tasks["t"].commands[0], Command::Env(_, _)));
+        assert!(matches!(tasks["t"].commands[1], Command::Run(_)));
     }
 }

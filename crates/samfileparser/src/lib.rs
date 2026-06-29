@@ -449,6 +449,9 @@ pub struct CommandWithMeta {
 
     /// Die Zeilennummer im Quelltext, an der der Command definiert ist.
     pub line: usize,
+
+    /// The Line as String.
+    pub linstr: String,
 }
 
 /// A named task with dependencies and commands.
@@ -1526,6 +1529,7 @@ pub fn parse(content: &str) -> Tasks {
                             .push(CommandWithMeta {
                                 command: cmd,
                                 line: line_no,
+                                linstr: line.to_string()
                             });
                     }
 
@@ -1628,7 +1632,7 @@ pub fn run_task(
     // 2. run commands
     for cmd in &task.commands {
         if conf.debug {
-            println!("[line {}] {:?}", cmd.line, cmd.command);
+            println!("[{}EXECUTING{}] {}", GREEN, END, cmd.linstr);
         }
 
         match &cmd.command {

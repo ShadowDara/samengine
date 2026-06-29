@@ -13,35 +13,30 @@ const packages = [
     description: "Core framework for building lightweight webgames.",
     link: "https://npmjs.com/package/samengine",
   },
-//   {
-//     name: "samengine-ui",
-//     description: "UI components for building in-game interfaces.",
-//     link: "https://npmjs.com/package/samengine-ui",
-//   },
-//   {
-//     name: "samengine-physics",
-//     description: "Simple physics system for 2D webgames.",
-//     link: "https://npmjs.com/package/samengine-physics",
-//   },
-//   {
-//     name: "samengine-audio",
-//     description: "Audio manager for music and sound effects.",
-//     link: "https://npmjs.com/package/samengine-audio",
-//   },
-  {
-    name: "samengine-build",
-    description: "The own buildtool for samengine.",
-    link: "https://npmjs.com/package/samengine-build",
-  },
   {
     name: "samengine-cli",
     description: "Some CLI tools which should with the Game Making Process. (The Package is in Progress)",
     link: "https://npmjs.com/package/samengine-build",
   },
   {
-    name: "@shadowdara/samtool",
-    description: "The new CLI Tool for samengine. (The Package is in Progress) and written in Rust for speed!",
-    link: "https://npmjs.com/package/@shadowdara/samtool",
+    name: "@shadowdara/seg",
+    description: "The new CLI Tool for samengine. Written in Rust for speed!",
+    link: "https://npmjs.com/package/@shadowdara/seg",
+  },
+  {
+    name: "automatic-md-index",
+    description: "Automatically generate a table of contents from headings in Markdown files.",
+    link: "https://npmjs.com/package/automatic-md-index",
+  },
+  {
+    name: "canvasinput-ts",
+    description: "This project is a TypeScript port of the original CanvasInput library by James Simpson (GoldFire Studios).",
+    link: "https://npmjs.com/package/canvasinput-ts",
+  },
+  {
+    name: "create-samengine-project",
+    description: "the project creator for samengine",
+    link: "https://npmjs.com/package/create-samengine-project",
   },
 ];
 

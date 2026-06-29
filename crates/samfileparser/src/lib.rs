@@ -30,7 +30,7 @@
 //! ```no_run
 //! use samfileparser::{parse, run_task, validate_all, RuntimeState};
 //! use std::collections::{HashMap, HashSet};
-//! 
+//!
 //! use samfileparser::init::RunConfig;
 //! use samfileparser::init::ErrorMode;
 //!
@@ -50,7 +50,7 @@
 //!     env: HashMap::new(),
 //! };
 //! let mut visited = HashSet::new();
-//! 
+//!
 //! let conf = RunConfig {
 //!     debug: false,
 //!     errorMode: ErrorMode::FailFast
@@ -81,6 +81,7 @@ use crate::init::{ErrorMode, RunConfig};
 ///
 /// Changes made by dependency tasks (such as `cd` or `env`) do not
 /// propagate back to the dependent task.
+#[derive(Debug)]
 pub enum Command {
     /// Change the current runtime directory.
     ///
@@ -438,6 +439,18 @@ pub enum Command {
 /// HashMap of every Task
 type Tasks = HashMap<String, Task>;
 
+/// Repräsentiert einen Command zusammen mit Metadaten.
+///
+/// Diese Struktur wird verwendet, um einen Command zusammen mit der
+/// Zeilennummer zu speichern, in der er im Quelltext vorkommt.
+pub struct CommandWithMeta {
+    /// Der eigentliche Command, der ausgeführt werden soll.
+    pub command: Command,
+
+    /// Die Zeilennummer im Quelltext, an der der Command definiert ist.
+    pub line: usize,
+}
+
 /// A named task with dependencies and commands.
 ///
 /// Dependencies are task names that should run before this task. Commands are
@@ -447,7 +460,7 @@ pub struct Task {
     pub deps: Vec<String>,
 
     /// Commands belonging to this task.
-    pub commands: Vec<Command>,
+    pub commands: Vec<CommandWithMeta>,
 }
 
 enum VisitState {
@@ -1154,6 +1167,10 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     // ECHO
+    if lower == "echo" {
+        return Some(Command::Echo(String::new()));
+    }
+
     if lower.starts_with("echo ") {
         let cmd = line[5..].trim();
 
@@ -1162,6 +1179,10 @@ fn parse_line(line: &str) -> Option<Command> {
         }
 
         return Some(Command::Echo(cmd.to_string()));
+    }
+
+    if lower == "echowin" {
+        return Some(Command::EchoWin(String::new()));
     }
 
     if lower.starts_with("echowin ") {
@@ -1174,6 +1195,10 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::EchoWin(cmd.to_string()));
     }
 
+    if lower == "echomac" {
+        return Some(Command::EchoMac(String::new()));
+    }
+
     if lower.starts_with("echomac ") {
         let cmd = line[8..].trim();
 
@@ -1182,6 +1207,10 @@ fn parse_line(line: &str) -> Option<Command> {
         }
 
         return Some(Command::EchoMac(cmd.to_string()));
+    }
+
+    if lower == "echolin" {
+        return Some(Command::EchoLin(String::new()));
     }
 
     if lower.starts_with("echolin ") {
@@ -1195,6 +1224,10 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     // WARN
+    if lower == "warn" {
+        return Some(Command::Warn(String::new()));
+    }
+
     if lower.starts_with("warn ") {
         let cmd = line[5..].trim();
 
@@ -1203,6 +1236,10 @@ fn parse_line(line: &str) -> Option<Command> {
         }
 
         return Some(Command::Warn(cmd.to_string()));
+    }
+
+    if lower == "warnwin" {
+        return Some(Command::WarnWin(String::new()));
     }
 
     if lower.starts_with("warnwin ") {
@@ -1215,6 +1252,10 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::WarnWin(cmd.to_string()));
     }
 
+    if lower == "warnmac" {
+        return Some(Command::WarnMac(String::new()));
+    }
+
     if lower.starts_with("warnmac ") {
         let cmd = line[8..].trim();
 
@@ -1223,6 +1264,10 @@ fn parse_line(line: &str) -> Option<Command> {
         }
 
         return Some(Command::WarnMac(cmd.to_string()));
+    }
+
+    if lower == "warnlin" {
+        return Some(Command::WarnLin(String::new()));
     }
 
     if lower.starts_with("warnlin ") {
@@ -1236,6 +1281,10 @@ fn parse_line(line: &str) -> Option<Command> {
     }
 
     // ERROR
+    if lower == "error" {
+        return Some(Command::Error(String::new()));
+    }
+
     if lower.starts_with("error ") {
         let cmd = line[6..].trim();
 
@@ -1244,6 +1293,10 @@ fn parse_line(line: &str) -> Option<Command> {
         }
 
         return Some(Command::Error(cmd.to_string()));
+    }
+
+    if lower == "errorwin" {
+        return Some(Command::ErrorWin(String::new()));
     }
 
     if lower.starts_with("errorwin ") {
@@ -1256,6 +1309,10 @@ fn parse_line(line: &str) -> Option<Command> {
         return Some(Command::ErrorWin(cmd.to_string()));
     }
 
+    if lower == "errormac" {
+        return Some(Command::ErrorMac(String::new()));
+    }
+
     if lower.starts_with("errormac ") {
         let cmd = line[9..].trim();
 
@@ -1264,6 +1321,10 @@ fn parse_line(line: &str) -> Option<Command> {
         }
 
         return Some(Command::ErrorMac(cmd.to_string()));
+    }
+
+    if lower == "errorlin" {
+        return Some(Command::ErrorLin(String::new()));
     }
 
     if lower.starts_with("errorlin ") {
@@ -1419,7 +1480,8 @@ pub fn parse(content: &str) -> Tasks {
     let mut tasks = HashMap::new();
     let mut current: Option<String> = None;
 
-    for line in content.lines() {
+    for (idx, line) in content.lines().enumerate() {
+        let line_no = idx + 1; // <-- wichtig
         let line = line.trim_end();
 
         let trimmed = line.trim();
@@ -1457,17 +1519,24 @@ pub fn parse(content: &str) -> Tasks {
             if let Some(task_name) = &current {
                 match parse_line(line) {
                     Some(cmd) => {
-                        tasks.get_mut(task_name).unwrap().commands.push(cmd);
+                        tasks
+                            .get_mut(task_name)
+                            .unwrap()
+                            .commands
+                            .push(CommandWithMeta {
+                                command: cmd,
+                                line: line_no,
+                            });
                     }
 
                     None => {
                         // ignore unknown lines (or comments, typos, etc.)
-                        eprintln!("warning: ignored invalid line: {}", line);
+                        eprintln!("{}warning: ignored invalid line: {}{}", YELLOW, line, END);
                     }
                 }
             }
         } else {
-            eprintln!("warning: line outside of task: {}", line);
+            eprintln!("{}warning: line outside of task: {}{}", YELLOW, line, END);
         }
     }
 
@@ -1517,7 +1586,7 @@ pub fn run_task(
     name: &str,
     visited: &mut HashSet<String>,
     state: &mut RuntimeState,
-    conf: &RunConfig
+    conf: &RunConfig,
 ) {
     if visited.contains(name) {
         return;
@@ -1558,7 +1627,11 @@ pub fn run_task(
 
     // 2. run commands
     for cmd in &task.commands {
-        match cmd {
+        if conf.debug {
+            println!("[line {}] {:?}", cmd.line, cmd.command);
+        }
+
+        match &cmd.command {
             // CD
             Command::Cd(path) => {
                 let new_path = if PathBuf::from(path).is_absolute() {
@@ -1659,185 +1732,185 @@ pub fn run_task(
 
             // RUN
             Command::Run(c) => {
-                run_command(c, state, conf);
+                run_command(&c, state, conf);
             }
 
             Command::RunWin(c) => {
                 if cfg!(target_os = "windows") {
-                    run_command(c, state, conf);
+                    run_command(&c, state, conf);
                 }
             }
 
             Command::RunMac(c) => {
                 if cfg!(target_os = "macos") {
-                    run_command(c, state, conf);
+                    run_command(&c, state, conf);
                 }
             }
 
             Command::RunLin(c) => {
                 if cfg!(target_os = "linux") {
-                    run_command(c, state, conf);
+                    run_command(&c, state, conf);
                 }
             }
 
             // TASK
             Command::Task(name) => {
-                run_task(tasks, name, visited, state, conf);
+                run_task(tasks, &name, visited, state, conf);
             }
 
             Command::TaskWin(name) => {
                 if cfg!(target_os = "windows") {
-                    run_task(tasks, name, visited, state, conf);
+                    run_task(tasks, &name, visited, state, conf);
                 }
             }
 
             Command::TaskMac(name) => {
                 if cfg!(target_os = "macos") {
-                    run_task(tasks, name, visited, state, conf);
+                    run_task(tasks, &name, visited, state, conf);
                 }
             }
 
             Command::TaskLin(name) => {
                 if cfg!(target_os = "linux") {
-                    run_task(tasks, name, visited, state, conf);
+                    run_task(tasks, &name, visited, state, conf);
                 }
             }
 
             // RM
             Command::Rm(path) => {
-                remove_path(path, state);
+                remove_path(&path, state);
             }
 
             Command::RmWin(path) => {
                 if cfg!(target_os = "windows") {
-                    remove_path(path, state);
+                    remove_path(&path, state);
                 }
             }
 
             Command::RmMac(path) => {
                 if cfg!(target_os = "macos") {
-                    remove_path(path, state);
+                    remove_path(&path, state);
                 }
             }
 
             Command::RmLin(path) => {
                 if cfg!(target_os = "linux") {
-                    remove_path(path, state);
+                    remove_path(&path, state);
                 }
             }
 
             // MKDIR
             Command::Mkdir(path) => {
-                make_dir(path, state);
+                make_dir(&path, state);
             }
 
             Command::MkdirWin(path) => {
                 if cfg!(target_os = "windows") {
-                    make_dir(path, state);
+                    make_dir(&path, state);
                 }
             }
 
             Command::MkdirMac(path) => {
                 if cfg!(target_os = "macos") {
-                    make_dir(path, state);
+                    make_dir(&path, state);
                 }
             }
 
             Command::MkdirLin(path) => {
                 if cfg!(target_os = "linux") {
-                    make_dir(path, state);
+                    make_dir(&path, state);
                 }
             }
 
             // CP
             Command::Cp(src, dst) => {
-                copy_path(src, dst, state);
+                copy_path(&src, &dst, state);
             }
 
             Command::CpWin(src, dst) => {
                 if cfg!(target_os = "windows") {
-                    copy_path(src, dst, state);
+                    copy_path(&src, &dst, state);
                 }
             }
 
             Command::CpMac(src, dst) => {
                 if cfg!(target_os = "macos") {
-                    copy_path(src, dst, state);
+                    copy_path(&src, &dst, state);
                 }
             }
 
             Command::CpLin(src, dst) => {
                 if cfg!(target_os = "linux") {
-                    copy_path(src, dst, state);
+                    copy_path(&src, &dst, state);
                 }
             }
 
             // MV
             Command::Mv(src, dst) => {
-                move_path(src, dst, state);
+                move_path(&src, &dst, state);
             }
 
             Command::MvWin(src, dst) => {
                 if cfg!(target_os = "windows") {
-                    move_path(src, dst, state);
+                    move_path(&src, &dst, state);
                 }
             }
 
             Command::MvMac(src, dst) => {
                 if cfg!(target_os = "macos") {
-                    move_path(src, dst, state);
+                    move_path(&src, &dst, state);
                 }
             }
 
             Command::MvLin(src, dst) => {
                 if cfg!(target_os = "linux") {
-                    move_path(src, dst, state);
+                    move_path(&src, &dst, state);
                 }
             }
 
             // SLEEP
             Command::Sleep(time) => {
-                sleep_for(time);
+                sleep_for(&time);
             }
 
             Command::SleepWin(time) => {
                 if cfg!(target_os = "windows") {
-                    sleep_for(time);
+                    sleep_for(&time);
                 }
             }
 
             Command::SleepMac(time) => {
                 if cfg!(target_os = "macos") {
-                    sleep_for(time);
+                    sleep_for(&time);
                 }
             }
 
             Command::SleepLin(time) => {
                 if cfg!(target_os = "linux") {
-                    sleep_for(time);
+                    sleep_for(&time);
                 }
             }
 
             // SHELL
             Command::Shell(cmd) => {
-                run_shell(cmd, state, conf);
+                run_shell(&cmd, state, conf);
             }
 
             Command::ShellWin(cmd) => {
                 if cfg!(target_os = "windows") {
-                    run_shell(cmd, state, conf);
+                    run_shell(&cmd, state, conf);
                 }
             }
 
             Command::ShellMac(cmd) => {
                 if cfg!(target_os = "macos") {
-                    run_shell(cmd, state, conf);
+                    run_shell(&cmd, state, conf);
                 }
             }
 
             Command::ShellLin(cmd) => {
                 if cfg!(target_os = "linux") {
-                    run_shell(cmd, state, conf);
+                    run_shell(&cmd, state, conf);
                 }
             }
 
@@ -1866,131 +1939,131 @@ pub fn run_task(
 
             // WARN
             Command::Warn(cmd) => {
-                warn(cmd);
+                warn(&cmd);
             }
 
             Command::WarnWin(cmd) => {
                 if cfg!(target_os = "windows") {
-                    warn(cmd);
+                    warn(&cmd);
                 }
             }
 
             Command::WarnMac(cmd) => {
                 if cfg!(target_os = "macos") {
-                    warn(cmd);
+                    warn(&cmd);
                 }
             }
 
             Command::WarnLin(cmd) => {
                 if cfg!(target_os = "linux") {
-                    warn(cmd);
+                    warn(&cmd);
                 }
             }
 
             // ERROR
             Command::Error(cmd) => {
-                error(cmd);
+                error(&cmd);
             }
 
             Command::ErrorWin(cmd) => {
                 if cfg!(target_os = "windows") {
-                    error(cmd);
+                    error(&cmd);
                 }
             }
 
             Command::ErrorMac(cmd) => {
                 if cfg!(target_os = "macos") {
-                    error(cmd);
+                    error(&cmd);
                 }
             }
 
             Command::ErrorLin(cmd) => {
                 if cfg!(target_os = "linux") {
-                    error(cmd);
+                    error(&cmd);
                 }
             }
 
             // TOUCH
-            Command::Touch(p) => touch(p, state),
+            Command::Touch(p) => touch(&p, state),
 
             Command::TouchWin(p) => {
                 if cfg!(target_os = "windows") {
-                    touch(p, state)
+                    touch(&p, state)
                 }
             }
 
             Command::TouchMac(p) => {
                 if cfg!(target_os = "macos") {
-                    touch(p, state)
+                    touch(&p, state)
                 }
             }
 
             Command::TouchLin(p) => {
                 if cfg!(target_os = "linux") {
-                    touch(p, state)
+                    touch(&p, state)
                 }
             }
 
             // WRITE
-            Command::Write(p, c) => write_file(p, c, state),
+            Command::Write(p, c) => write_file(&p, &c, state),
 
             Command::WriteWin(p, c) => {
                 if cfg!(target_os = "windows") {
-                    write_file(p, c, state)
+                    write_file(&p, &c, state)
                 }
             }
 
             Command::WriteMac(p, c) => {
                 if cfg!(target_os = "macos") {
-                    write_file(p, c, state)
+                    write_file(&p, &c, state)
                 }
             }
 
             Command::WriteLin(p, c) => {
                 if cfg!(target_os = "linux") {
-                    write_file(p, c, state)
+                    write_file(&p, &c, state)
                 }
             }
 
             // APPEND
-            Command::Append(p, c) => append_file(p, c, state),
+            Command::Append(p, c) => append_file(&p, &c, state),
 
             Command::AppendWin(p, c) => {
                 if cfg!(target_os = "windows") {
-                    append_file(p, c, state)
+                    append_file(&p, &c, state)
                 }
             }
 
             Command::AppendMac(p, c) => {
                 if cfg!(target_os = "macos") {
-                    append_file(p, c, state)
+                    append_file(&p, &c, state)
                 }
             }
 
             Command::AppendLin(p, c) => {
                 if cfg!(target_os = "linux") {
-                    append_file(p, c, state)
+                    append_file(&p, &c, state)
                 }
             }
 
             // UNSETENV
-            Command::UnsetEnv(k) => unset_env(k, state),
+            Command::UnsetEnv(k) => unset_env(&k, state),
 
             Command::UnsetEnvWin(k) => {
                 if cfg!(target_os = "windows") {
-                    unset_env(k, state)
+                    unset_env(&k, state)
                 }
             }
 
             Command::UnsetEnvMac(k) => {
                 if cfg!(target_os = "macos") {
-                    unset_env(k, state)
+                    unset_env(&k, state)
                 }
             }
 
             Command::UnsetEnvLin(k) => {
                 if cfg!(target_os = "linux") {
-                    unset_env(k, state)
+                    unset_env(&k, state)
                 }
             }
 
@@ -2013,9 +2086,7 @@ pub fn run_task(
                 if cfg!(target_os = "linux") {
                     prompt()
                 }
-            }
-
-            // _ => todo!()
+            } // _ => todo!()
         }
     }
 }
@@ -2031,8 +2102,8 @@ mod tests {
     use super::*;
     use std::collections::{HashMap, HashSet};
 
-    use crate::init::RunConfig;
     use crate::init::ErrorMode;
+    use crate::init::RunConfig;
 
     fn make_state() -> RuntimeState {
         RuntimeState {
@@ -2042,9 +2113,9 @@ mod tests {
     }
 
     fn make_conf() -> RunConfig {
-        let conf = RunConfig{
+        let conf = RunConfig {
             debug: false,
-            errorMode: ErrorMode::FailFast
+            errorMode: ErrorMode::FailFast,
         };
         return conf;
     }
@@ -2094,7 +2165,7 @@ t:
 "#;
 
         let tasks = parse(input);
-        match tasks["t"].commands[0] {
+        match tasks["t"].commands[0].command {
             Command::Env(ref k, ref v) => {
                 assert_eq!(k, "KEY");
                 assert_eq!(v, "value");
@@ -2111,7 +2182,7 @@ t:
 "#;
 
         let tasks = parse(input);
-        match &tasks["t"].commands[0] {
+        match &tasks["t"].commands[0].command {
             Command::Rm(p) => assert_eq!(p, "test.txt"),
             _ => panic!("wrong command"),
         }
@@ -2161,7 +2232,7 @@ t:
 "#;
 
         let tasks = parse(input);
-        assert!(matches!(tasks["t"].commands[0], Command::Env(_, _)));
-        assert!(matches!(tasks["t"].commands[1], Command::Run(_)));
+        assert!(matches!(tasks["t"].commands[0].command, Command::Env(_, _)));
+        assert!(matches!(tasks["t"].commands[1].command, Command::Run(_)));
     }
 }

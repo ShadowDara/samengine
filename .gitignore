@@ -5,7 +5,8 @@ node_modules
 
 **/.webgameengine/config.mjs
 **/.samengine/config.mjs
-**/.samengine/links.*
+**/.samengine/links.md
+**/.samengine/links.txt
 
 web/docs
 
@@ -18,3 +19,6 @@ dist2/
 /minisite-md/index.html
 
 .npmrc
+
+index.html
+pages/links.md

@@ -60,13 +60,18 @@
 //! ```
 
 // some more usable functions
+pub mod fstree;
 pub mod init;
+
+mod helper;
 
 use fluaterm::{END, GREEN, RED, YELLOW};
 use fs_extra::{dir, file};
 use std::collections::{HashMap, HashSet};
+use std::env::consts::ARCH;
 use std::path::PathBuf;
 
+use crate::helper::split_args;
 use crate::init::{ErrorMode, RunConfig};
 
 /// A single executable instruction inside a [`Task`].
@@ -746,131 +751,127 @@ pub fn validate_all(tasks: &Tasks) {
 
 // Function to parse a Line
 fn parse_line(line: &str) -> Option<Command> {
-    let line = line.trim();
-
-    // normalize for case-insensitive matching
+    let args = split_args(line).clone();
     let lower = line.to_lowercase();
 
-    // CD
-    if lower.starts_with("cd ") {
-        return Some(Command::Cd(line[3..].to_string()));
+    if args.is_empty() {
+        return None;
     }
 
-    if lower.starts_with("cdwin ") {
-        return Some(Command::CdWin(line[6..].to_string()));
-    }
+    let cmd = args[0].to_lowercase();
 
-    if lower.starts_with("cdmac ") {
-        return Some(Command::CdMac(line[6..].to_string()));
-    }
+    match cmd.as_str() {
+        // CD
+        "cd" => {
+            if args.len() != 2 {
+                panic!("cd PATH");
+            }
 
-    if lower.starts_with("cdlin ") {
-        return Some(Command::CdLin(line[6..].to_string()));
-    }
-
-    // RUN
-    if lower.starts_with("run ") {
-        let cmd = line[4..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty run command");
+            return Some(Command::Cd(args[1].clone()));
         }
 
-        return Some(Command::Run(cmd.to_string()));
-    }
-
-    if lower.starts_with("runwin ") {
-        let cmd = line[7..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty runwin command");
+        "cdwin" => {
+            return Some(Command::CdWin(args[1].clone()));
         }
 
-        return Some(Command::RunWin(cmd.to_string()));
-    }
-
-    if lower.starts_with("runmac ") {
-        let cmd = line[7..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty runmac command");
+        "cdmac" => {
+            return Some(Command::CdMac(args[1].clone()));
         }
 
-        return Some(Command::RunMac(cmd.to_string()));
-    }
-
-    if lower.starts_with("runlin ") {
-        let cmd = line[7..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty runlin command");
+        "cdlin" => {
+            return Some(Command::CdLin(args[1].clone()));
         }
 
-        return Some(Command::RunLin(cmd.to_string()));
-    }
+        // RUN
+        "run" => {
+            let cmd = line[4..].trim();
 
-    // ENV
-    if lower.starts_with("env ") {
-        // env KEY=VALUE
-        let rest = &line[4..];
-        if let Some((key, value)) = rest.split_once('=') {
-            return Some(Command::Env(key.trim().to_string(), value.to_string()));
-        }
-    }
+            if cmd.is_empty() {
+                panic!("Invalid empty run command");
+            }
 
-    if lower.starts_with("envwin ") {
-        // env KEY=VALUE
-        let rest = &line[7..];
-        if let Some((key, value)) = rest.split_once('=') {
-            return Some(Command::EnvWin(key.trim().to_string(), value.to_string()));
+            return Some(Command::Run(args[1..].join(" ")));
         }
-    }
 
-    if lower.starts_with("envmac ") {
-        // env KEY=VALUE
-        let rest = &line[7..];
-        if let Some((key, value)) = rest.split_once('=') {
-            return Some(Command::EnvMac(key.trim().to_string(), value.to_string()));
-        }
-    }
+        "runwin " => {
+            let cmd = line[7..].trim();
 
-    if lower.starts_with("envlin ") {
-        // env KEY=VALUE
-        let rest = &line[7..];
-        if let Some((key, value)) = rest.split_once('=') {
-            return Some(Command::EnvLin(key.trim().to_string(), value.to_string()));
+            if cmd.is_empty() {
+                panic!("Invalid empty runwin command");
+            }
+
+            return Some(Command::RunWin(args[1..].join(" ")));
         }
-    }
+
+        "runmac " => {
+            let cmd = line[7..].trim();
+
+            if cmd.is_empty() {
+                panic!("Invalid empty runmac command");
+            }
+
+            return Some(Command::RunMac(args[1..].join(" ")));
+        }
+
+        "runlin " => {
+            let cmd = line[7..].trim();
+
+            if cmd.is_empty() {
+                panic!("Invalid empty runlin command");
+            }
+
+            return Some(Command::RunLin(args[1..].join(" ")));
+        }
+
+        // ENV
+        "env" => {
+            // env KEY=VALUE
+            return Some(Command::Env(args[1].clone(), args[1].clone()));
+        }
+
+        "envwin" => {
+            // env KEY=VALUE
+            return Some(Command::Env(args[1].clone(), args[1].clone()));
+        }
+
+        "envmac" => {
+            // env KEY=VALUE
+            return Some(Command::Env(args[1].clone(), args[1].clone()));
+        }
+
+        "envlin " => {
+            // env KEY=VALUE
+            return Some(Command::Env(args[1].clone(), args[1].clone()));
+        }
+
+        _ => {}
+    
 
     // TASK
-    if lower.starts_with("task ") {
-        let name = line[5..].trim();
+    "task" => {
+        // if name.is_empty() {
+        //     panic!("Invalid empty task command");
+        // }
 
-        if name.is_empty() {
-            panic!("Invalid empty task command");
-        }
-
-        return Some(Command::Task(name.to_string()));
+        return Some(Command::Task(args[1]));
     }
 
-    if lower.starts_with("taskwin ") {
-        let name = line[8..].trim();
+    "taskwin " => {
 
-        if name.is_empty() {
-            panic!("Invalid empty taskwin command");
-        }
+        // if name.is_empty() {
+        //     panic!("Invalid empty taskwin command");
+        // }
 
-        return Some(Command::TaskWin(name.to_string()));
+        return Some(Command::TaskWin(args[1]));
     }
 
-    if lower.starts_with("taskmac ") {
-        let name = line[8..].trim();
+    "taskmac " => {
 
-        if name.is_empty() {
-            panic!("Invalid empty taskmac command");
-        }
+        // if name.is_empty() {
+        //     panic!("Invalid empty taskmac command");
+        // }
 
-        return Some(Command::TaskMac(name.to_string()));
+        return Some(Command::TaskMac(args[1]));
     }
 
     if lower.starts_with("tasklin ") {
@@ -1529,7 +1530,7 @@ pub fn parse(content: &str) -> Tasks {
                             .push(CommandWithMeta {
                                 command: cmd,
                                 line: line_no,
-                                linstr: line.to_string()
+                                linstr: line.to_string(),
                             });
                     }
 

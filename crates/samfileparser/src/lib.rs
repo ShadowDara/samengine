@@ -803,30 +803,24 @@ fn parse_line(line: &str) -> Option<Command> {
         }
 
         "runwin " => {
-            let cmd = line[7..].trim();
-
-            if cmd.is_empty() {
-                panic!("Invalid empty runwin command");
+            if args.len() != 2 {
+                handle_failure("Invalid empty runwin command");
             }
 
             return Some(Command::RunWin(args[1..].join(" ")));
         }
 
         "runmac " => {
-            let cmd = line[7..].trim();
-
-            if cmd.is_empty() {
-                panic!("Invalid empty runmac command");
+            if args.len() != 2 {
+                handle_failure("Invalid empty runmac command");
             }
 
             return Some(Command::RunMac(args[1..].join(" ")));
         }
 
         "runlin " => {
-            let cmd = line[7..].trim();
-
-            if cmd.is_empty() {
-                panic!("Invalid empty runlin command");
+            if args.len() != 2 {
+                handle_failure("Invalid empty runlin command");
             }
 
             return Some(Command::RunLin(args[1..].join(" ")));
@@ -835,22 +829,22 @@ fn parse_line(line: &str) -> Option<Command> {
         // ENV
         "env" => {
             // env KEY=VALUE
-            return Some(Command::Env(args[1].clone(), args[1].clone()));
+            return Some(Command::Env(args[1].clone(), args[2].clone()));
         }
 
         "envwin" => {
             // env KEY=VALUE
-            return Some(Command::Env(args[1].clone(), args[1].clone()));
+            return Some(Command::Env(args[1].clone(), args[2].clone()));
         }
 
         "envmac" => {
             // env KEY=VALUE
-            return Some(Command::Env(args[1].clone(), args[1].clone()));
+            return Some(Command::Env(args[1].clone(), args[2].clone()));
         }
 
         "envlin" => {
             // env KEY=VALUE
-            return Some(Command::Env(args[1].clone(), args[1].clone()));
+            return Some(Command::Env(args[1].clone(), args[2].clone()));
         }
 
         // TASK

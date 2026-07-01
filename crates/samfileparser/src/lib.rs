@@ -68,7 +68,6 @@ mod helper;
 use fluaterm::{END, GREEN, RED, YELLOW};
 use fs_extra::{dir, file};
 use std::collections::{HashMap, HashSet};
-use std::env::consts::ARCH;
 use std::path::PathBuf;
 
 use crate::helper::split_args;
@@ -764,30 +763,40 @@ fn parse_line(line: &str) -> Option<Command> {
         // CD
         "cd" => {
             if args.len() != 2 {
-                panic!("cd PATH");
+                handle_failure("cd PATH");
             }
 
             return Some(Command::Cd(args[1].clone()));
         }
 
         "cdwin" => {
+            if args.len() != 2 {
+                handle_failure("cdwin PATH");
+            }
+
             return Some(Command::CdWin(args[1].clone()));
         }
 
         "cdmac" => {
+            if args.len() != 2 {
+                handle_failure("cdmac PATH");
+            }
+
             return Some(Command::CdMac(args[1].clone()));
         }
 
         "cdlin" => {
+            if args.len() != 2 {
+                handle_failure("cdlin PATH");
+            }
+
             return Some(Command::CdLin(args[1].clone()));
         }
 
         // RUN
         "run" => {
-            let cmd = line[4..].trim();
-
-            if cmd.is_empty() {
-                panic!("Invalid empty run command");
+            if args.len() != 2 {
+                handle_failure("Invalid empty run command");
             }
 
             return Some(Command::Run(args[1..].join(" ")));
@@ -839,616 +848,612 @@ fn parse_line(line: &str) -> Option<Command> {
             return Some(Command::Env(args[1].clone(), args[1].clone()));
         }
 
-        "envlin " => {
+        "envlin" => {
             // env KEY=VALUE
             return Some(Command::Env(args[1].clone(), args[1].clone()));
         }
 
-        _ => {}
-    
+        // TASK
+        "task" => {
+            // if name.is_empty() {
+            //     panic!("Invalid empty task command");
+            // }
 
-    // TASK
-    "task" => {
-        // if name.is_empty() {
-        //     panic!("Invalid empty task command");
-        // }
-
-        return Some(Command::Task(args[1]));
-    }
-
-    "taskwin " => {
-
-        // if name.is_empty() {
-        //     panic!("Invalid empty taskwin command");
-        // }
-
-        return Some(Command::TaskWin(args[1]));
-    }
-
-    "taskmac " => {
-
-        // if name.is_empty() {
-        //     panic!("Invalid empty taskmac command");
-        // }
-
-        return Some(Command::TaskMac(args[1]));
-    }
-
-    if lower.starts_with("tasklin ") {
-        let name = line[8..].trim();
-
-        if name.is_empty() {
-            panic!("Invalid empty tasklin command");
+            return Some(Command::Task(args[1].clone()));
         }
 
-        return Some(Command::TaskLin(name.to_string()));
-    }
+        "taskwin" => {
+            // if name.is_empty() {
+            //     panic!("Invalid empty taskwin command");
+            // }
 
-    // RM
-    if lower.starts_with("rm ") {
-        let path = line[3..].trim();
-
-        if path.is_empty() {
-            panic!("Invalid empty rm command");
+            return Some(Command::TaskWin(args[1].clone()));
         }
 
-        return Some(Command::Rm(path.to_string()));
-    }
+        "taskmac" => {
+            // if name.is_empty() {
+            //     panic!("Invalid empty taskmac command");
+            // }
 
-    if lower.starts_with("rmwin ") {
-        let path = line[6..].trim();
-
-        if path.is_empty() {
-            panic!("Invalid empty rmwin command");
+            return Some(Command::TaskMac(args[1].clone()));
         }
 
-        return Some(Command::RmWin(path.to_string()));
-    }
+        "tasklin" => {
+            let name = line[8..].trim();
 
-    if lower.starts_with("rmmac ") {
-        let path = line[6..].trim();
+            if name.is_empty() {
+                panic!("Invalid empty tasklin command");
+            }
 
-        if path.is_empty() {
-            panic!("Invalid empty rmmac command");
+            return Some(Command::TaskLin(name.to_string()));
         }
 
-        return Some(Command::RmMac(path.to_string()));
-    }
+        // RM
+        "rm" => {
+            let path = args[1..].join(" ");
 
-    if lower.starts_with("rmlin ") {
-        let path = line[6..].trim();
+            if path.is_empty() {
+                panic!("Invalid empty rm command");
+            }
 
-        if path.is_empty() {
-            panic!("Invalid empty rmlin command");
+            return Some(Command::Rm(path.to_string()));
         }
 
-        return Some(Command::RmLin(path.to_string()));
-    }
+        "rmwin" => {
+            let path = args[1..].join(" ");
 
-    // MKDIR
-    if lower.starts_with("mkdir ") {
-        let path = line[6..].trim();
+            if path.is_empty() {
+                panic!("Invalid empty rmwin command");
+            }
 
-        if path.is_empty() {
-            panic!("Invalid empty mkdir command");
+            return Some(Command::RmWin(path.to_string()));
         }
 
-        return Some(Command::Mkdir(path.to_string()));
-    }
+        "rmmac" => {
+            let path = args[1..].join(" ");
 
-    if lower.starts_with("mkdirwin ") {
-        let path = line[9..].trim();
+            if path.is_empty() {
+                panic!("Invalid empty rmmac command");
+            }
 
-        if path.is_empty() {
-            panic!("Invalid empty mkdirwin command");
+            return Some(Command::RmMac(path.to_string()));
         }
 
-        return Some(Command::MkdirWin(path.to_string()));
-    }
+        "rmlin" => {
+            let path = args[1..].join(" ");
 
-    if lower.starts_with("mkdirmac ") {
-        let path = line[9..].trim();
+            if path.is_empty() {
+                panic!("Invalid empty rmlin command");
+            }
 
-        if path.is_empty() {
-            panic!("Invalid empty mkdirmac command");
+            return Some(Command::RmLin(path.to_string()));
         }
 
-        return Some(Command::MkdirMac(path.to_string()));
-    }
+        // MKDIR
+        "mkdir" => {
+            let path = args[1..].join(" ");
 
-    if lower.starts_with("mkdirlin ") {
-        let path = line[9..].trim();
+            if path.is_empty() {
+                panic!("Invalid empty mkdir command");
+            }
 
-        if path.is_empty() {
-            panic!("Invalid empty mkdirlin command");
+            return Some(Command::Mkdir(path.to_string()));
         }
 
-        return Some(Command::MkdirLin(path.to_string()));
-    }
+        "mkdirwin" => {
+            let path = args[1..].join(" ");
 
-    // CP
-    if lower.starts_with("cp ") {
-        let rest = line[3..].trim();
+            if path.is_empty() {
+                panic!("Invalid empty mkdirwin command");
+            }
 
-        let mut parts = rest.split_whitespace();
-
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
-
-        if parts.next().is_some() {
-            panic!("cp expects exactly SOURCE DEST");
+            return Some(Command::MkdirWin(path.to_string()));
         }
 
-        return Some(Command::Cp(src.to_string(), dst.to_string()));
-    }
+        "mkdirmac" => {
+            let path = args[1..].join(" ");
 
-    if lower.starts_with("cpwin ") {
-        let rest = line[6..].trim();
+            if path.is_empty() {
+                panic!("Invalid empty mkdirmac command");
+            }
 
-        let mut parts = rest.split_whitespace();
-
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
-
-        if parts.next().is_some() {
-            panic!("cpwin expects exactly SOURCE DEST");
+            return Some(Command::MkdirMac(path.to_string()));
         }
 
-        return Some(Command::CpWin(src.to_string(), dst.to_string()));
-    }
+        "mkdirlin" => {
+            let path = args[1..].join(" ");
 
-    if lower.starts_with("cpmac ") {
-        let rest = line[6..].trim();
+            if path.is_empty() {
+                panic!("Invalid empty mkdirlin command");
+            }
 
-        let mut parts = rest.split_whitespace();
-
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
-
-        if parts.next().is_some() {
-            panic!("cpmac expects exactly SOURCE DEST");
+            return Some(Command::MkdirLin(path.to_string()));
         }
 
-        return Some(Command::CpMac(src.to_string(), dst.to_string()));
-    }
+        // CP
+        "cp" => {
+            let rest = line[3..].trim();
 
-    if lower.starts_with("cplin ") {
-        let rest = line[6..].trim();
+            let mut parts = rest.split_whitespace();
 
-        let mut parts = rest.split_whitespace();
+            let src = parts.next().expect("missing source");
+            let dst = parts.next().expect("missing destination");
 
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
+            if parts.next().is_some() {
+                panic!("cp expects exactly SOURCE DEST");
+            }
 
-        if parts.next().is_some() {
-            panic!("cplin expects exactly SOURCE DEST");
+            return Some(Command::Cp(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::CpLin(src.to_string(), dst.to_string()));
-    }
+        "cpwin" => {
+            let rest = line[6..].trim();
 
-    // MV
-    if lower.starts_with("mv ") {
-        let rest = line[3..].trim();
+            let mut parts = rest.split_whitespace();
 
-        let mut parts = rest.split_whitespace();
+            let src = parts.next().expect("missing source");
+            let dst = parts.next().expect("missing destination");
 
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
+            if parts.next().is_some() {
+                panic!("cpwin expects exactly SOURCE DEST");
+            }
 
-        if parts.next().is_some() {
-            panic!("mv expects exactly SOURCE DEST");
+            return Some(Command::CpWin(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::Mv(src.to_string(), dst.to_string()));
-    }
+        "cpmac" => {
+            let rest = line[6..].trim();
 
-    if lower.starts_with("mvwin ") {
-        let rest = line[6..].trim();
+            let mut parts = rest.split_whitespace();
 
-        let mut parts = rest.split_whitespace();
+            let src = parts.next().expect("missing source");
+            let dst = parts.next().expect("missing destination");
 
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
+            if parts.next().is_some() {
+                panic!("cpmac expects exactly SOURCE DEST");
+            }
 
-        if parts.next().is_some() {
-            panic!("mvwin expects exactly SOURCE DEST");
+            return Some(Command::CpMac(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::MvWin(src.to_string(), dst.to_string()));
-    }
+        "cplin" => {
+            let rest = line[6..].trim();
 
-    if lower.starts_with("mvmac ") {
-        let rest = line[6..].trim();
+            let mut parts = rest.split_whitespace();
 
-        let mut parts = rest.split_whitespace();
+            let src = parts.next().expect("missing source");
+            let dst = parts.next().expect("missing destination");
 
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
+            if parts.next().is_some() {
+                panic!("cplin expects exactly SOURCE DEST");
+            }
 
-        if parts.next().is_some() {
-            panic!("mvmac expects exactly SOURCE DEST");
+            return Some(Command::CpLin(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::MvMac(src.to_string(), dst.to_string()));
-    }
+        // MV
+        "mv" => {
+            let rest = line[3..].trim();
 
-    if lower.starts_with("mvlin ") {
-        let rest = line[6..].trim();
+            let mut parts = rest.split_whitespace();
 
-        let mut parts = rest.split_whitespace();
+            let src = parts.next().expect("missing source");
+            let dst = parts.next().expect("missing destination");
 
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
+            if parts.next().is_some() {
+                panic!("mv expects exactly SOURCE DEST");
+            }
 
-        if parts.next().is_some() {
-            panic!("mvlin expects exactly SOURCE DEST");
+            return Some(Command::Mv(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::MvLin(src.to_string(), dst.to_string()));
-    }
+        "mvwin" => {
+            let rest = line[6..].trim();
 
-    // SLEEP
-    if lower.starts_with("sleep ") {
-        let time = line[6..].trim();
+            let mut parts = rest.split_whitespace();
 
-        if time.is_empty() {
-            panic!("Invalid empty sleep command");
+            let src = parts.next().expect("missing source");
+            let dst = parts.next().expect("missing destination");
+
+            if parts.next().is_some() {
+                panic!("mvwin expects exactly SOURCE DEST");
+            }
+
+            return Some(Command::MvWin(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::Sleep(time.to_string()));
-    }
+        "mvmac" => {
+            let rest = line[6..].trim();
 
-    if lower.starts_with("sleepwin ") {
-        let time = line[9..].trim();
+            let mut parts = rest.split_whitespace();
 
-        if time.is_empty() {
-            panic!("Invalid empty sleepwin command");
+            let src = parts.next().expect("missing source");
+            let dst = parts.next().expect("missing destination");
+
+            if parts.next().is_some() {
+                panic!("mvmac expects exactly SOURCE DEST");
+            }
+
+            return Some(Command::MvMac(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::SleepWin(time.to_string()));
-    }
+        "mvlin" => {
+            let rest = line[6..].trim();
 
-    if lower.starts_with("sleepmac ") {
-        let time = line[9..].trim();
+            let mut parts = rest.split_whitespace();
 
-        if time.is_empty() {
-            panic!("Invalid empty sleepmac command");
+            let src = parts.next().expect("missing source");
+            let dst = parts.next().expect("missing destination");
+
+            if parts.next().is_some() {
+                panic!("mvlin expects exactly SOURCE DEST");
+            }
+
+            return Some(Command::MvLin(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::SleepMac(time.to_string()));
-    }
+        // SLEEP
+        "sleep" => {
+            let time = line[6..].trim();
 
-    if lower.starts_with("sleeplin ") {
-        let time = line[9..].trim();
+            if time.is_empty() {
+                panic!("Invalid empty sleep command");
+            }
 
-        if time.is_empty() {
-            panic!("Invalid empty sleeplin command");
+            return Some(Command::Sleep(args[1].clone()));
         }
 
-        return Some(Command::SleepLin(time.to_string()));
-    }
+        "sleepwin" => {
+            let time = line[9..].trim();
 
-    // SHELL
-    if lower.starts_with("shell ") {
-        let cmd = line[6..].trim();
+            if time.is_empty() {
+                panic!("Invalid empty sleepwin command");
+            }
 
-        if cmd.is_empty() {
-            panic!("Invalid empty shell command");
+            return Some(Command::SleepWin(args[1].clone()));
         }
 
-        return Some(Command::Shell(cmd.to_string()));
-    }
+        "sleepmac" => {
+            let time = line[9..].trim();
 
-    if lower.starts_with("shellwin ") {
-        let cmd = line[9..].trim();
+            if time.is_empty() {
+                panic!("Invalid empty sleepmac command");
+            }
 
-        if cmd.is_empty() {
-            panic!("Invalid empty shellwin command");
+            return Some(Command::SleepMac(args[1].clone()));
         }
 
-        return Some(Command::ShellWin(cmd.to_string()));
-    }
+        "sleeplin" => {
+            let time = line[9..].trim();
 
-    if lower.starts_with("shellmac ") {
-        let cmd = line[9..].trim();
+            if time.is_empty() {
+                panic!("Invalid empty sleeplin command");
+            }
 
-        if cmd.is_empty() {
-            panic!("Invalid empty shellmac command");
+            return Some(Command::SleepLin(args[1].clone()));
         }
 
-        return Some(Command::ShellMac(cmd.to_string()));
-    }
+        // SHELL
+        "shell" => {
+            let cmd = args[1..].join(" ");
 
-    if lower.starts_with("shelllin ") {
-        let cmd = line[9..].trim();
+            if cmd.is_empty() {
+                panic!("Invalid empty shell command");
+            }
 
-        if cmd.is_empty() {
-            panic!("Invalid empty shelllin command");
+            return Some(Command::Shell(cmd));
         }
 
-        return Some(Command::ShellLin(cmd.to_string()));
-    }
+        "shellwin" => {
+            let cmd = args[1..].join(" ");
 
-    // ECHO
-    if lower == "echo" {
-        return Some(Command::Echo(String::new()));
-    }
+            if cmd.is_empty() {
+                panic!("Invalid empty shellwin command");
+            }
 
-    if lower.starts_with("echo ") {
-        let cmd = line[5..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty echo command");
+            return Some(Command::ShellWin(cmd));
         }
 
-        return Some(Command::Echo(cmd.to_string()));
-    }
+        "shellmac" => {
+            let cmd = args[1..].join(" ");
 
-    if lower == "echowin" {
-        return Some(Command::EchoWin(String::new()));
-    }
+            if cmd.is_empty() {
+                panic!("Invalid empty shellmac command");
+            }
 
-    if lower.starts_with("echowin ") {
-        let cmd = line[8..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty echowin command");
+            return Some(Command::ShellMac(cmd));
         }
 
-        return Some(Command::EchoWin(cmd.to_string()));
-    }
+        "shelllin" => {
+            let cmd = args[1..].join(" ");
 
-    if lower == "echomac" {
-        return Some(Command::EchoMac(String::new()));
-    }
+            if cmd.is_empty() {
+                panic!("Invalid empty shelllin command");
+            }
 
-    if lower.starts_with("echomac ") {
-        let cmd = line[8..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty echomac command");
+            return Some(Command::ShellLin(cmd));
         }
 
-        return Some(Command::EchoMac(cmd.to_string()));
-    }
-
-    if lower == "echolin" {
-        return Some(Command::EchoLin(String::new()));
-    }
-
-    if lower.starts_with("echolin ") {
-        let cmd = line[8..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty echolin command");
+        // ECHO
+        "echo" => {
+            return Some(Command::Echo(String::new()));
         }
 
-        return Some(Command::EchoLin(cmd.to_string()));
-    }
+        "echo" => {
+            let cmd = args[1..].join(" ");
 
-    // WARN
-    if lower == "warn" {
-        return Some(Command::Warn(String::new()));
-    }
+            if cmd.is_empty() {
+                panic!("Invalid empty echo command");
+            }
 
-    if lower.starts_with("warn ") {
-        let cmd = line[5..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty warn command");
+            return Some(Command::Echo(cmd));
         }
 
-        return Some(Command::Warn(cmd.to_string()));
-    }
-
-    if lower == "warnwin" {
-        return Some(Command::WarnWin(String::new()));
-    }
-
-    if lower.starts_with("warnwin ") {
-        let cmd = line[8..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty warnwin command");
+        "echowin" => {
+            return Some(Command::EchoWin(String::new()));
         }
 
-        return Some(Command::WarnWin(cmd.to_string()));
-    }
+        "echowin" => {
+            let cmd = args[1..].join(" ");
 
-    if lower == "warnmac" {
-        return Some(Command::WarnMac(String::new()));
-    }
+            if cmd.is_empty() {
+                panic!("Invalid empty echowin command");
+            }
 
-    if lower.starts_with("warnmac ") {
-        let cmd = line[8..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty warnmac command");
+            return Some(Command::EchoWin(cmd.to_string()));
         }
 
-        return Some(Command::WarnMac(cmd.to_string()));
-    }
-
-    if lower == "warnlin" {
-        return Some(Command::WarnLin(String::new()));
-    }
-
-    if lower.starts_with("warnlin ") {
-        let cmd = line[8..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty warnlin command");
+        "echomac" => {
+            return Some(Command::EchoMac(String::new()));
         }
 
-        return Some(Command::WarnLin(cmd.to_string()));
-    }
+        "echomac" => {
+            let cmd = args[1..].join(" ");
 
-    // ERROR
-    if lower == "error" {
-        return Some(Command::Error(String::new()));
-    }
+            if cmd.is_empty() {
+                panic!("Invalid empty echomac command");
+            }
 
-    if lower.starts_with("error ") {
-        let cmd = line[6..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty error command");
+            return Some(Command::EchoMac(cmd.to_string()));
         }
 
-        return Some(Command::Error(cmd.to_string()));
-    }
-
-    if lower == "errorwin" {
-        return Some(Command::ErrorWin(String::new()));
-    }
-
-    if lower.starts_with("errorwin ") {
-        let cmd = line[9..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty errorwin command");
+        "echolin" => {
+            return Some(Command::EchoLin(String::new()));
         }
 
-        return Some(Command::ErrorWin(cmd.to_string()));
-    }
+        "echolin" => {
+            let cmd = args[1..].join(" ");
 
-    if lower == "errormac" {
-        return Some(Command::ErrorMac(String::new()));
-    }
+            if cmd.is_empty() {
+                panic!("Invalid empty echolin command");
+            }
 
-    if lower.starts_with("errormac ") {
-        let cmd = line[9..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty errormac command");
+            return Some(Command::EchoLin(cmd.to_string()));
         }
 
-        return Some(Command::ErrorMac(cmd.to_string()));
-    }
-
-    if lower == "errorlin" {
-        return Some(Command::ErrorLin(String::new()));
-    }
-
-    if lower.starts_with("errorlin ") {
-        let cmd = line[9..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty errorlin command");
+        // WARN
+        "warn" => {
+            return Some(Command::Warn(String::new()));
         }
 
-        return Some(Command::ErrorLin(cmd.to_string()));
+        "warn" => {
+            let cmd = args[1..].join(" ");
+
+            if cmd.is_empty() {
+                panic!("Invalid empty warn command");
+            }
+
+            return Some(Command::Warn(cmd.to_string()));
+        }
+
+        "warnwin" => {
+            return Some(Command::WarnWin(String::new()));
+        }
+
+        "warnwin" => {
+            let cmd = args[1..].join(" ");
+
+            if cmd.is_empty() {
+                panic!("Invalid empty warnwin command");
+            }
+
+            return Some(Command::WarnWin(cmd.to_string()));
+        }
+
+        "warnmac" => {
+            return Some(Command::WarnMac(String::new()));
+        }
+
+        "warnmac" => {
+            let cmd = args[1..].join(" ");
+
+            if cmd.is_empty() {
+                panic!("Invalid empty warnmac command");
+            }
+
+            return Some(Command::WarnMac(cmd.to_string()));
+        }
+
+        "warnlin" => {
+            return Some(Command::WarnLin(String::new()));
+        }
+
+        "warnlin" => {
+            let cmd = args[1..].join(" ");
+
+            if cmd.is_empty() {
+                panic!("Invalid empty warnlin command");
+            }
+
+            return Some(Command::WarnLin(cmd.to_string()));
+        }
+
+        // ERROR
+        "error" => {
+            return Some(Command::Error(String::new()));
+        }
+
+        "error" => {
+            let cmd = args[1..].join(" ");
+
+            if cmd.is_empty() {
+                panic!("Invalid empty error command");
+            }
+
+            return Some(Command::Error(cmd.to_string()));
+        }
+
+        "errorwin" => {
+            return Some(Command::ErrorWin(String::new()));
+        }
+
+        "errorwin" => {
+            let cmd = args[1..].join(" ");
+
+            if cmd.is_empty() {
+                panic!("Invalid empty errorwin command");
+            }
+
+            return Some(Command::ErrorWin(cmd.to_string()));
+        }
+
+        "errormac" => {
+            return Some(Command::ErrorMac(String::new()));
+        }
+
+        "errormac" => {
+            let cmd = args[1..].join(" ");
+
+            if cmd.is_empty() {
+                panic!("Invalid empty errormac command");
+            }
+
+            return Some(Command::ErrorMac(cmd.to_string()));
+        }
+
+        "errorlin" => {
+            return Some(Command::ErrorLin(String::new()));
+        }
+
+        "errorlin" => {
+            let cmd = args[1..].join(" ");
+
+            if cmd.is_empty() {
+                panic!("Invalid empty errorlin command");
+            }
+
+            return Some(Command::ErrorLin(cmd.to_string()));
+        }
+
+        // TOUCH
+        "touch" => {
+            return Some(Command::Touch(args[1..].join(" ").to_string()));
+        }
+
+        "touchwin" => {
+            return Some(Command::TouchWin(args[1..].join(" ").to_string()));
+        }
+
+        "touchmac" => {
+            return Some(Command::TouchMac(args[1..].join(" ").to_string()));
+        }
+
+        "touchlin" => {
+            return Some(Command::TouchLin(args[1..].join(" ").to_string()));
+        }
+
+        // WRITE
+        "write" => {
+            let rest = args[2..].join(" ");
+            let (path, content) = rest.split_once(' ').expect("write PATH CONTENT");
+
+            return Some(Command::Write(args[1].clone(), rest));
+        }
+
+        "writewin" => {
+            let rest = args[2..].join(" ");
+            let (path, content) = rest.split_once(' ').expect("writewin PATH CONTENT");
+
+            return Some(Command::WriteWin(args[1].clone(), rest));
+        }
+
+        "writemac" => {
+            let rest = args[2..].join(" ");
+            let (path, content) = rest.split_once(' ').expect("writemac PATH CONTENT");
+
+            return Some(Command::WriteMac(args[1].clone(), rest));
+        }
+
+        "writelin" => {
+            let rest = args[1..].join(" ");
+            let (path, content) = rest.split_once(' ').expect("writelin PATH CONTENT");
+
+            return Some(Command::WriteLin(path.to_string(), content.to_string()));
+        }
+
+        // APPEND
+        "append" => {
+            let rest = args[1..].join(" ");
+            let (path, content) = rest.split_once(' ').expect("append PATH CONTENT");
+
+            return Some(Command::Append(path.to_string(), content.to_string()));
+        }
+
+        "appendwin" => {
+            let rest = args[1..].join(" ");
+            let (path, content) = rest.split_once(' ').expect("appendwin PATH CONTENT");
+
+            return Some(Command::AppendWin(path.to_string(), content.to_string()));
+        }
+
+        "appendmac" => {
+            let rest = args[1..].join(" ");
+            let (path, content) = rest.split_once(' ').expect("appendmac PATH CONTENT");
+
+            return Some(Command::AppendMac(path.to_string(), content.to_string()));
+        }
+
+        "appendlin" => {
+            let rest = args[1..].join(" ");
+            let (path, content) = rest.split_once(' ').expect("appendlin PATH CONTENT");
+
+            return Some(Command::AppendLin(path.to_string(), content.to_string()));
+        }
+
+        "unsetenv" => {
+            return Some(Command::UnsetEnv(args[1].clone()));
+        }
+
+        "unsetenvwin " => {
+            return Some(Command::UnsetEnvWin(args[1].clone()));
+        }
+
+        "unsetenvmac" => {
+            return Some(Command::UnsetEnvMac(args[1].clone()));
+        }
+
+        "unsetenvlin" => {
+            return Some(Command::UnsetEnvLin(args[1].clone()));
+        }
+
+        "prompt" => {
+            return Some(Command::Prompt());
+        }
+
+        "promptwin" => {
+            return Some(Command::PromptWin());
+        }
+
+        "promptmac" => {
+            return Some(Command::PromptMac());
+        }
+
+        "promptlin" => {
+            return Some(Command::PromptLin());
+        }
+
+        _ => return None,
     }
-
-    // TOUCH
-    if lower.starts_with("touch ") {
-        return Some(Command::Touch(line[6..].trim().to_string()));
-    }
-
-    if lower.starts_with("touchwin ") {
-        return Some(Command::TouchWin(line[9..].trim().to_string()));
-    }
-
-    if lower.starts_with("touchmac ") {
-        return Some(Command::TouchMac(line[9..].trim().to_string()));
-    }
-
-    if lower.starts_with("touchlin ") {
-        return Some(Command::TouchLin(line[9..].trim().to_string()));
-    }
-
-    // WRITE
-    if lower.starts_with("write ") {
-        let rest = line[6..].trim();
-        let (path, content) = rest.split_once(' ').expect("write PATH CONTENT");
-
-        return Some(Command::Write(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("writewin ") {
-        let rest = line[9..].trim();
-        let (path, content) = rest.split_once(' ').expect("writewin PATH CONTENT");
-
-        return Some(Command::WriteWin(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("writemac ") {
-        let rest = line[9..].trim();
-        let (path, content) = rest.split_once(' ').expect("writemac PATH CONTENT");
-
-        return Some(Command::WriteMac(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("writelin ") {
-        let rest = line[9..].trim();
-        let (path, content) = rest.split_once(' ').expect("writelin PATH CONTENT");
-
-        return Some(Command::WriteLin(path.to_string(), content.to_string()));
-    }
-
-    // APPEND
-    if lower.starts_with("append ") {
-        let rest = line[7..].trim();
-        let (path, content) = rest.split_once(' ').expect("append PATH CONTENT");
-
-        return Some(Command::Append(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("appendwin ") {
-        let rest = line[10..].trim();
-        let (path, content) = rest.split_once(' ').expect("appendwin PATH CONTENT");
-
-        return Some(Command::AppendWin(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("appendmac ") {
-        let rest = line[10..].trim();
-        let (path, content) = rest.split_once(' ').expect("appendmac PATH CONTENT");
-
-        return Some(Command::AppendMac(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("appendlin") {
-        let rest = line[10..].trim();
-        let (path, content) = rest.split_once(' ').expect("appendlin PATH CONTENT");
-
-        return Some(Command::AppendLin(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("unsetenv ") {
-        return Some(Command::UnsetEnv(line[9..].trim().to_string()));
-    }
-
-    if lower.starts_with("unsetenvwin ") {
-        return Some(Command::UnsetEnvWin(line[12..].trim().to_string()));
-    }
-
-    if lower.starts_with("unsetenvmac ") {
-        return Some(Command::UnsetEnvMac(line[12..].trim().to_string()));
-    }
-
-    if lower.starts_with("unsetenvlin ") {
-        return Some(Command::UnsetEnvLin(line[12..].trim().to_string()));
-    }
-
-    if lower.starts_with("prompt") {
-        return Some(Command::Prompt());
-    }
-
-    if lower.starts_with("promptwin") {
-        return Some(Command::PromptWin());
-    }
-
-    if lower.starts_with("promptmac") {
-        return Some(Command::PromptMac());
-    }
-
-    if lower.starts_with("promptlin") {
-        return Some(Command::PromptLin());
-    }
-
-    None
 }
 
 // Function to parse the Header of a Task

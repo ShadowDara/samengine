@@ -873,13 +873,11 @@ fn parse_line(line: &str) -> Option<Command> {
         }
 
         "tasklin" => {
-            let name = line[8..].trim();
+            //if name.is_empty() {
+            //    panic!("Invalid empty tasklin command");
+            //}
 
-            if name.is_empty() {
-                panic!("Invalid empty tasklin command");
-            }
-
-            return Some(Command::TaskLin(name.to_string()));
+            return Some(Command::TaskLin(args[1].clone()));
         }
 
         // RM

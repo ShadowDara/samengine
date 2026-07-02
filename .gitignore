@@ -19,3 +19,5 @@ dist2/
 
 .npmrc
 /minifier/target
+
+*.vsix

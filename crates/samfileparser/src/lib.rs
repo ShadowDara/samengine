@@ -41,8 +41,16 @@
 //! test: build
 //!     run cargo test
 //! "#;
+//! 
+//! fn make_conf() -> RunConfig {
+//!     let conf = RunConfig {
+//!         debug: false,
+//!         errorMode: ErrorMode::FailFast,
+//!     };
+//!     return conf;
+//! }
 //!
-//! let tasks = parse(content);
+//! let tasks = parse(content, &make_conf());
 //! validate_all(&tasks);
 //!
 //! let mut state = RuntimeState {
@@ -753,7 +761,6 @@ pub fn validate_all(tasks: &Tasks) {
 // Function to parse a Line
 fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
     let args = split_args(line).clone();
-    let lower = line.to_lowercase();
 
     if args.is_empty() {
         return None;

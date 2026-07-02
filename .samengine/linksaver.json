@@ -11,7 +11,19 @@
       "licenselink": "https://mit-license.org/",
       "showinlist": true,
       "changenotice": true
+    },
+    {
+      "name": "@zulfikawr/fstree",
+      "link": "https://www.npmjs.com/package/@zulfikawr/fstree",
+      "description": "A zero-dependency Bun/Node CLI tool that renders a visual file/folder tree in the terminal and exports it as a file.",
+      "license": "MIT",
+      "author": "zulfikawr",
+      "licenselink": "https://mit-license.org/",
+      "showinlist": true,
+      "changenotice": true
     }
   ],
-  "links2": []
+  "links2": [],
+  "links3": [],
+  "note": "This file was generated with linksaver from seg from the samengine project. https://samengine.js.org or https://github.com/shadowdara/seg"
 }

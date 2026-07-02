@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "scripts": {
     "up": "npx automatic-md-index --no-h1 --files=docs/Api.md,docs/Build.md,docs/Config.md,docs/Get-Started.md,docs/README.md,CHANGELOG.md,README.md --no-strict --no-timestamp",
-    "read": "node scripts/copyreadme.js"
+    "read": "node scripts/copyreadme.js",
+    "gen": "npx seg -l view && node .samengine/copy.js && sam-cli minisite"
   },
   "devDependencies": {
-    "automatic-md-index": "^1.3.6"
+    "automatic-md-index": "^1.3.7",
+    "samengine-cli": "^2.0.6",
+    "@shadowdara/seg": "^0.1.26"
   }
 }

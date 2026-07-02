@@ -41,8 +41,16 @@
 //! test: build
 //!     run cargo test
 //! "#;
+//! 
+//! fn make_conf() -> RunConfig {
+//!     let conf = RunConfig {
+//!         debug: false,
+//!         errorMode: ErrorMode::FailFast,
+//!     };
+//!     return conf;
+//! }
 //!
-//! let tasks = parse(content);
+//! let tasks = parse(content, &make_conf());
 //! validate_all(&tasks);
 //!
 //! let mut state = RuntimeState {
@@ -60,13 +68,17 @@
 //! ```
 
 // some more usable functions
+pub mod fstree;
 pub mod init;
+
+mod helper;
 
 use fluaterm::{END, GREEN, RED, YELLOW};
 use fs_extra::{dir, file};
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 
+use crate::helper::split_args;
 use crate::init::{ErrorMode, RunConfig};
 
 /// A single executable instruction inside a [`Task`].
@@ -434,6 +446,8 @@ pub enum Command {
     // - downlaod
     // - clear
     // - open
+    /// ERROR COMMAND TYPE
+    THIS_COMMAND_WAS_WRONG_ERROR(),
 }
 
 /// HashMap of every Task
@@ -745,709 +759,734 @@ pub fn validate_all(tasks: &Tasks) {
 }
 
 // Function to parse a Line
-fn parse_line(line: &str) -> Option<Command> {
-    let line = line.trim();
+fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
+    let args = split_args(line).clone();
 
-    // normalize for case-insensitive matching
-    let lower = line.to_lowercase();
-
-    // CD
-    if lower.starts_with("cd ") {
-        return Some(Command::Cd(line[3..].to_string()));
+    if args.is_empty() {
+        return None;
     }
 
-    if lower.starts_with("cdwin ") {
-        return Some(Command::CdWin(line[6..].to_string()));
-    }
+    let cmd = args[0].to_lowercase();
 
-    if lower.starts_with("cdmac ") {
-        return Some(Command::CdMac(line[6..].to_string()));
-    }
+    let metadata = &CommandWithMeta {
+        command: Command::THIS_COMMAND_WAS_WRONG_ERROR(),
+        line: idx,
+        linstr: line.to_string(),
+    };
 
-    if lower.starts_with("cdlin ") {
-        return Some(Command::CdLin(line[6..].to_string()));
-    }
+    match cmd.as_str() {
+        // CD
+        "cd" => {
+            if args.len() < 2 {
+                handle_failure("cd PATH", conf, metadata);
+            }
 
-    // RUN
-    if lower.starts_with("run ") {
-        let cmd = line[4..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty run command");
+            return Some(Command::Cd(args[1].clone()));
         }
 
-        return Some(Command::Run(cmd.to_string()));
-    }
+        "cdwin" => {
+            if args.len() < 2 {
+                handle_failure("cdwin PATH", conf, metadata);
+            }
 
-    if lower.starts_with("runwin ") {
-        let cmd = line[7..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty runwin command");
+            return Some(Command::CdWin(args[1].clone()));
         }
 
-        return Some(Command::RunWin(cmd.to_string()));
-    }
+        "cdmac" => {
+            if args.len() < 2 {
+                handle_failure("cdmac PATH", conf, metadata);
+            }
 
-    if lower.starts_with("runmac ") {
-        let cmd = line[7..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty runmac command");
+            return Some(Command::CdMac(args[1].clone()));
         }
 
-        return Some(Command::RunMac(cmd.to_string()));
-    }
+        "cdlin" => {
+            if args.len() < 2 {
+                handle_failure("cdlin PATH", conf, metadata);
+            }
 
-    if lower.starts_with("runlin ") {
-        let cmd = line[7..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty runlin command");
+            return Some(Command::CdLin(args[1].clone()));
         }
 
-        return Some(Command::RunLin(cmd.to_string()));
-    }
+        // RUN
+        "run" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty run command", conf, metadata);
+            }
 
-    // ENV
-    if lower.starts_with("env ") {
-        // env KEY=VALUE
-        let rest = &line[4..];
-        if let Some((key, value)) = rest.split_once('=') {
-            return Some(Command::Env(key.trim().to_string(), value.to_string()));
-        }
-    }
-
-    if lower.starts_with("envwin ") {
-        // env KEY=VALUE
-        let rest = &line[7..];
-        if let Some((key, value)) = rest.split_once('=') {
-            return Some(Command::EnvWin(key.trim().to_string(), value.to_string()));
-        }
-    }
-
-    if lower.starts_with("envmac ") {
-        // env KEY=VALUE
-        let rest = &line[7..];
-        if let Some((key, value)) = rest.split_once('=') {
-            return Some(Command::EnvMac(key.trim().to_string(), value.to_string()));
-        }
-    }
-
-    if lower.starts_with("envlin ") {
-        // env KEY=VALUE
-        let rest = &line[7..];
-        if let Some((key, value)) = rest.split_once('=') {
-            return Some(Command::EnvLin(key.trim().to_string(), value.to_string()));
-        }
-    }
-
-    // TASK
-    if lower.starts_with("task ") {
-        let name = line[5..].trim();
-
-        if name.is_empty() {
-            panic!("Invalid empty task command");
+            return Some(Command::Run(args[1..].join(" ")));
         }
 
-        return Some(Command::Task(name.to_string()));
-    }
+        "runwin " => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty runwin command", conf, metadata);
+            }
 
-    if lower.starts_with("taskwin ") {
-        let name = line[8..].trim();
-
-        if name.is_empty() {
-            panic!("Invalid empty taskwin command");
+            return Some(Command::RunWin(args[1..].join(" ")));
         }
 
-        return Some(Command::TaskWin(name.to_string()));
-    }
+        "runmac " => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty runmac command", conf, metadata);
+            }
 
-    if lower.starts_with("taskmac ") {
-        let name = line[8..].trim();
-
-        if name.is_empty() {
-            panic!("Invalid empty taskmac command");
+            return Some(Command::RunMac(args[1..].join(" ")));
         }
 
-        return Some(Command::TaskMac(name.to_string()));
-    }
+        "runlin " => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty runlin command", conf, metadata);
+            }
 
-    if lower.starts_with("tasklin ") {
-        let name = line[8..].trim();
-
-        if name.is_empty() {
-            panic!("Invalid empty tasklin command");
+            return Some(Command::RunLin(args[1..].join(" ")));
         }
 
-        return Some(Command::TaskLin(name.to_string()));
-    }
+        // ENV
+        "env" => {
+            if args.len() <= 1 {
+                handle_failure("Invalid env command: env KEY=VALUE", conf, metadata);
+            }
 
-    // RM
-    if lower.starts_with("rm ") {
-        let path = line[3..].trim();
-
-        if path.is_empty() {
-            panic!("Invalid empty rm command");
+            // env KEY=VALUE
+            if let Some((key, value)) = args[1].split_once('=') {
+                return Some(Command::Env(key.trim().to_string(), value.to_string()));
+            } else {
+                handle_failure("Invalid env command: env KEY=VALUE", conf, metadata);
+                return None;
+            }
         }
 
-        return Some(Command::Rm(path.to_string()));
-    }
+        "envwin" => {
+            if args.len() <= 1 {
+                handle_failure("Invalid env command: env KEY=VALUE", conf, metadata);
+            }
 
-    if lower.starts_with("rmwin ") {
-        let path = line[6..].trim();
-
-        if path.is_empty() {
-            panic!("Invalid empty rmwin command");
+            // env KEY=VALUE
+            if let Some((key, value)) = args[1].split_once('=') {
+                return Some(Command::EnvWin(key.trim().to_string(), value.to_string()));
+            } else {
+                handle_failure("Invalid env command: env KEY=VALUE", conf, metadata);
+                return None;
+            }
         }
 
-        return Some(Command::RmWin(path.to_string()));
-    }
+        "envmac" => {
+            if args.len() <= 1 {
+                handle_failure("Invalid env command: env KEY=VALUE", conf, metadata);
+            }
 
-    if lower.starts_with("rmmac ") {
-        let path = line[6..].trim();
-
-        if path.is_empty() {
-            panic!("Invalid empty rmmac command");
+            // env KEY=VALUE
+            if let Some((key, value)) = args[1].split_once('=') {
+                return Some(Command::EnvMac(key.trim().to_string(), value.to_string()));
+            } else {
+                handle_failure("Invalid env command: env KEY=VALUE", conf, metadata);
+                return None;
+            }
         }
 
-        return Some(Command::RmMac(path.to_string()));
-    }
+        "envlin" => {
+            if args.len() <= 1 {
+                handle_failure("Invalid env command: env KEY=VALUE", conf, metadata);
+            }
 
-    if lower.starts_with("rmlin ") {
-        let path = line[6..].trim();
-
-        if path.is_empty() {
-            panic!("Invalid empty rmlin command");
+            // env KEY=VALUE
+            if let Some((key, value)) = args[1].split_once('=') {
+                return Some(Command::EnvLin(key.trim().to_string(), value.to_string()));
+            } else {
+                handle_failure("Invalid env command: env KEY=VALUE", conf, metadata);
+                return None;
+            }
         }
 
-        return Some(Command::RmLin(path.to_string()));
-    }
+        // TASK
+        "task" => {
+            if args.len() <= 1 {
+                handle_failure("Invalid empty task command", conf, metadata);
+            }
 
-    // MKDIR
-    if lower.starts_with("mkdir ") {
-        let path = line[6..].trim();
-
-        if path.is_empty() {
-            panic!("Invalid empty mkdir command");
+            return Some(Command::Task(args[1].clone()));
         }
 
-        return Some(Command::Mkdir(path.to_string()));
-    }
+        "taskwin" => {
+            if args.len() <= 1 {
+                handle_failure("Invalid empty taskwin command", conf, metadata);
+            }
 
-    if lower.starts_with("mkdirwin ") {
-        let path = line[9..].trim();
-
-        if path.is_empty() {
-            panic!("Invalid empty mkdirwin command");
+            return Some(Command::TaskWin(args[1].clone()));
         }
 
-        return Some(Command::MkdirWin(path.to_string()));
-    }
+        "taskmac" => {
+            if args.len() <= 1 {
+                handle_failure("Invalid empty taskmac command", conf, metadata);
+            }
 
-    if lower.starts_with("mkdirmac ") {
-        let path = line[9..].trim();
-
-        if path.is_empty() {
-            panic!("Invalid empty mkdirmac command");
+            return Some(Command::TaskMac(args[1].clone()));
         }
 
-        return Some(Command::MkdirMac(path.to_string()));
-    }
+        "tasklin" => {
+            if args.len() <= 1 {
+                handle_failure("Invalid empty tasklin command", conf, metadata);
+            }
 
-    if lower.starts_with("mkdirlin ") {
-        let path = line[9..].trim();
-
-        if path.is_empty() {
-            panic!("Invalid empty mkdirlin command");
+            return Some(Command::TaskLin(args[1].clone()));
         }
 
-        return Some(Command::MkdirLin(path.to_string()));
-    }
+        // RM
+        "rm" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty rm command", conf, metadata);
+            }
 
-    // CP
-    if lower.starts_with("cp ") {
-        let rest = line[3..].trim();
+            let path = args[1..].join(" ");
 
-        let mut parts = rest.split_whitespace();
-
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
-
-        if parts.next().is_some() {
-            panic!("cp expects exactly SOURCE DEST");
+            return Some(Command::Rm(path.to_string()));
         }
 
-        return Some(Command::Cp(src.to_string(), dst.to_string()));
-    }
+        "rmwin" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty rmwin command", conf, metadata);
+            }
 
-    if lower.starts_with("cpwin ") {
-        let rest = line[6..].trim();
+            let path = args[1..].join(" ");
 
-        let mut parts = rest.split_whitespace();
-
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
-
-        if parts.next().is_some() {
-            panic!("cpwin expects exactly SOURCE DEST");
+            return Some(Command::RmWin(path.to_string()));
         }
 
-        return Some(Command::CpWin(src.to_string(), dst.to_string()));
-    }
+        "rmmac" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty rmmac command", conf, metadata);
+            }
 
-    if lower.starts_with("cpmac ") {
-        let rest = line[6..].trim();
+            let path = args[1..].join(" ");
 
-        let mut parts = rest.split_whitespace();
-
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
-
-        if parts.next().is_some() {
-            panic!("cpmac expects exactly SOURCE DEST");
+            return Some(Command::RmMac(path.to_string()));
         }
 
-        return Some(Command::CpMac(src.to_string(), dst.to_string()));
-    }
+        "rmlin" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty rmlin command", conf, metadata);
+            }
 
-    if lower.starts_with("cplin ") {
-        let rest = line[6..].trim();
+            let path = args[1..].join(" ");
 
-        let mut parts = rest.split_whitespace();
-
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
-
-        if parts.next().is_some() {
-            panic!("cplin expects exactly SOURCE DEST");
+            return Some(Command::RmLin(path.to_string()));
         }
 
-        return Some(Command::CpLin(src.to_string(), dst.to_string()));
-    }
+        // MKDIR
+        "mkdir" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty mkdir command", conf, metadata);
+            }
 
-    // MV
-    if lower.starts_with("mv ") {
-        let rest = line[3..].trim();
+            let path = args[1..].join(" ");
 
-        let mut parts = rest.split_whitespace();
-
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
-
-        if parts.next().is_some() {
-            panic!("mv expects exactly SOURCE DEST");
+            return Some(Command::Mkdir(path.to_string()));
         }
 
-        return Some(Command::Mv(src.to_string(), dst.to_string()));
-    }
+        "mkdirwin" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty mkdirwin command", conf, metadata);
+            }
 
-    if lower.starts_with("mvwin ") {
-        let rest = line[6..].trim();
+            let path = args[1..].join(" ");
 
-        let mut parts = rest.split_whitespace();
-
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
-
-        if parts.next().is_some() {
-            panic!("mvwin expects exactly SOURCE DEST");
+            return Some(Command::MkdirWin(path.to_string()));
         }
 
-        return Some(Command::MvWin(src.to_string(), dst.to_string()));
-    }
+        "mkdirmac" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty mkdirmac command", conf, metadata);
+            }
+            let path = args[1..].join(" ");
 
-    if lower.starts_with("mvmac ") {
-        let rest = line[6..].trim();
-
-        let mut parts = rest.split_whitespace();
-
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
-
-        if parts.next().is_some() {
-            panic!("mvmac expects exactly SOURCE DEST");
+            return Some(Command::MkdirMac(path.to_string()));
         }
 
-        return Some(Command::MvMac(src.to_string(), dst.to_string()));
-    }
+        "mkdirlin" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty mkdirlin command", conf, metadata);
+            }
+            let path = args[1..].join(" ");
 
-    if lower.starts_with("mvlin ") {
-        let rest = line[6..].trim();
-
-        let mut parts = rest.split_whitespace();
-
-        let src = parts.next().expect("missing source");
-        let dst = parts.next().expect("missing destination");
-
-        if parts.next().is_some() {
-            panic!("mvlin expects exactly SOURCE DEST");
+            return Some(Command::MkdirLin(path.to_string()));
         }
 
-        return Some(Command::MvLin(src.to_string(), dst.to_string()));
-    }
+        // CP
+        "cp" => {
+            if args.len() < 3 {
+                handle_failure("cp expects exactly SOURCE DEST", conf, metadata);
+            }
 
-    // SLEEP
-    if lower.starts_with("sleep ") {
-        let time = line[6..].trim();
-
-        if time.is_empty() {
-            panic!("Invalid empty sleep command");
+            return Some(Command::Cp(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::Sleep(time.to_string()));
-    }
+        "cpwin" => {
+            if args.len() < 3 {
+                handle_failure("cp expects exactly SOURCE DEST", conf, metadata);
+            }
 
-    if lower.starts_with("sleepwin ") {
-        let time = line[9..].trim();
-
-        if time.is_empty() {
-            panic!("Invalid empty sleepwin command");
+            return Some(Command::CpWin(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::SleepWin(time.to_string()));
-    }
+        "cpmac" => {
+            if args.len() < 3 {
+                handle_failure("cp expects exactly SOURCE DEST", conf, metadata);
+            }
 
-    if lower.starts_with("sleepmac ") {
-        let time = line[9..].trim();
-
-        if time.is_empty() {
-            panic!("Invalid empty sleepmac command");
+            return Some(Command::CpMac(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::SleepMac(time.to_string()));
-    }
+        "cplin" => {
+            if args.len() < 3 {
+                handle_failure("cp expects exactly SOURCE DEST", conf, metadata);
+            }
 
-    if lower.starts_with("sleeplin ") {
-        let time = line[9..].trim();
-
-        if time.is_empty() {
-            panic!("Invalid empty sleeplin command");
+            return Some(Command::CpLin(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::SleepLin(time.to_string()));
-    }
+        // MV
+        "mv" => {
+            if args.len() < 3 {
+                handle_failure("mv expects exactly SOURCE DEST", conf, metadata);
+            }
 
-    // SHELL
-    if lower.starts_with("shell ") {
-        let cmd = line[6..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty shell command");
+            return Some(Command::Mv(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::Shell(cmd.to_string()));
-    }
+        "mvwin" => {
+            if args.len() < 3 {
+                handle_failure("mvwin expects exactly SOURCE DEST", conf, metadata);
+            }
 
-    if lower.starts_with("shellwin ") {
-        let cmd = line[9..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty shellwin command");
+            return Some(Command::MvWin(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::ShellWin(cmd.to_string()));
-    }
+        "mvmac" => {
+            if args.len() < 3 {
+                handle_failure("mvmac expects exactly SOURCE DEST", conf, metadata);
+            }
 
-    if lower.starts_with("shellmac ") {
-        let cmd = line[9..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty shellmac command");
+            return Some(Command::MvMac(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::ShellMac(cmd.to_string()));
-    }
+        "mvlin" => {
+            if args.len() < 3 {
+                handle_failure("mvlin expects exactly SOURCE DEST", conf, metadata);
+            }
 
-    if lower.starts_with("shelllin ") {
-        let cmd = line[9..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty shelllin command");
+            return Some(Command::MvLin(args[1].clone(), args[2].clone()));
         }
 
-        return Some(Command::ShellLin(cmd.to_string()));
-    }
+        // SLEEP
+        "sleep" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty sleep command", conf, metadata);
+            }
 
-    // ECHO
-    if lower == "echo" {
-        return Some(Command::Echo(String::new()));
-    }
-
-    if lower.starts_with("echo ") {
-        let cmd = line[5..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty echo command");
+            return Some(Command::Sleep(args[1].clone()));
         }
 
-        return Some(Command::Echo(cmd.to_string()));
-    }
+        "sleepwin" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty sleepwin command", conf, metadata);
+            }
 
-    if lower == "echowin" {
-        return Some(Command::EchoWin(String::new()));
-    }
-
-    if lower.starts_with("echowin ") {
-        let cmd = line[8..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty echowin command");
+            return Some(Command::SleepWin(args[1].clone()));
         }
 
-        return Some(Command::EchoWin(cmd.to_string()));
-    }
+        "sleepmac" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty sleepmac command", conf, metadata);
+            }
 
-    if lower == "echomac" {
-        return Some(Command::EchoMac(String::new()));
-    }
-
-    if lower.starts_with("echomac ") {
-        let cmd = line[8..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty echomac command");
+            return Some(Command::SleepMac(args[1].clone()));
         }
 
-        return Some(Command::EchoMac(cmd.to_string()));
-    }
+        "sleeplin" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty sleeplin command", conf, metadata);
+            }
 
-    if lower == "echolin" {
-        return Some(Command::EchoLin(String::new()));
-    }
-
-    if lower.starts_with("echolin ") {
-        let cmd = line[8..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty echolin command");
+            return Some(Command::SleepLin(args[1].clone()));
         }
 
-        return Some(Command::EchoLin(cmd.to_string()));
-    }
+        // SHELL
+        "shell" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty shell command", conf, metadata);
+            }
 
-    // WARN
-    if lower == "warn" {
-        return Some(Command::Warn(String::new()));
-    }
+            let cmd = args[1..].join(" ");
 
-    if lower.starts_with("warn ") {
-        let cmd = line[5..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty warn command");
+            return Some(Command::Shell(cmd));
         }
 
-        return Some(Command::Warn(cmd.to_string()));
-    }
+        "shellwin" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty shellwin command", conf, metadata);
+            }
 
-    if lower == "warnwin" {
-        return Some(Command::WarnWin(String::new()));
-    }
+            let cmd = args[1..].join(" ");
 
-    if lower.starts_with("warnwin ") {
-        let cmd = line[8..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty warnwin command");
+            return Some(Command::ShellWin(cmd));
         }
 
-        return Some(Command::WarnWin(cmd.to_string()));
-    }
+        "shellmac" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty shellmac command", conf, metadata);
+            }
 
-    if lower == "warnmac" {
-        return Some(Command::WarnMac(String::new()));
-    }
+            let cmd = args[1..].join(" ");
 
-    if lower.starts_with("warnmac ") {
-        let cmd = line[8..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty warnmac command");
+            return Some(Command::ShellMac(cmd));
         }
 
-        return Some(Command::WarnMac(cmd.to_string()));
-    }
+        "shelllin" => {
+            if args.len() < 2 {
+                handle_failure("Invalid empty shelllin command", conf, metadata);
+            }
 
-    if lower == "warnlin" {
-        return Some(Command::WarnLin(String::new()));
-    }
+            let cmd = args[1..].join(" ");
 
-    if lower.starts_with("warnlin ") {
-        let cmd = line[8..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty warnlin command");
+            return Some(Command::ShellLin(cmd));
         }
 
-        return Some(Command::WarnLin(cmd.to_string()));
-    }
+        // ECHO
+        "echo" => {
+            if args.len() < 2 {
+                return Some(Command::Echo(String::new()));
+            }
 
-    // ERROR
-    if lower == "error" {
-        return Some(Command::Error(String::new()));
-    }
+            let cmd = args[1..].join(" ");
 
-    if lower.starts_with("error ") {
-        let cmd = line[6..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty error command");
+            return Some(Command::Echo(cmd));
         }
 
-        return Some(Command::Error(cmd.to_string()));
-    }
+        "echowin" => {
+            if args.len() < 2 {
+                return Some(Command::EchoWin(String::new()));
+            }
 
-    if lower == "errorwin" {
-        return Some(Command::ErrorWin(String::new()));
-    }
+            let cmd = args[1..].join(" ");
 
-    if lower.starts_with("errorwin ") {
-        let cmd = line[9..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty errorwin command");
+            return Some(Command::EchoWin(cmd.to_string()));
         }
 
-        return Some(Command::ErrorWin(cmd.to_string()));
-    }
+        "echomac" => {
+            if args.len() < 2 {
+                return Some(Command::EchoMac(String::new()));
+            }
 
-    if lower == "errormac" {
-        return Some(Command::ErrorMac(String::new()));
-    }
+            let cmd = args[1..].join(" ");
 
-    if lower.starts_with("errormac ") {
-        let cmd = line[9..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty errormac command");
+            return Some(Command::EchoMac(cmd.to_string()));
         }
 
-        return Some(Command::ErrorMac(cmd.to_string()));
-    }
+        "echolin" => {
+            if args.len() < 2 {
+                return Some(Command::EchoLin(String::new()));
+            }
 
-    if lower == "errorlin" {
-        return Some(Command::ErrorLin(String::new()));
-    }
+            let cmd = args[1..].join(" ");
 
-    if lower.starts_with("errorlin ") {
-        let cmd = line[9..].trim();
-
-        if cmd.is_empty() {
-            panic!("Invalid empty errorlin command");
+            return Some(Command::EchoLin(cmd.to_string()));
         }
 
-        return Some(Command::ErrorLin(cmd.to_string()));
+        // WARN
+        "warn" => {
+            if args.len() < 2 {
+                return Some(Command::Warn(String::new()));
+            }
+
+            let cmd = args[1..].join(" ");
+
+            return Some(Command::Warn(cmd.to_string()));
+        }
+
+        "warnwin" => {
+            if args.len() < 2 {
+                return Some(Command::WarnWin(String::new()));
+            }
+
+            let cmd = args[1..].join(" ");
+
+            return Some(Command::WarnWin(cmd.to_string()));
+        }
+
+        "warnmac" => {
+            if args.len() < 2 {
+                return Some(Command::WarnMac(String::new()));
+            }
+
+            let cmd = args[1..].join(" ");
+
+            return Some(Command::WarnMac(cmd.to_string()));
+        }
+
+        "warnlin" => {
+            if args.len() < 2 {
+                return Some(Command::WarnLin(String::new()));
+            }
+
+            let cmd = args[1..].join(" ");
+
+            return Some(Command::WarnLin(cmd.to_string()));
+        }
+
+        // ERROR
+        "error" => {
+            if args.len() < 2 {
+                return Some(Command::Error(String::new()));
+            }
+
+            let cmd = args[1..].join(" ");
+
+            return Some(Command::Error(cmd.to_string()));
+        }
+
+        "errorwin" => {
+            if args.len() < 2 {
+                return Some(Command::ErrorWin(String::new()));
+            }
+
+            let cmd = args[1..].join(" ");
+
+            return Some(Command::ErrorWin(cmd.to_string()));
+        }
+
+        "errormac" => {
+            if args.len() < 2 {
+                return Some(Command::ErrorMac(String::new()));
+            }
+
+            let cmd = args[1..].join(" ");
+
+            return Some(Command::ErrorMac(cmd.to_string()));
+        }
+
+        "errorlin" => {
+            if args.len() < 2 {
+                return Some(Command::ErrorLin(String::new()));
+            }
+
+            let cmd = args[1..].join(" ");
+
+            return Some(Command::ErrorLin(cmd.to_string()));
+        }
+
+        // TOUCH
+        "touch" => {
+            if args.len() < 2 {
+                handle_failure("Invalid touch command: touch <filename>", conf, metadata);
+            }
+
+            return Some(Command::Touch(args[1..].join(" ").to_string()));
+        }
+
+        "touchwin" => {
+            if args.len() < 2 {
+                handle_failure("Invalid touch command: touch <filename>", conf, metadata);
+            }
+
+            return Some(Command::TouchWin(args[1..].join(" ").to_string()));
+        }
+
+        "touchmac" => {
+            if args.len() < 2 {
+                handle_failure("Invalid touch command: touch <filename>", conf, metadata);
+            }
+
+            return Some(Command::TouchMac(args[1..].join(" ").to_string()));
+        }
+
+        "touchlin" => {
+            if args.len() < 2 {
+                handle_failure("Invalid touch command: touch <filename>", conf, metadata);
+            }
+
+            return Some(Command::TouchLin(args[1..].join(" ").to_string()));
+        }
+
+        // WRITE
+        "write" => {
+            if args.len() < 3 {
+                handle_failure(
+                    "Invalid write command: write <filename> <content>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            let rest = args[2..].join(" ");
+
+            return Some(Command::Write(args[1].clone(), rest));
+        }
+
+        "writewin" => {
+            if args.len() < 3 {
+                handle_failure(
+                    "Invalid write command: write <filename> <content>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            let rest = args[2..].join(" ");
+
+            return Some(Command::WriteWin(args[1].clone(), rest));
+        }
+
+        "writemac" => {
+            if args.len() < 3 {
+                handle_failure(
+                    "Invalid write command: write <filename> <content>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            let rest = args[2..].join(" ");
+
+            return Some(Command::WriteMac(args[1].clone(), rest));
+        }
+
+        "writelin" => {
+            if args.len() < 3 {
+                handle_failure(
+                    "Invalid write command: write <filename> <content>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            let rest = args[1..].join(" ");
+
+            return Some(Command::WriteLin(args[1].clone(), rest.to_string()));
+        }
+
+        // APPEND
+        "append" => {
+            if args.len() < 3 {
+                handle_failure(
+                    "Invalid append command: append <filename> <content>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            let rest = args[1..].join(" ");
+
+            return Some(Command::Append(args[1].clone(), rest.to_string()));
+        }
+
+        "appendwin" => {
+            if args.len() < 3 {
+                handle_failure(
+                    "Invalid append command: append <filename> <content>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            let rest = args[1..].join(" ");
+
+            return Some(Command::AppendWin(args[1].clone(), rest.to_string()));
+        }
+
+        "appendmac" => {
+            if args.len() < 3 {
+                handle_failure(
+                    "Invalid append command: append <filename> <content>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            let rest = args[1..].join(" ");
+
+            return Some(Command::AppendMac(args[1].clone(), rest.to_string()));
+        }
+
+        "appendlin" => {
+            if args.len() < 3 {
+                handle_failure(
+                    "Invalid append command: append <filename> <content>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            let rest = args[1..].join(" ");
+
+            return Some(Command::AppendLin(args[1].clone(), rest.to_string()));
+        }
+
+        "unsetenv" => {
+            if args.len() < 2 {
+                handle_failure(
+                    "Invalid unsetenvh command: unsetenv <envvar>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            return Some(Command::UnsetEnv(args[1].clone()));
+        }
+
+        "unsetenvwin " => {
+            if args.len() < 2 {
+                handle_failure(
+                    "Invalid unsetenvh command: unsetenv <envvar>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            return Some(Command::UnsetEnvWin(args[1].clone()));
+        }
+
+        "unsetenvmac" => {
+            if args.len() < 2 {
+                handle_failure(
+                    "Invalid unsetenvh command: unsetenv <envvar>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            return Some(Command::UnsetEnvMac(args[1].clone()));
+        }
+
+        "unsetenvlin" => {
+            if args.len() < 2 {
+                handle_failure(
+                    "Invalid unsetenvh command: unsetenv <envvar>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            return Some(Command::UnsetEnvLin(args[1].clone()));
+        }
+
+        "prompt" => {
+            return Some(Command::Prompt());
+        }
+
+        "promptwin" => {
+            return Some(Command::PromptWin());
+        }
+
+        "promptmac" => {
+            return Some(Command::PromptMac());
+        }
+
+        "promptlin" => {
+            return Some(Command::PromptLin());
+        }
+
+        _ => return None,
     }
-
-    // TOUCH
-    if lower.starts_with("touch ") {
-        return Some(Command::Touch(line[6..].trim().to_string()));
-    }
-
-    if lower.starts_with("touchwin ") {
-        return Some(Command::TouchWin(line[9..].trim().to_string()));
-    }
-
-    if lower.starts_with("touchmac ") {
-        return Some(Command::TouchMac(line[9..].trim().to_string()));
-    }
-
-    if lower.starts_with("touchlin ") {
-        return Some(Command::TouchLin(line[9..].trim().to_string()));
-    }
-
-    // WRITE
-    if lower.starts_with("write ") {
-        let rest = line[6..].trim();
-        let (path, content) = rest.split_once(' ').expect("write PATH CONTENT");
-
-        return Some(Command::Write(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("writewin ") {
-        let rest = line[9..].trim();
-        let (path, content) = rest.split_once(' ').expect("writewin PATH CONTENT");
-
-        return Some(Command::WriteWin(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("writemac ") {
-        let rest = line[9..].trim();
-        let (path, content) = rest.split_once(' ').expect("writemac PATH CONTENT");
-
-        return Some(Command::WriteMac(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("writelin ") {
-        let rest = line[9..].trim();
-        let (path, content) = rest.split_once(' ').expect("writelin PATH CONTENT");
-
-        return Some(Command::WriteLin(path.to_string(), content.to_string()));
-    }
-
-    // APPEND
-    if lower.starts_with("append ") {
-        let rest = line[7..].trim();
-        let (path, content) = rest.split_once(' ').expect("append PATH CONTENT");
-
-        return Some(Command::Append(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("appendwin ") {
-        let rest = line[10..].trim();
-        let (path, content) = rest.split_once(' ').expect("appendwin PATH CONTENT");
-
-        return Some(Command::AppendWin(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("appendmac ") {
-        let rest = line[10..].trim();
-        let (path, content) = rest.split_once(' ').expect("appendmac PATH CONTENT");
-
-        return Some(Command::AppendMac(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("appendlin") {
-        let rest = line[10..].trim();
-        let (path, content) = rest.split_once(' ').expect("appendlin PATH CONTENT");
-
-        return Some(Command::AppendLin(path.to_string(), content.to_string()));
-    }
-
-    if lower.starts_with("unsetenv ") {
-        return Some(Command::UnsetEnv(line[9..].trim().to_string()));
-    }
-
-    if lower.starts_with("unsetenvwin ") {
-        return Some(Command::UnsetEnvWin(line[12..].trim().to_string()));
-    }
-
-    if lower.starts_with("unsetenvmac ") {
-        return Some(Command::UnsetEnvMac(line[12..].trim().to_string()));
-    }
-
-    if lower.starts_with("unsetenvlin ") {
-        return Some(Command::UnsetEnvLin(line[12..].trim().to_string()));
-    }
-
-    if lower.starts_with("prompt") {
-        return Some(Command::Prompt());
-    }
-
-    if lower.starts_with("promptwin") {
-        return Some(Command::PromptWin());
-    }
-
-    if lower.starts_with("promptmac") {
-        return Some(Command::PromptMac());
-    }
-
-    if lower.starts_with("promptlin") {
-        return Some(Command::PromptLin());
-    }
-
-    None
 }
 
 // Function to parse the Header of a Task
@@ -1479,7 +1518,7 @@ fn parse_task_header(line: &str) -> (String, Vec<String>) {
 /// - unknown command lines are ignored and reported as warnings
 ///
 /// The returned map is keyed by task name.
-pub fn parse(content: &str) -> Tasks {
+pub fn parse(content: &str, conf: &RunConfig) -> Tasks {
     let mut tasks = HashMap::new();
     let mut current: Option<String> = None;
 
@@ -1520,7 +1559,7 @@ pub fn parse(content: &str) -> Tasks {
         // command
         else if line.starts_with(' ') {
             if let Some(task_name) = &current {
-                match parse_line(line) {
+                match parse_line(line, conf, idx) {
                     Some(cmd) => {
                         tasks
                             .get_mut(task_name)
@@ -1529,7 +1568,7 @@ pub fn parse(content: &str) -> Tasks {
                             .push(CommandWithMeta {
                                 command: cmd,
                                 line: line_no,
-                                linstr: line.to_string()
+                                linstr: line.to_string(),
                             });
                     }
 
@@ -2090,7 +2129,12 @@ pub fn run_task(
                 if cfg!(target_os = "linux") {
                     prompt()
                 }
-            } // _ => todo!()
+            }
+
+            // ERROR TYPE
+            Command::THIS_COMMAND_WAS_WRONG_ERROR() => {
+                println!("{}This Command was wrong!{}", RED, END);
+            }
         }
     }
 }
@@ -2132,7 +2176,7 @@ build:
     run echo hello
 "#;
 
-        let tasks = parse(input);
+        let tasks = parse(input, &make_conf());
         assert!(tasks.contains_key("build"));
         assert_eq!(tasks["build"].commands.len(), 1);
     }
@@ -2144,7 +2188,7 @@ a:
 b: a
 "#;
 
-        let tasks = parse(input);
+        let tasks = parse(input, &make_conf());
         assert_eq!(tasks["b"].deps, vec!["a"]);
     }
 
@@ -2155,7 +2199,7 @@ a: b
 b: a
 "#;
 
-        let tasks = parse(input);
+        let tasks = parse(input, &make_conf());
 
         let result = std::panic::catch_unwind(|| validate_all(&tasks));
         assert!(result.is_err());
@@ -2168,7 +2212,7 @@ t:
     env KEY=value
 "#;
 
-        let tasks = parse(input);
+        let tasks = parse(input, &make_conf());
         match tasks["t"].commands[0].command {
             Command::Env(ref k, ref v) => {
                 assert_eq!(k, "KEY");
@@ -2185,7 +2229,7 @@ t:
     rm test.txt
 "#;
 
-        let tasks = parse(input);
+        let tasks = parse(input, &make_conf());
         match &tasks["t"].commands[0].command {
             Command::Rm(p) => assert_eq!(p, "test.txt"),
             _ => panic!("wrong command"),
@@ -2199,7 +2243,7 @@ a:
     echo hello
 "#;
 
-        let tasks = parse(input);
+        let tasks = parse(input, &make_conf());
         validate_all(&tasks);
 
         let mut state = make_state();
@@ -2218,7 +2262,7 @@ b: a
     echo B
 "#;
 
-        let tasks = parse(input);
+        let tasks = parse(input, &make_conf());
         validate_all(&tasks);
 
         let mut state = make_state();
@@ -2235,7 +2279,7 @@ t:
     RuN echo hello
 "#;
 
-        let tasks = parse(input);
+        let tasks = parse(input, &make_conf());
         assert!(matches!(tasks["t"].commands[0].command, Command::Env(_, _)));
         assert!(matches!(tasks["t"].commands[1].command, Command::Run(_)));
     }

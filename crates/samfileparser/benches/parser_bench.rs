@@ -1,5 +1,16 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use samfileparser::parse;
+use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use samfileparser::{
+    init::{ErrorMode, RunConfig},
+    parse,
+};
+
+fn make_conf() -> RunConfig {
+    let conf = RunConfig {
+        debug: false,
+        errorMode: ErrorMode::FailFast,
+    };
+    return conf;
+}
 
 fn build_big_samfile() -> String {
     let mut s = String::new();
@@ -26,7 +37,7 @@ fn bench_parser(c: &mut Criterion) {
 
     c.bench_function("parse_big_samfile", |b| {
         b.iter(|| {
-            let tasks = parse(black_box(&input));
+            let tasks = parse(black_box(&input), &make_conf());
             black_box(tasks);
         });
     });

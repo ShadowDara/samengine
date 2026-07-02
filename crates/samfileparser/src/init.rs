@@ -1,11 +1,11 @@
 use std::{collections::HashMap, fs, path::Path};
 
-use fluaterm::{YELLOW, END};
+use fluaterm::{END, YELLOW};
 
+use crate::RuntimeState;
+use crate::parse;
 use crate::run_task;
 use crate::validate_all;
-use crate::parse;
-use crate::RuntimeState;
 
 /// Defines how execution errors are handled during task execution.
 ///
@@ -81,7 +81,7 @@ pub fn run_sam_file(command: &str, conf: RunConfig) {
         }
     };
 
-    let tasks = parse(&content);
+    let tasks = parse(&content, &conf);
 
     // Check for cycled dependencies
     validate_all(&tasks);
@@ -107,14 +107,10 @@ pub fn init() {
     println!("Creating a new samfile!");
 
     // Create .samengine Directory
-    std::fs::create_dir_all(dir)
-        .expect("failed to create directory");
+    std::fs::create_dir_all(dir).expect("failed to create directory");
 
-    std::fs::write(
-        &file,
-        "# A new samfile, write your scripts here"
-    )
-    .expect("failed to create file");
+    std::fs::write(&file, "# A new samfile, write your scripts here")
+        .expect("failed to create file");
 
     let dir2 = std::env::current_dir()
         .unwrap()

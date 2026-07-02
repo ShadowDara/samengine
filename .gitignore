@@ -18,3 +18,4 @@ dist2/
 /minisite-md/index.html
 
 .npmrc
+/minifier/target

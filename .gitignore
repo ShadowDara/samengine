@@ -24,3 +24,5 @@ index.html
 pages/links.md
 
 /minifier/target
+
+*.vsix

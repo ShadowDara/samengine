@@ -1,0 +1,39 @@
+{
+    "name": "samfile",
+    "displayName": "Samfile",
+    "description": "Syntax Highlighting for Samfiles",
+    "version": "0.0.2",
+    "publisher": "your-name",
+
+    "engines": {
+        "vscode": "^1.90.0"
+    },
+
+    "categories": [
+        "Programming Languages"
+    ],
+
+    "contributes": {
+        "languages": [
+            {
+                "id": "samfile",
+                "aliases": [
+                    "Samfile"
+                ],
+                "extensions": [],
+                "filenames": [
+                    "Samfile"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+
+        "grammars": [
+            {
+                "language": "samfile",
+                "scopeName": "source.samfile",
+                "path": "./syntaxes/samfile.tmLanguage.json"
+            }
+        ]
+    }
+}

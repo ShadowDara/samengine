@@ -1,0 +1,69 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "Samfile",
+    "scopeName": "source.samfile",
+    "patterns": [
+        {
+            "include": "#comments"
+        },
+        {
+            "include": "#targets"
+        },
+        {
+            "include": "#commands"
+        },
+        {
+            "include": "#strings"
+        },
+        {
+            "include": "#urls"
+        }
+    ],
+    "repository": {
+        "comments": {
+            "patterns": [
+                {
+                    "name": "comment.line.number-sign.samfile",
+                    "match": "#.*$"
+                }
+            ]
+        },
+        "targets": {
+            "patterns": [
+                {
+                    "name": "entity.name.function.samfile",
+                    "match": "^[A-Za-z0-9_-]+(?=:)"
+                }
+            ]
+        },
+        "commands": {
+            "patterns": [
+                {
+                    "name": "keyword.control.samfile",
+                    "match": "\\b(RUN|SHELL|SHELLWIN|RM|MV|CP|ECHO|echo|PROMPT|CD|MKDIR|RMDIR)\\b"
+                }
+            ]
+        },
+        "strings": {
+            "patterns": [
+                {
+                    "name": "string.quoted.double.samfile",
+                    "begin": "\"",
+                    "end": "\""
+                },
+                {
+                    "name": "string.unquoted.filename.samfile",
+                    "match": "\\b[\\w./-]+\\.(html|cpp|c|hpp|h|js|ts|json|wasm|data|png|jpg|txt|bat|exe)\\b"
+                }
+            ]
+        },
+        "urls": {
+            "patterns": [
+                {
+                    "name": "markup.underline.link.samfile",
+                    "match": "https?://[^\\s]+"
+                }
+            ]
+        }
+    }
+}

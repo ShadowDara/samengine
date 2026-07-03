@@ -60,8 +60,8 @@ const packages = [
   },
   {
     "name": "samfile syntax vscode",
-    "description": "a VSCode extension for Syntax Highliting (soon)",
-    "link": ""
+    "description": "a VSCode extension for Syntax Highlighting",
+    "link": "https://marketplace.visualstudio.com/items?itemName=shadowdara.samfile"
   }
 ];
 

@@ -17,9 +17,29 @@
         },
         {
             "include": "#urls"
+        },
+        {
+            "include": "#macros"
         }
     ],
     "repository": {
+        "macros": {
+            "patterns": [
+                {
+                    "name": "meta.preprocessor.define.samfile",
+                    "match": "^\\s*#define\\s+[A-Za-z_][A-Za-z0-9_]*\\s+.*$"
+                },
+                {
+                    "name": "entity.name.constant.macro.definition.samfile",
+                    "match": "^\\s*#define\\s+([A-Za-z_][A-Za-z0-9_]*)",
+                    "captures": {
+                        "1": {
+                            "name": "entity.name.constant.macro.samfile"
+                        }
+                    }
+                }
+            ]
+        },
         "comments": {
             "patterns": [
                 {
@@ -32,7 +52,7 @@
                 },
                 {
                     "name": "comment.line.number-sign.samfile",
-                    "match": "#.*$"
+                    "match": "^\\s*#(?!define).*$"
                 }
             ]
         },

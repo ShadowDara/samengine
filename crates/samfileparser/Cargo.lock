@@ -413,7 +413,7 @@ dependencies = [
 
 [[package]]
 name = "samfileparser"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "criterion",
  "fluaterm",

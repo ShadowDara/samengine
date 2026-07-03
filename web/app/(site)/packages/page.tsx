@@ -38,6 +38,31 @@ const packages = [
     description: "the project creator for samengine",
     link: "https://npmjs.com/package/create-samengine-project",
   },
+  {
+    name: "samfileparser",
+    description: "a better Makefile Clone in Rust",
+    link: "https://crates.io/crates/samfileparser",
+  },
+  {
+    "name": "fluaterm",
+    "description": "a terminal module for flua which supports ANSI colors (now samengine, because flua is dead) in Rust",
+    "link": "https://crates.io/crates/fluaterm"
+  },
+  {
+    "name": "samtool",
+    "description": "the fast cli tool for samengine in Rust (same as seg but on the cargo registry)",
+    "link": "https://crates.io/crates/samtool"
+  },
+  {
+    "name": "easy-git-ignore",
+    "description": "a tool to add stuff to the git ignore the cool way",
+    "link": "https://crates.io/crates/easy-git-ignore"
+  },
+  {
+    "name": "samfile syntax vscode",
+    "description": "a VSCode extension for Syntax Highliting (soon)",
+    "link": ""
+  }
 ];
 
 export default function Packages() {

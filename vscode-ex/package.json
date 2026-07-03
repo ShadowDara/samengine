@@ -2,7 +2,7 @@
     "name": "samfile",
     "displayName": "Samfile",
     "description": "Syntax Highlighting for Samfiles",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "publisher": "your-name",
 
     "engines": {

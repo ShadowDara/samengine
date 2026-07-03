@@ -15,7 +15,7 @@ repository = "https://github.com/shadowdara/samengine"
 [dependencies]
 fluaterm = "0.2.2"
 fs_extra = "1"
-regex = "1.12.4"
+regex = "1"
 shlex = "1"
 
 [dev-dependencies]

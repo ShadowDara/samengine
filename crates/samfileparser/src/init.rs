@@ -1,5 +1,6 @@
 use std::{collections::HashMap, fs, path::Path};
 
+use fluaterm::GREEN;
 use fluaterm::{END, YELLOW};
 
 use crate::RuntimeState;
@@ -127,5 +128,27 @@ pub fn init() {
                 println!("{}WARN: samfile is NOT ignored{}", YELLOW, END);
             }
         }
+    }
+}
+
+// View Tasks
+pub fn tasks(conf: RunConfig) {
+    let content = match std::fs::read_to_string(".samengine/samfile") {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("Error while reading samfile: {}", e);
+            return;
+        }
+    };
+
+    let tasks = parse(&content, &conf);
+
+    // Check for cycled dependencies
+    validate_all(&tasks);
+
+    // Proint every task
+    println!("{}Tasks:{}", YELLOW, END);
+    for task in tasks {
+        println!(" - {}{}{}", GREEN, task.0, END);
     }
 }

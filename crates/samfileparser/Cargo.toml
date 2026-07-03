@@ -2,7 +2,7 @@
 
 [package]
 name = "samfileparser"
-version = "0.1.10"
+version = "0.1.11"
 edition = "2024"
 authors = ["Shadowdara"]
 readme = "README.md"
@@ -15,6 +15,7 @@ repository = "https://github.com/shadowdara/samengine"
 [dependencies]
 fluaterm = "0.2.2"
 fs_extra = "1"
+regex = "1.12.4"
 shlex = "1"
 
 [dev-dependencies]

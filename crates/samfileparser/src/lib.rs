@@ -1372,7 +1372,7 @@ pub fn parse(content: &str, conf: &RunConfig) -> Tasks {
             current = Some(name);
         }
         // command
-        else if line.starts_with(' ') {
+        else if line.chars().next().map_or(false, |c| c.is_whitespace()) {
             if let Some(task_name) = &current {
                 match parse_line(line, conf, idx) {
                     Some(cmd) => {

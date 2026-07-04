@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AppConfig",
+  "type": "object",
+  "required": ["projectname", "pretty", "links", "links2"],
+  "properties": {
+    "projectname": {
+      "type": "string"
+    },
+    "pretty": {
+      "type": "boolean"
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["link", "description", "showinlist", "changenotice"],
+        "properties": {
+          "name": { "type": ["string", "null"] },
+          "link": { "type": "string" },
+          "description": { "type": "string" },
+          "license": { "type": ["string", "null"] },
+          "author": { "type": ["string", "null"] },
+          "licenselink": { "type": ["string", "null"] },
+          "showinlist": { "type": "boolean" },
+          "changenotice": { "type": "boolean" }
+        }
+      }
+    },
+    "links2": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "links3": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "note": {
+      "type": ["string", "null"]
+    }
+  }
+}

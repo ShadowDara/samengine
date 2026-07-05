@@ -26,3 +26,6 @@ pages/links.md
 /minifier/target
 
 *.vsix
+/extensions/samfile-vs/.vs
+/extensions/samfile-vs/bin
+/extensions/samfile-vs/obj

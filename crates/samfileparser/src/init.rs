@@ -1,11 +1,13 @@
 use std::{collections::HashMap, fs, path::Path};
 
+use fluaterm::GREEN;
 use fluaterm::{END, YELLOW};
 
 use crate::RuntimeState;
 use crate::parse;
 use crate::run_task;
 use crate::validate_all;
+
 
 /// Defines how execution errors are handled during task execution.
 ///
@@ -81,6 +83,13 @@ pub fn run_sam_file(command: &str, conf: RunConfig) {
         }
     };
 
+    // 👇 combine built-in + file
+    let content = format!(
+        "{}\n\n{}",
+        crate::buildin::BUILTIN_SAMFILE,
+        content
+    );
+
     let tasks = parse(&content, &conf);
 
     // Check for cycled dependencies
@@ -127,5 +136,27 @@ pub fn init() {
                 println!("{}WARN: samfile is NOT ignored{}", YELLOW, END);
             }
         }
+    }
+}
+
+// View Tasks
+pub fn tasks(conf: RunConfig) {
+    let content = match std::fs::read_to_string(".samengine/samfile") {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("Error while reading samfile: {}", e);
+            return;
+        }
+    };
+
+    let tasks = parse(&content, &conf);
+
+    // Check for cycled dependencies
+    validate_all(&tasks);
+
+    // Proint every task
+    println!("{}Tasks:{}", YELLOW, END);
+    for task in tasks {
+        println!(" - {}{}{}", GREEN, task.0, END);
     }
 }

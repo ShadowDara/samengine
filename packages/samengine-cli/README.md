@@ -19,3 +19,7 @@ for CLI Tools
 
 And Probably more Tools for samengine will not be written in JS, but
 they will be mentioned in the README File of the samengine Framework!
+
+## Minsite:
+
+Infos here: [https://shadowdara.wordpress.com/2026/06/30/minisite-a-site-in-only-one-html-file/](https://shadowdara.wordpress.com/2026/06/30/minisite-a-site-in-only-one-html-file/)

@@ -2,20 +2,24 @@
 
 [package]
 name = "samfileparser"
-version = "0.1.9"
+version = "0.2.0"
 edition = "2024"
 authors = ["Shadowdara"]
 readme = "README.md"
 description = "a little Makefile inspired Command file"
 license = "Apache-2.0"
-include = ["LICENSE", "README.md", "Cargo.toml", "/src/"]
+include = ["LICENSE", "README.md", "Cargo.toml", "/src/", "buildin.samfile", "build.rs"]
 keywords = ["cmd", "cmdfile", "samfile"]
 repository = "https://github.com/shadowdara/samengine"
+build = "build.rs"
 
 [dependencies]
 fluaterm = "0.2.2"
 fs_extra = "1"
+regex = "1"
 shlex = "1"
+zip = "2"
+walkdir = "2"
 
 [dev-dependencies]
 criterion = "0.5"
@@ -23,3 +27,6 @@ criterion = "0.5"
 [[bench]]
 name = "parser_bench"
 harness = false
+
+[profile.dev]
+debug = 1

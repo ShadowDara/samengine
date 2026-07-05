@@ -72,14 +72,18 @@ pub mod fstree;
 pub mod init;
 
 mod helper;
+mod preprocessor;
+mod buildin;
 
 use fluaterm::{END, GREEN, RED, YELLOW};
 use fs_extra::{dir, file};
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 
-use crate::helper::split_args;
+use crate::helper::zip::zip_current_dir;
+use crate::helper::{append_file, copy_path, error, handle_failure, make_dir, move_path, prompt, remove_path, run_shell, sleep_for, split_args, touch, unset_env, warn, write_file};
 use crate::init::{ErrorMode, RunConfig};
+use crate::preprocessor::preprocess;
 
 /// A single executable instruction inside a [`Task`].
 ///
@@ -434,6 +438,10 @@ pub enum Command {
     ///
     /// This command is ignored on other operating systems.
     PromptLin(),
+
+    /// Creates a ZIP from the current CWD directory
+    ZIP(String),
+
     //
     //
     //
@@ -500,196 +508,6 @@ pub struct RuntimeState {
     /// commands also set variables on the process environment.
     pub env: HashMap<String, String>,
 }
-
-//
-//
-//
-//
-// HELPER FUNCTIONS
-//
-//
-
-fn warn(s: &str) {
-    println!("{}{}{}", YELLOW, s, END)
-}
-
-fn error(s: &str) {
-    println!("{}{}{}", RED, s, END)
-}
-
-fn prompt() {
-    use std::io::{self, Write};
-
-    print!("> ");
-    io::stdout().flush().unwrap();
-
-    let mut input = String::new();
-    io::stdin().read_line(&mut input).unwrap();
-}
-
-fn unset_env(key: &str, state: &mut RuntimeState) {
-    state.env.remove(key);
-    unsafe {
-        std::env::remove_var(key);
-    }
-}
-
-fn append_file(path: &str, content: &str, state: &RuntimeState) {
-    let path = state.cwd.join(path);
-
-    use std::fs::OpenOptions;
-
-    let mut file = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(&path)
-        .expect("append failed");
-
-    use std::io::Write;
-    writeln!(file, "{}", content).unwrap();
-}
-
-fn write_file(path: &str, content: &str, state: &RuntimeState) {
-    let path = state.cwd.join(path);
-
-    std::fs::write(&path, content).unwrap_or_else(|e| panic!("write failed: {}", e));
-}
-
-fn touch(path: &str, state: &RuntimeState) {
-    let path = if PathBuf::from(path).is_absolute() {
-        PathBuf::from(path)
-    } else {
-        state.cwd.join(path)
-    };
-
-    use std::fs::OpenOptions;
-
-    OpenOptions::new()
-        .create(true)
-        .write(true)
-        .open(&path)
-        .expect("touch failed");
-}
-
-fn make_dir(path: &str, state: &RuntimeState) {
-    let path = if PathBuf::from(path).is_absolute() {
-        PathBuf::from(path)
-    } else {
-        state.cwd.join(path)
-    };
-
-    std::fs::create_dir_all(&path).unwrap_or_else(|e| panic!("mkdir '{}': {}", path.display(), e));
-}
-
-fn copy_path(src: &str, dst: &str, state: &RuntimeState) {
-    let src = state.cwd.join(src);
-    let dst = state.cwd.join(dst);
-
-    if src.is_dir() {
-        let mut options = dir::CopyOptions::new();
-        options.copy_inside = true;
-        options.overwrite = true;
-
-        dir::copy(src, dst, &options).unwrap();
-    } else {
-        let mut options = file::CopyOptions::new();
-        options.overwrite = true;
-
-        file::copy(src, dst, &options).unwrap();
-    }
-}
-
-fn move_path(src: &str, dst: &str, state: &RuntimeState) {
-    let src = if PathBuf::from(src).is_absolute() {
-        PathBuf::from(src)
-    } else {
-        state.cwd.join(src)
-    };
-
-    let dst = if PathBuf::from(dst).is_absolute() {
-        PathBuf::from(dst)
-    } else {
-        state.cwd.join(dst)
-    };
-
-    std::fs::rename(src, dst).expect("move failed");
-}
-
-fn remove_path(path: &str, state: &RuntimeState) {
-    let target = if PathBuf::from(path).is_absolute() {
-        PathBuf::from(path)
-    } else {
-        state.cwd.join(path)
-    };
-
-    if !target.exists() {
-        return;
-    }
-
-    if target.is_dir() {
-        std::fs::remove_dir_all(&target)
-            .unwrap_or_else(|e| panic!("failed to remove directory '{}': {}", target.display(), e));
-    } else {
-        std::fs::remove_file(&target)
-            .unwrap_or_else(|e| panic!("failed to remove file '{}': {}", target.display(), e));
-    }
-}
-
-fn sleep_for(time: &str) {
-    let duration = if let Some(ms) = time.strip_suffix("ms") {
-        std::time::Duration::from_millis(ms.parse().expect("invalid duration"))
-    } else if let Some(sec) = time.strip_suffix('s') {
-        std::time::Duration::from_secs(sec.parse().expect("invalid duration"))
-    } else if let Some(min) = time.strip_suffix('m') {
-        std::time::Duration::from_secs(min.parse::<u64>().expect("invalid duration") * 60)
-    } else {
-        std::time::Duration::from_secs(time.parse().expect("invalid duration"))
-    };
-
-    std::thread::sleep(duration);
-}
-
-fn run_shell(command: &str, state: &RuntimeState, conf: &RunConfig, cmd: &CommandWithMeta) {
-    let status = if cfg!(target_os = "windows") {
-        std::process::Command::new("cmd")
-            .args(["/C", command])
-            .current_dir(&state.cwd)
-            .envs(&state.env)
-            .status()
-            .expect("failed to start shell")
-    } else {
-        std::process::Command::new("sh")
-            .args(["-c", command])
-            .current_dir(&state.cwd)
-            .envs(&state.env)
-            .status()
-            .expect("failed to start shell")
-    };
-
-    if !status.success() {
-        handle_failure("shell command failed", conf, cmd);
-    }
-}
-
-fn handle_failure(msg: &str, conf: &RunConfig, cmd: &CommandWithMeta) {
-    match conf.errorMode {
-        ErrorMode::FailFast => {
-            panic!("Error in line {}\n\"{}\"\n{}", cmd.line, cmd.linstr, msg);
-        }
-        ErrorMode::Continue => {
-            eprintln!("error (ignored): {}", msg);
-        }
-        ErrorMode::Silent => {
-            // komplett still
-        }
-    }
-}
-
-//
-//
-// Helper functions ^^^^
-//
-//
 
 fn detect_cycles(
     tasks: &Tasks,
@@ -1359,7 +1177,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
                 );
             }
 
-            let rest = args[1..].join(" ");
+            let rest = args[2..].join(" ");
 
             return Some(Command::WriteLin(args[1].clone(), rest.to_string()));
         }
@@ -1374,7 +1192,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
                 );
             }
 
-            let rest = args[1..].join(" ");
+            let rest = args[2..].join(" ");
 
             return Some(Command::Append(args[1].clone(), rest.to_string()));
         }
@@ -1388,7 +1206,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
                 );
             }
 
-            let rest = args[1..].join(" ");
+            let rest = args[2..].join(" ");
 
             return Some(Command::AppendWin(args[1].clone(), rest.to_string()));
         }
@@ -1402,7 +1220,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
                 );
             }
 
-            let rest = args[1..].join(" ");
+            let rest = args[2..].join(" ");
 
             return Some(Command::AppendMac(args[1].clone(), rest.to_string()));
         }
@@ -1416,7 +1234,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
                 );
             }
 
-            let rest = args[1..].join(" ");
+            let rest = args[2..].join(" ");
 
             return Some(Command::AppendLin(args[1].clone(), rest.to_string()));
         }
@@ -1460,7 +1278,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
         "unsetenvlin" => {
             if args.len() < 2 {
                 handle_failure(
-                    "Invalid unsetenvh command: unsetenv <envvar>",
+                    "Invalid unsetenv command: unsetenv <envvar>",
                     conf,
                     metadata,
                 );
@@ -1483,6 +1301,18 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
         "promptlin" => {
             return Some(Command::PromptLin());
+        }
+
+        "zip" => {
+            if args.len() < 2 {
+                handle_failure(
+                    "Invalid zup command: zip <zipname>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            return Some(Command::ZIP(args[1].clone()));
         }
 
         _ => return None,
@@ -1519,6 +1349,9 @@ fn parse_task_header(line: &str) -> (String, Vec<String>) {
 ///
 /// The returned map is keyed by task name.
 pub fn parse(content: &str, conf: &RunConfig) -> Tasks {
+    // add preprocessor
+    let content = preprocess(content);
+
     let mut tasks = HashMap::new();
     let mut current: Option<String> = None;
 
@@ -1557,7 +1390,7 @@ pub fn parse(content: &str, conf: &RunConfig) -> Tasks {
             current = Some(name);
         }
         // command
-        else if line.starts_with(' ') {
+        else if line.chars().next().map_or(false, |c| c.is_whitespace()) {
             if let Some(task_name) = &current {
                 match parse_line(line, conf, idx) {
                     Some(cmd) => {
@@ -2129,6 +1962,11 @@ pub fn run_task(
                 if cfg!(target_os = "linux") {
                     prompt()
                 }
+            }
+
+            // ZIP
+            Command::ZIP(k) => {
+                let _ = zip_current_dir(k);
             }
 
             // ERROR TYPE

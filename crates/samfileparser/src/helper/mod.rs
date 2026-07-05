@@ -1,3 +1,5 @@
+pub mod zip;
+
 use std::path::PathBuf;
 
 use fluaterm::{RED, YELLOW, END};

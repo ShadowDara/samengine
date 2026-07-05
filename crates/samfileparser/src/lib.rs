@@ -79,6 +79,7 @@ use fs_extra::{dir, file};
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 
+use crate::helper::zip::zip_current_dir;
 use crate::helper::{append_file, copy_path, error, handle_failure, make_dir, move_path, prompt, remove_path, run_shell, sleep_for, split_args, touch, unset_env, warn, write_file};
 use crate::init::{ErrorMode, RunConfig};
 use crate::preprocessor::preprocess;
@@ -436,6 +437,10 @@ pub enum Command {
     ///
     /// This command is ignored on other operating systems.
     PromptLin(),
+
+    /// Creates a ZIP from the current CWD directory
+    ZIP(String),
+
     //
     //
     //
@@ -1272,7 +1277,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
         "unsetenvlin" => {
             if args.len() < 2 {
                 handle_failure(
-                    "Invalid unsetenvh command: unsetenv <envvar>",
+                    "Invalid unsetenv command: unsetenv <envvar>",
                     conf,
                     metadata,
                 );
@@ -1295,6 +1300,18 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
         "promptlin" => {
             return Some(Command::PromptLin());
+        }
+
+        "zip" => {
+            if args.len() < 2 {
+                handle_failure(
+                    "Invalid zup command: zip <zipname>",
+                    conf,
+                    metadata,
+                );
+            }
+
+            return Some(Command::ZIP(args[1].clone()));
         }
 
         _ => return None,
@@ -1944,6 +1961,11 @@ pub fn run_task(
                 if cfg!(target_os = "linux") {
                     prompt()
                 }
+            }
+
+            // ZIP
+            Command::ZIP(k) => {
+                let _ = zip_current_dir(k);
             }
 
             // ERROR TYPE

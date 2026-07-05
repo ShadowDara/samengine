@@ -24,3 +24,22 @@
 _build_in_copy_links_md:
     MV .samengine/links.md pages/links.md
 
+
+# This is a task to compile minisite for a single HTML File with the linksaver file
+# for projects or games with npm
+# More Infos can be found here: (scroll to the bottom of the article)
+# https://shadowdara.wordpress.com/2026/06/30/minisite-a-site-in-only-one-html-file/
+_build_in_minisite_build_bun:
+    SHELL bun x seg -l view
+    TASK _build_in_copy_links_md
+    SHELL bun x sam-cli minisite
+
+
+# This is a task to compile minisite for a single HTML File with the linksaver file
+# for projects or games with bun
+# More Infos can be found here: (scroll to the bottom of the article)
+# https://shadowdara.wordpress.com/2026/06/30/minisite-a-site-in-only-one-html-file/
+_build_in_minisite_build_npm:
+    SHELL npx seg -l view
+    TASK _build_in_copy_links_md
+    SHELL npx sam-cli minisite

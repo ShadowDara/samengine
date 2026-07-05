@@ -1,5 +1,5 @@
 # Cli Tools should although be in TS
 *.ts linguist-language=Typescript
 
-samfile linguist-language=shell
-*.samfile linguist-language=shell
+samfile linguist-language=Shell
+*.samfile linguist-language=Shell

@@ -1,10 +1,11 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{Criterion, black_box, criterion_group, criterion_main};
 use samfileparser::{
     init::{ErrorMode, RunConfig},
     parse,
 };
 
 include!(concat!(env!("OUT_DIR"), "/builtin_filtered.rs"));
+pub const BUILTIN_SAMFILE_C: &str = include_str!("../buildin.samfile");
 
 fn make_conf() -> RunConfig {
     RunConfig {
@@ -60,7 +61,17 @@ fn bench_parse_builtin(c: &mut Criterion) {
     });
 }
 
+fn bench_parse_builtin_wint_c(c: &mut Criterion) {
+    let conf = make_conf();
+    c.bench_function("parse_builtin_with_comments", |b| {
+        b.iter(|| {
+            let tasks = parse(black_box(BUILTIN_SAMFILE_C), &conf);
+            black_box(tasks);
+        });
+    });
+}
+
 // ------------------- GROUP -------------------
 
-criterion_group!(benches, bench_parse_big, bench_parse_builtin);
+criterion_group!(benches, bench_parse_big, bench_parse_builtin, bench_parse_builtin_wint_c);
 criterion_main!(benches);

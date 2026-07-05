@@ -4,14 +4,14 @@ fn main() {
     let input_path = "buildin.samfile";
 
     let input = fs::read_to_string(input_path)
-        .expect("failed to read builtin.samfile");
+        .expect("failed to read buildin.samfile");
 
     // remove comments starting with #
     let filtered: String = input
         .lines()
         .filter(|line| {
             let trimmed = line.trim_start();
-            !trimmed.starts_with('#')
+            !trimmed.starts_with('#') && !trimmed.trim().is_empty()
         })
         .collect::<Vec<_>>()
         .join("\n");

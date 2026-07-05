@@ -1,11 +1,21 @@
 # Buildin Samfile for the samfileparser Lib
+#
 # Every Task here starts with _build_in_
 # This tasks are automaticly in the libary, feel free to use them
 # You can copy them if you want, the are under Appache 2.0 license by Shadowdara
+#
+# More Infos about samfiles
+# https://shadowdara.wordpress.com/2026/07/02/samfile/
+
 
 # INFO
 # dont name your tasks starting: _build_in_
 # This could lead to errors!
+
+# Compiling
+# all the comments get removed from the build.rs file!
+# so no worries that they will slow down the parser
+# target\debug\build\samfileparser-947b3b80d6e6026e\out\builtin_filtered.rs
 
 # a task for minisite to copy the links.md file to the pages directory
 # to bundle them into a minisite HTML File

@@ -53,6 +53,11 @@
                 {
                     "name": "comment.line.number-sign.samfile",
                     "match": "^\\s*#(?!define).*$"
+                },
+                {
+                    "name": "comment.block.samfile",
+                    "begin": "/\\*",
+                    "end": "\\*/"
                 }
             ]
         },

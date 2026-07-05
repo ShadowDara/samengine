@@ -73,6 +73,7 @@ pub mod init;
 
 mod helper;
 mod preprocessor;
+pub mod buildin;
 
 use fluaterm::{END, GREEN, RED, YELLOW};
 use fs_extra::{dir, file};

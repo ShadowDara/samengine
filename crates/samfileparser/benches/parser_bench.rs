@@ -5,7 +5,6 @@ use samfileparser::{
 };
 
 include!(concat!(env!("OUT_DIR"), "/builtin_filtered.rs"));
-pub const BUILTIN_SAMFILE_C: &str = include_str!("../buildin.samfile");
 
 fn make_conf() -> RunConfig {
     RunConfig {
@@ -65,7 +64,7 @@ fn bench_parse_builtin_wint_c(c: &mut Criterion) {
     let conf = make_conf();
     c.bench_function("parse_builtin_with_comments", |b| {
         b.iter(|| {
-            let tasks = parse(black_box(BUILTIN_SAMFILE_C), &conf);
+            let tasks = parse(black_box(BUILTIN_SAMFILE), &conf);
             black_box(tasks);
         });
     });

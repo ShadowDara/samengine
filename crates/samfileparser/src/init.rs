@@ -9,10 +9,6 @@ use crate::run_task;
 use crate::validate_all;
 
 
-// Build in samfile for buildin tasks
-include!(concat!(env!("OUT_DIR"), "/builtin_filtered.rs"));
-
-
 /// Defines how execution errors are handled during task execution.
 ///
 /// This controls whether the runner stops immediately, continues execution,
@@ -90,7 +86,7 @@ pub fn run_sam_file(command: &str, conf: RunConfig) {
     // 👇 combine built-in + file
     let content = format!(
         "{}\n\n{}",
-        crate::init::BUILTIN_SAMFILE,
+        crate::buildin::BUILTIN_SAMFILE,
         content
     );
 

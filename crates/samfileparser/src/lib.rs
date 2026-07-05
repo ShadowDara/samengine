@@ -1176,7 +1176,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
                 );
             }
 
-            let rest = args[1..].join(" ");
+            let rest = args[2..].join(" ");
 
             return Some(Command::WriteLin(args[1].clone(), rest.to_string()));
         }
@@ -1191,7 +1191,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
                 );
             }
 
-            let rest = args[1..].join(" ");
+            let rest = args[2..].join(" ");
 
             return Some(Command::Append(args[1].clone(), rest.to_string()));
         }
@@ -1205,7 +1205,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
                 );
             }
 
-            let rest = args[1..].join(" ");
+            let rest = args[2..].join(" ");
 
             return Some(Command::AppendWin(args[1].clone(), rest.to_string()));
         }
@@ -1219,7 +1219,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
                 );
             }
 
-            let rest = args[1..].join(" ");
+            let rest = args[2..].join(" ");
 
             return Some(Command::AppendMac(args[1].clone(), rest.to_string()));
         }
@@ -1233,7 +1233,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
                 );
             }
 
-            let rest = args[1..].join(" ");
+            let rest = args[2..].join(" ");
 
             return Some(Command::AppendLin(args[1].clone(), rest.to_string()));
         }

@@ -84,13 +84,13 @@ pub fn run_sam_file(command: &str, conf: RunConfig) {
     };
 
     // 👇 combine built-in + file
-    let content = format!(
+    let content2 = format!(
         "{}\n\n{}",
         crate::buildin::BUILTIN_SAMFILE,
         content
     );
 
-    let tasks = parse(&content, &conf);
+    let tasks = parse(&content2, &conf);
 
     // Check for cycled dependencies
     validate_all(&tasks);

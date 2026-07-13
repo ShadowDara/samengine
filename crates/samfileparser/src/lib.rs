@@ -80,7 +80,7 @@ use fs_extra::{dir, file};
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 
-use crate::helper::{append_file, copy_path, error, handle_failure, make_dir, move_path, prompt, remove_path, run_shell, sleep_for, split_args, touch, unset_env, warn, write_file};
+use crate::helper::{append_file, copy_path, error, handle_failure, make_dir, move_path, prompt, remove_path, run_shell, sleep_for, split_args, touch, unescape, unset_env, warn, write_file};
 use crate::init::{ErrorMode, RunConfig, run_sam_file, view_samfile_tasks};
 use crate::preprocessor::preprocess;
 
@@ -520,13 +520,15 @@ fn detect_cycles(
             let cycle_start = match stack.iter().position(|n| n == name) {
                 Some(i) => i,
                 None => {
-                    panic!("Internal error: cycle detection state corrupted");
+                    println!("Internal error: cycle detection state corrupted");
+                    panic!("...");
                 }
             };
 
             let cycle = &stack[cycle_start..];
 
-            panic!("Cycle detected: {:?}", cycle);
+            println!("Cycle detected: {:?}", cycle);
+            panic!("...");
         }
 
         VisitState::Visited => return,
@@ -543,7 +545,8 @@ fn detect_cycles(
     // Check Unknow dependencies
     for dep in &task.deps {
         if !tasks.contains_key(dep) {
-            panic!("Unknown dependency '{}' in task '{}'", dep, name);
+            println!("Unknown dependency '{}' in task '{}'", dep, name);
+            panic!("...");
         }
     }
 
@@ -634,7 +637,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
             return Some(Command::Run(args[1..].join(" ")));
         }
 
-        "runwin " => {
+        "runwin" => {
             if args.len() < 2 {
                 handle_failure("Invalid empty runwin command", conf, metadata);
             }
@@ -642,7 +645,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
             return Some(Command::RunWin(args[1..].join(" ")));
         }
 
-        "runmac " => {
+        "runmac" => {
             if args.len() < 2 {
                 handle_failure("Invalid empty runmac command", conf, metadata);
             }
@@ -650,7 +653,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
             return Some(Command::RunMac(args[1..].join(" ")));
         }
 
-        "runlin " => {
+        "runlin" => {
             if args.len() < 2 {
                 handle_failure("Invalid empty runlin command", conf, metadata);
             }
@@ -976,7 +979,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let cmd = args[1..].join(" ");
 
-            return Some(Command::Echo(cmd));
+            return Some(Command::Echo(unescape(&cmd)));
         }
 
         "echowin" => {
@@ -986,7 +989,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let cmd = args[1..].join(" ");
 
-            return Some(Command::EchoWin(cmd.to_string()));
+            return Some(Command::EchoWin(unescape(&cmd)));
         }
 
         "echomac" => {
@@ -996,7 +999,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let cmd = args[1..].join(" ");
 
-            return Some(Command::EchoMac(cmd.to_string()));
+            return Some(Command::EchoMac(unescape(&cmd)));
         }
 
         "echolin" => {
@@ -1006,7 +1009,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let cmd = args[1..].join(" ");
 
-            return Some(Command::EchoLin(cmd.to_string()));
+            return Some(Command::EchoLin(unescape(&cmd)));
         }
 
         // WARN
@@ -1017,7 +1020,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let cmd = args[1..].join(" ");
 
-            return Some(Command::Warn(cmd.to_string()));
+            return Some(Command::Warn(unescape(&cmd)));
         }
 
         "warnwin" => {
@@ -1027,7 +1030,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let cmd = args[1..].join(" ");
 
-            return Some(Command::WarnWin(cmd.to_string()));
+            return Some(Command::WarnWin(unescape(&cmd)));
         }
 
         "warnmac" => {
@@ -1037,7 +1040,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let cmd = args[1..].join(" ");
 
-            return Some(Command::WarnMac(cmd.to_string()));
+            return Some(Command::WarnMac(unescape(&cmd)));
         }
 
         "warnlin" => {
@@ -1047,7 +1050,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let cmd = args[1..].join(" ");
 
-            return Some(Command::WarnLin(cmd.to_string()));
+            return Some(Command::WarnLin(unescape(&cmd)));
         }
 
         // ERROR
@@ -1058,7 +1061,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let cmd = args[1..].join(" ");
 
-            return Some(Command::Error(cmd.to_string()));
+            return Some(Command::Error(unescape(&cmd)));
         }
 
         "errorwin" => {
@@ -1068,7 +1071,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let cmd = args[1..].join(" ");
 
-            return Some(Command::ErrorWin(cmd.to_string()));
+            return Some(Command::ErrorWin(unescape(&cmd)));
         }
 
         "errormac" => {
@@ -1078,7 +1081,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let cmd = args[1..].join(" ");
 
-            return Some(Command::ErrorMac(cmd.to_string()));
+            return Some(Command::ErrorMac(unescape(&cmd)));
         }
 
         "errorlin" => {
@@ -1088,7 +1091,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let cmd = args[1..].join(" ");
 
-            return Some(Command::ErrorLin(cmd.to_string()));
+            return Some(Command::ErrorLin(unescape(&cmd)));
         }
 
         // TOUCH
@@ -1325,7 +1328,8 @@ fn parse_task_header(line: &str) -> (String, Vec<String>) {
     let name = name.trim();
 
     if name.is_empty() {
-        panic!("Task name cannot be empty");
+        println!("Task name cannot be empty");
+        panic!("...");
     }
 
     let deps = deps_part
@@ -1375,7 +1379,8 @@ pub fn parse(content: &str, conf: &RunConfig) -> Tasks {
             let (name, deps) = parse_task_header(line);
 
             if tasks.contains_key(&name) {
-                panic!("Duplicate task '{}'", name);
+                println!("{}Duplicate task{}: '{}'", RED, END, name);
+                panic!("...");
             }
 
             tasks.insert(

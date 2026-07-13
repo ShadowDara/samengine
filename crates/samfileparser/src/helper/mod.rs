@@ -185,6 +185,14 @@ pub fn handle_failure(msg: &str, conf: &RunConfig, cmd: &CommandWithMeta) {
     }
 }
 
+pub fn unescape(s: &str) -> String {
+    s.replace("\\n", "\n")
+        .replace("\\t", "\t")
+        .replace("\\r", "\r")
+        .replace("\\\"", "\"")
+        .replace("\\\\", "\\")
+}
+
 #[cfg(test)]
 mod tests {
     use crate::helper::split_args;

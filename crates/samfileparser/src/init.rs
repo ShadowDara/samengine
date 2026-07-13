@@ -8,7 +8,6 @@ use crate::parse;
 use crate::run_task;
 use crate::validate_all;
 
-
 /// Defines how execution errors are handled during task execution.
 ///
 /// This controls whether the runner stops immediately, continues execution,
@@ -69,7 +68,7 @@ fn is_samfile_ignored(gitignore_content: &str) -> bool {
 }
 
 // View samfile tasks
-pub fn view_samfile_tasks() {
+pub fn view_samfile_tasks(buildintasks: &str) {
     let content = match std::fs::read_to_string(".samengine/samfile") {
         Ok(c) => c,
         Err(e) => {
@@ -78,34 +77,37 @@ pub fn view_samfile_tasks() {
         }
     };
 
-
-     let conf = RunConfig {
-         debug: false,
-         errorMode: ErrorMode::FailFast,
-     };
-
+    let conf = RunConfig {
+        debug: false,
+        errorMode: ErrorMode::FailFast,
+    };
 
     // 👇 combine built-in + file
     let content2 = format!(
-        "{}\n\n{}",
+        "{}\n\n{}\n\n{}",
         crate::buildin::BUILTIN_SAMFILE,
-        content
+        content,
+        buildintasks
     );
 
     let tasks = parse(&content2, &conf);
 
     let mut msg = format!("");
 
-    msg.push_str("Available tasks:\n");
-            for key in tasks.keys() {
-                msg.push_str(&format!("  - {}\n", key));
-            }
+    msg.push_str(&format!("{}Available tasks{}:\n", GREEN, END).to_string());
 
-            println!("\n{}", msg);
+    let mut keys: Vec<_> = tasks.keys().collect();
+    keys.sort();
+
+    for key in keys {
+        msg.push_str(&format!("  - {}\n", key));
+    }
+
+    println!("\n{}", msg);
 }
 
 // Run sth from the samfile
-pub fn run_sam_file(command: &str, conf: RunConfig) {
+pub fn run_sam_file(command: &str, conf: RunConfig, buildintasks: &str) {
     let mut state = RuntimeState {
         cwd: std::env::current_dir().unwrap(),
         env: HashMap::new(),
@@ -121,9 +123,10 @@ pub fn run_sam_file(command: &str, conf: RunConfig) {
 
     // 👇 combine built-in + file
     let content2 = format!(
-        "{}\n\n{}",
+        "{}\n\n{}\n\n{}",
         crate::buildin::BUILTIN_SAMFILE,
-        content
+        content,
+        buildintasks
     );
 
     let tasks = parse(&content2, &conf);

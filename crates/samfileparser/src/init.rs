@@ -68,6 +68,42 @@ fn is_samfile_ignored(gitignore_content: &str) -> bool {
         .any(|line| line.trim() == "samfile")
 }
 
+// View samfile tasks
+pub fn view_samfile_tasks() {
+    let content = match std::fs::read_to_string(".samengine/samfile") {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("Error while reading samfile: {}", e);
+            return;
+        }
+    };
+
+
+     let conf = RunConfig {
+         debug: false,
+         errorMode: ErrorMode::FailFast,
+     };
+
+
+    // 👇 combine built-in + file
+    let content2 = format!(
+        "{}\n\n{}",
+        crate::buildin::BUILTIN_SAMFILE,
+        content
+    );
+
+    let tasks = parse(&content2, &conf);
+
+    let mut msg = format!("");
+
+    msg.push_str("Available tasks:\n");
+            for key in tasks.keys() {
+                msg.push_str(&format!("  - {}\n", key));
+            }
+
+            println!("\n{}", msg);
+}
+
 // Run sth from the samfile
 pub fn run_sam_file(command: &str, conf: RunConfig) {
     let mut state = RuntimeState {

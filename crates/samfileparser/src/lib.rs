@@ -80,9 +80,8 @@ use fs_extra::{dir, file};
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 
-use crate::helper::zip::zip_current_dir;
 use crate::helper::{append_file, copy_path, error, handle_failure, make_dir, move_path, prompt, remove_path, run_shell, sleep_for, split_args, touch, unset_env, warn, write_file};
-use crate::init::{ErrorMode, RunConfig};
+use crate::init::{ErrorMode, RunConfig, run_sam_file, view_samfile_tasks};
 use crate::preprocessor::preprocess;
 
 /// A single executable instruction inside a [`Task`].
@@ -1966,7 +1965,7 @@ pub fn run_task(
 
             // ZIP
             Command::ZIP(k) => {
-                let _ = zip_current_dir(k);
+               todo!("This feature was removed! Please stop using it");
             }
 
             // ERROR TYPE
@@ -2122,3 +2121,32 @@ t:
         assert!(matches!(tasks["t"].commands[1].command, Command::Run(_)));
     }
 }
+
+
+// use std::ffi::{CStr, CString};
+// use std::os::raw::c_char;
+
+// #[unsafe(no_mangle)]
+// pub extern "C" fn run_samfile_task(name: *const i8) {
+//     if name.is_null() {
+//         return;
+//     }
+
+//     let name = unsafe { CStr::from_ptr(name) };
+
+//     let conf = RunConfig {
+//          debug: false,
+//          errorMode: ErrorMode::FailFast,
+//      };
+
+//     match name.to_str() {
+//         Ok(s) => run_sam_file(s, conf),
+//         Err(_) => println!("Ungültiger UTF-8-String"),
+//     }
+// }
+
+
+// #[unsafe(no_mangle)]
+// pub extern "C" fn view_samfile_tasks_c() {
+//     view_samfile_tasks();
+// }

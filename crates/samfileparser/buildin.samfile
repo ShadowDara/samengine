@@ -132,6 +132,6 @@ _build_in_cmake:
 # Build Process for CMake Release
 #
 # seg _build_in_cmake_r
-_build_in_cmake:
+_build_in_cmake_r:
     RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
     RUN cmake --build build

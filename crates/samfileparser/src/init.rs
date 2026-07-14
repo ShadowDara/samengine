@@ -49,14 +49,27 @@ pub struct RunConfig {
     pub errorMode: ErrorMode,
 }
 
-fn loadsamfile() -> String {
-    match std::fs::read_to_string(".samengine/samfile") {
-        Ok(c) => return c,
-        Err(e) => {
-            eprintln!("Error while reading samfile: {}", e);
-            return "".to_string();
+fn load_samfile() -> String {
+    let files = [
+        ".samengine/samfile",
+        "samfile",
+    ];
+
+    let mut content = String::new();
+
+    for file in files {
+        match std::fs::read_to_string(file) {
+            Ok(c) => {
+                content.push_str(&c);
+                content.push('\n');
+            }
+            Err(e) => {
+                eprintln!("Could not read {}: {}", file, e);
+            }
         }
-    };
+    }
+
+    content
 }
 
 // Helper functions
@@ -79,7 +92,7 @@ fn is_samfile_ignored(gitignore_content: &str) -> bool {
 
 // View samfile tasks
 pub fn view_samfile_tasks(buildintasks: &str) {
-    let content = loadsamfile();
+    let content = load_samfile();
 
     let conf = RunConfig {
         debug: false,
@@ -115,13 +128,7 @@ pub fn run_sam_file(command: &str, conf: RunConfig, buildintasks: &str) {
         env: HashMap::new(),
     };
 
-    let content = match std::fs::read_to_string(".samengine/samfile") {
-        Ok(c) => c,
-        Err(e) => {
-            eprintln!("Error while reading samfile: {}", e);
-            return;
-        }
-    };
+    let content = load_samfile();
 
     // 👇 combine built-in + file
     let content2 = format!(
@@ -187,13 +194,7 @@ pub fn tasks() {
         errorMode: ErrorMode::FailFast,
     };
 
-    let content = match std::fs::read_to_string(".samengine/samfile") {
-        Ok(c) => c,
-        Err(e) => {
-            eprintln!("Error while reading samfile: {}", e);
-            return;
-        }
-    };
+    let content = load_samfile();
 
     let tasks = parse(&content, &conf);
 
@@ -214,13 +215,7 @@ pub fn tasks_string() -> Vec<String> {
         errorMode: ErrorMode::FailFast,
     };
 
-    let content = match std::fs::read_to_string(".samengine/samfile") {
-        Ok(c) => c,
-        Err(e) => {
-            eprintln!("Error while reading samfile: {}", e);
-            return vec![];
-        }
-    };
+    let content = load_samfile();
 
     let tasks = parse(&content, &conf);
 

@@ -61,7 +61,8 @@ _build_in_copy_links_md:
 #
 # seg _build_in_minisite_build_bun
 _build_in_minisite_build_bun:
-    SHELL bun x seg -l view
+    ECHO Info This Task has changed because linksaver moved to l2. See more here: https://shadowdara.github.io/docs/#/linksaver
+    SHELL l2 view
     TASK _build_in_copy_links_md
     SHELL bun x sam-cli minisite
 
@@ -73,7 +74,8 @@ _build_in_minisite_build_bun:
 #
 # seg _build_in_minisite_build_npm
 _build_in_minisite_build_npm:
-    SHELL npx seg -l view
+    ECHO Info This Task has changed because linksaver moved to l2. See more here: https://shadowdara.github.io/docs/#/linksaver
+    SHELL l2 view
     TASK _build_in_copy_links_md
     SHELL npx sam-cli minisite
 

@@ -96,9 +96,7 @@ pub fn view_samfile_tasks(buildintasks: &str) {
 
     let tasks = parse(&content2, &conf);
 
-    let mut msg = format!("");
-
-    msg.push_str(&format!("{}Available tasks{}:\n", GREEN, END).to_string());
+    let mut msg = format!("{}Available tasks{}:\n", GREEN, END);
 
     let mut keys: Vec<_> = tasks.keys().collect();
     keys.sort();

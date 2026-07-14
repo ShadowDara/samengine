@@ -50,10 +50,7 @@ pub struct RunConfig {
 }
 
 fn load_samfile() -> String {
-    let files = [
-        ".samengine/samfile",
-        "samfile",
-    ];
+    let files = [".samengine/samfile", "samfile"];
 
     let mut content = String::new();
 
@@ -202,7 +199,9 @@ pub fn tasks() {
     validate_all(&tasks);
 
     // Proint every task
-    println!("{}Tasks:{}", YELLOW, END);
+    if tasks.len() > 0 {
+        println!("{}Tasks:{}", YELLOW, END);
+    }
     for task in tasks {
         println!(" - {}{}{}", GREEN, task.0, END);
     }

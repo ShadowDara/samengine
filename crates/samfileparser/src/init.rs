@@ -49,6 +49,16 @@ pub struct RunConfig {
     pub errorMode: ErrorMode,
 }
 
+fn loadsamfile() -> String {
+    match std::fs::read_to_string(".samengine/samfile") {
+        Ok(c) => return c,
+        Err(e) => {
+            eprintln!("Error while reading samfile: {}", e);
+            return "".to_string();
+        }
+    };
+}
+
 // Helper functions
 
 fn has_gitignore(dir: &str) -> bool {
@@ -69,13 +79,7 @@ fn is_samfile_ignored(gitignore_content: &str) -> bool {
 
 // View samfile tasks
 pub fn view_samfile_tasks(buildintasks: &str) {
-    let content = match std::fs::read_to_string(".samengine/samfile") {
-        Ok(c) => c,
-        Err(e) => {
-            eprintln!("Error while reading samfile: {}", e);
-            return;
-        }
-    };
+    let content = loadsamfile();
 
     let conf = RunConfig {
         debug: false,
@@ -178,8 +182,13 @@ pub fn init() {
     }
 }
 
-// View Tasks
-pub fn tasks(conf: RunConfig) {
+/// View Tasks every task from the local samfile
+pub fn tasks() {
+    let conf = RunConfig {
+        debug: true,
+        errorMode: ErrorMode::FailFast,
+    };
+
     let content = match std::fs::read_to_string(".samengine/samfile") {
         Ok(c) => c,
         Err(e) => {
@@ -198,4 +207,33 @@ pub fn tasks(conf: RunConfig) {
     for task in tasks {
         println!(" - {}{}{}", GREEN, task.0, END);
     }
+}
+
+/// Function which returns an array of string which contents every task
+pub fn tasks_string() -> Vec<String> {
+    let conf = RunConfig {
+        debug: true,
+        errorMode: ErrorMode::FailFast,
+    };
+
+    let content = match std::fs::read_to_string(".samengine/samfile") {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("Error while reading samfile: {}", e);
+            return vec![];
+        }
+    };
+
+    let tasks = parse(&content, &conf);
+
+    // Check for cycled dependencies
+    validate_all(&tasks);
+
+    let mut tasksstring: Vec<String> = vec![];
+
+    for task in tasks {
+        tasksstring.push(task.0);
+    }
+
+    return tasksstring;
 }

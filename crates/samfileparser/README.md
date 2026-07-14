@@ -7,6 +7,8 @@ indented commands.
 It is useful when you want a tiny task format for project scripts without
 pulling in a full build system.
 
+## [Samfile Docs](https://shadowdara.github.io/docs/#/samfile)
+
 ## Samfile format
 
 A Samfile is made of task headers and indented command lines.

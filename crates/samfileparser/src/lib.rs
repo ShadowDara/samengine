@@ -1139,7 +1139,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let rest = args[2..].join(" ");
 
-            return Some(Command::Write(args[1].clone(), rest));
+            return Some(Command::Write(args[1].clone(), unescape(&rest)));
         }
 
         "writewin" => {
@@ -1153,7 +1153,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let rest = args[2..].join(" ");
 
-            return Some(Command::WriteWin(args[1].clone(), rest));
+            return Some(Command::WriteWin(args[1].clone(), unescape(&rest)));
         }
 
         "writemac" => {
@@ -1167,7 +1167,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let rest = args[2..].join(" ");
 
-            return Some(Command::WriteMac(args[1].clone(), rest));
+            return Some(Command::WriteMac(args[1].clone(), unescape(&rest)));
         }
 
         "writelin" => {
@@ -1181,7 +1181,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let rest = args[2..].join(" ");
 
-            return Some(Command::WriteLin(args[1].clone(), rest.to_string()));
+            return Some(Command::WriteLin(args[1].clone(), unescape(&rest)));
         }
 
         // APPEND
@@ -1196,7 +1196,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let rest = args[2..].join(" ");
 
-            return Some(Command::Append(args[1].clone(), rest.to_string()));
+            return Some(Command::Append(args[1].clone(), unescape(&rest)));
         }
 
         "appendwin" => {
@@ -1210,7 +1210,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let rest = args[2..].join(" ");
 
-            return Some(Command::AppendWin(args[1].clone(), rest.to_string()));
+            return Some(Command::AppendWin(args[1].clone(), unescape(&rest)));
         }
 
         "appendmac" => {
@@ -1224,7 +1224,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let rest = args[2..].join(" ");
 
-            return Some(Command::AppendMac(args[1].clone(), rest.to_string()));
+            return Some(Command::AppendMac(args[1].clone(), unescape(&rest)));
         }
 
         "appendlin" => {
@@ -1238,7 +1238,7 @@ fn parse_line(line: &str, conf: &RunConfig, idx: usize) -> Option<Command> {
 
             let rest = args[2..].join(" ");
 
-            return Some(Command::AppendLin(args[1].clone(), rest.to_string()));
+            return Some(Command::AppendLin(args[1].clone(), unescape(&rest)));
         }
 
         "unsetenv" => {

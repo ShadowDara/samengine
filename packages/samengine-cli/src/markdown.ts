@@ -710,6 +710,21 @@ img { max-width: 100%; height: auto; border-radius: 4px; }
 mark { background: #fef08a; padding: 0.1em 0.2em; border-radius: 2px; }
 input[type="checkbox"] { margin-right: 0.4em; }
 .footnotes { font-size: 0.875em; color: var(--md-blockquote); }
+@media (prefers-color-scheme: dark) {
+    :root {
+        --md-font: system-ui, sans-serif;
+        --md-mono: "Fira Code", "Cascadia Code", Consolas, monospace;
+        --md-max-width: 800px;
+        --md-line-height: 1.7;
+        --md-color: #ffffff;
+        --md-bg: #000000;
+        --md-code-bg: #292929;
+        --md-table-2: #1b1b1b;
+        --md-border: #d1d5db;
+        --md-accent: #45bbff;
+        --md-blockquote: #6b7280;
+    }
+}
 `;
 
 // ---------------------------------------------------------------------------

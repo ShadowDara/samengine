@@ -1,5 +1,0 @@
-# A new samfile, write your scripts here
-
-# Package the extension
-build:
-    SHELL vsce package

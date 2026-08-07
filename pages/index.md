@@ -1,3 +1,0 @@
-# samengine
-
-[Credits](#/links)

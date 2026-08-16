@@ -129,11 +129,90 @@ export function defineConfig(): buildconfig {
 ```
 
 
+## Svelte Adapter
+
+SamEngine can be used directly inside Svelte/SvelteKit projects via the
+`samengine/svelte` entry point, without depending on generated HTML or
+`window.__GAMESETTINGS__`.
+
+```svelte
+<script lang="ts">
+    import { onMount } from "svelte";
+    import { SamEngine, getGameSetting, setGameSetting } from "samengine/svelte";
+
+    let canvas: HTMLCanvasElement;
+    let cards = "8";
+
+    onMount(() => {
+        const engine = new SamEngine({
+            canvas,
+            settings: { cards },
+            update: (dt) => {
+                const cardCount = Number(getGameSetting("cards", "8"));
+                // ... draw the frame using engine.ctx ...
+            },
+        });
+
+        engine.start();
+
+        // Runs on unmount - stops the game loop and removes every
+        // keyboard/mouse/wheel/resize listener the engine installed.
+        return () => engine.destroy();
+    });
+
+    function changeCards(value: string) {
+        cards = value;
+        setGameSetting("cards", value);
+    }
+</script>
+
+<select value={cards} onchange={(e) => changeCards(e.currentTarget.value)}>
+    <option value="4">4</option>
+    <option value="8">8</option>
+    <option value="16">16</option>
+    <option value="32">32</option>
+</select>
+
+<canvas bind:this={canvas}></canvas>
+```
+
+Notes:
+
+- Always construct `SamEngine` inside `onMount()` (or after mount). It
+  throws if created during server-side rendering, so SvelteKit stays safe.
+- `svelte` is an optional peer dependency - projects that only use the HTML
+  build do not need to install it.
+- Settings read through `getGameSetting`/`getGameSettings` work the same way
+  in the HTML build and in Svelte; only Svelte needs `SamEngine`, the
+  Settings Runtime itself is framework-agnostic Core API.
+- `engine.destroy()` is idempotent and safe to call from cleanup functions
+  even if the component unmounts before `start()` was ever called.
+
+
 ## API Reference
 
 
 ### Core Engine
 - `startEngine(init, gameLoop)` - Initialize game loop
+- `stopEngine()` - Stop the currently running game loop
+- `isEngineRunning()` - Whether a game loop is currently running
+
+
+### Settings Runtime
+- `setGameSettings(settings)` / `getGameSettings()` - Replace/read all settings
+- `setGameSetting(id, value)` / `getGameSetting(id, fallback?)` - Read/write a single setting
+- `onGameSettingsChange(listener)` - Subscribe to settings changes
+- Replaces direct reads of `window.__GAMESETTINGS__` in game code; the HTML
+  adapter's `bridgeLegacyGameSettings()` keeps the legacy global in sync for
+  existing single-file builds
+
+
+### Svelte Adapter (`samengine/svelte`)
+- `new SamEngine({ canvas, update, setup?, settings?, ... })` - Binds an existing canvas and wires up input
+- `engine.start()` / `engine.stop()` / `engine.destroy()` - Lifecycle, matching `onMount`/cleanup
+- `engine.requestFullscreen()` - Toggle fullscreen for the bound canvas
+- `engine.input` - `getMouse`, `isKeyPressed`, `isKeyJustPressed`, `isKeyJustReleased`
+- Re-exports the Settings Runtime and `Key` enum for convenience
 
 
 ### Rendering

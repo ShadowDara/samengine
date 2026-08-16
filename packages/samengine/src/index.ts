@@ -1,5 +1,16 @@
 // Core Engine Exports
-export { startEngine } from "./core.js";
+export { startEngine, stopEngine, isEngineRunning } from "./core.js";
+
+// Settings Runtime
+export type { GameSettings, GameSettingsListener } from "./settings.js";
+export {
+    setGameSettings,
+    getGameSettings,
+    setGameSetting,
+    getGameSetting,
+    clearGameSettings,
+    onGameSettingsChange,
+} from "./settings.js";
 
 // Rendering
 export type { CharMap, ParallaxLayer } from "./renderer.js";
@@ -20,6 +31,7 @@ export {
 export type { Mouse } from "./input.js";
 export {
     setupInput,
+    teardownInput,
     isKeyPressed,
     isKeyJustPressed,
     isKeyJustReleased,
@@ -61,10 +73,14 @@ export {
 } from "./texture.js";
 
 // HTML Generation
+export type { CanvasConfig, AttachedCanvas, AttachCanvasConfig } from "./html.js";
 export {
     createCanvas,
+    attachCanvas,
+    toggleFullscreen,
     enableFullscreen,
-    setupFullscreenButton
+    setupFullscreenButton,
+    bridgeLegacyGameSettings
 } from "./html.js";
 
 // Keys Reference

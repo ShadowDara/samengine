@@ -28,7 +28,8 @@
     "./storage": "./dist/storage/index.js",
     "./text": "./dist/text/index.js",
     "./config": "./dist/config/index.js",
-    "./nonbrowser": "./dist/nonbrowser/index.js"
+    "./nonbrowser": "./dist/nonbrowser/index.js",
+    "./svelte": "./dist/svelte/index.js"
   },
   "keywords": [
     "game",
@@ -42,7 +43,16 @@
     "@types/node": "^25.9.4",
     "@types/ws": "^8.18.1",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "svelte": "^5.0.0"
+  },
+  "peerDependencies": {
+    "svelte": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "svelte": {
+      "optional": true
+    }
   },
   "repository": {
     "type": "git",

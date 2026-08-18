@@ -1,17 +1,13 @@
 {
-  "name": "samengine-cli",
-  "version": "2.1.0",
-  "description": "CLI Tools and other useful helper for samengine",
+  "name": "@shadowdara/dlib",
+  "version": "0.0.1",
+  "description": "Shadowdaras Lib with a multiple Parsers",
   "scripts": {
-    "build": "tsc",
-    "pack": "node ../../scripts/clean.js && npm run build && npm pack && git push --follow-tags"
+    "build": "tsc"
   },
   "exports": {
     ".": "./dist/index.js",
     "./csv": "./dist/csv/index.js"
-  },
-  "bin": {
-    "sam-cli": "dist/cli/index.js"
   },
   "author": "Shadowdara",
   "type": "module",
@@ -23,12 +19,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/shadowdara/samengine",
-    "directory": "packages/samengine-cli"
+    "directory": "packages/dlib"
   },
   "bugs": {
     "url": "https://github.com/shadowdara/samengine/issues"
-  },
-  "dependencies": {
-    "@shadowdara/dlib": "^0.0.1"
   }
 }

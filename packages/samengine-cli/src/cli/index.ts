@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { parseMarkdownToDocument } from "../index.js";
+import { parseMarkdownToDocument } from "@shadowdara/dlib";
 import fs from "fs/promises";
 import path from "path";
 

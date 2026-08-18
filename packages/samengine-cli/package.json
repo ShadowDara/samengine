@@ -1,6 +1,6 @@
 {
   "name": "samengine-cli",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "CLI Tools and other useful helper for samengine",
   "scripts": {
     "build": "tsc",

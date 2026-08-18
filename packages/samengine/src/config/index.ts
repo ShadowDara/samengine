@@ -26,3 +26,16 @@ export {
     newReleaseProfile,
     newMarkdownStyle
 } from "./buildconfig.js";
+
+/**
+ * Shared theme CSS generators used by both the HTML generator and the
+ * Svelte UI components (`samengine/svelte/ui/*`), so a custom host can reuse
+ * the exact same start screen / settings menu / fullscreen button styling.
+ */
+export {
+    getStandardCSS,
+    getStageCSS,
+    getFullscreenButtonCSS,
+    getSettingsButtonCSS,
+    getMDNotesCSS,
+} from "./htmlTheme.js";

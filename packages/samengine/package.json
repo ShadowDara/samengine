@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "npx samengine-build",
-    "build": "tsc",
+    "build": "tsc && node scripts/copy-svelte-assets.mjs",
     "pack": "node ../../scripts/clean.js && npm run build && npm pack && git push --follow-tags && npm run up",
     "test": "bun test"
   },
@@ -29,7 +29,9 @@
     "./text": "./dist/text/index.js",
     "./config": "./dist/config/index.js",
     "./nonbrowser": "./dist/nonbrowser/index.js",
-    "./svelte": "./dist/svelte/index.js"
+    "./svelte": "./dist/svelte/index.js",
+    "./svelte/ui": "./dist/svelte/ui/index.js",
+    "./svelte/ui/*": "./dist/svelte/ui/*"
   },
   "keywords": [
     "game",
@@ -47,7 +49,7 @@
     "svelte": "^5.0.0"
   },
   "peerDependencies": {
-    "svelte": ">=4.0.0"
+    "svelte": ">=5.0.0"
   },
   "peerDependenciesMeta": {
     "svelte": {

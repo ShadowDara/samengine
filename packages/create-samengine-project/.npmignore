@@ -1,7 +1,0 @@
-src/
-tsconfig.json
-*.tgz
-.npmrc
-
-*.d.ts
-bun.lock
